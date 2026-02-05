@@ -1,0 +1,49 @@
+assignment:
+Using the point estimates of Panel B, table I, simulate the model and report the
+simulated moments as they appear on Table I. Repeat this exercise for Table II. Produce a table
+similar to Table IV. Discuss your findings.
+
+
+README
+
+params -- defines params, including estimated & calibrated values, size of grid
+
+MODEL EQUATIONS
+profit -- paper assum1
+tax_dist -- paper (integral in closed form) eq3-4
+equity_cost -- paper assum4
+tax_corp -- paper eq1
+realized_networth -- paper eq6
+revised_networth -- as defined p.10
+recovery_R -- paper eq18
+
+SOLUTION FUNCTIONS
+tauchen -- AR discretization
+
+grids -- sets up kgrid, bgrid based on zgrid, according to p.18
+        should kgrid be [0, 0.5, 1:15] or [0:0.5:15]?
+build_wgrid -- linspace for wgrid
+
+default_wbar -- chooses default threshold on grid, described p.10
+feasible_ibmax -- implements feasibility described on p.11 (rules out borrowing w/ certain default)
+
+*bond_yield_rtilde -- debt schedule, paper eq20
+update_rtilde -- vectorized version of above, not checked, calls different parameter
+*bellman_rhs -- equity problem, paper eq13 -- does not include feasibility constraint
+bellman_rhs_fast -- vectorizes above, uses griddedInterpolant
+    changed payout D
+*solve_vfi -- iterates bellman_rhs
+solve_vfi_howard -- faster (?) version of above
+    changed payout, made slow?
+solve_equilibrium -- outer loop rtilde -> solve_vfi -> rtilde ->
+
+*unused
+
+make sure we have correct after-tax discount rate
+
+The model is solved via iteration on the Bellman equation, which produces
+the value function V( ˜w, z) and policy function h( ˜w, z). The numerical solution
+proceeds in two steps. First, we guess ˜r(k,b, z) = r and solve for the value
+function given this guess. Second, we use the solution for the value function
+to identify default states and then recalculate ˜r(k, b, z) according to (20). We
+then iterate on this two-step procedure until the value function converges.
