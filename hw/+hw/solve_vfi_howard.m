@@ -21,8 +21,8 @@ if ~isfield(opts,'V_init'),        opts.V_init = []; end
 if ~isfield(opts,'pol_init'),      opts.pol_init = []; end
 
 % new defaults
-if ~isfield(opts,'freeze_feasible'), opts.freeze_feasible = true; end
-if ~isfield(opts,'freeze_wbar'),     opts.freeze_wbar = true; end
+if ~isfield(opts,'freeze_feasible'), opts.freeze_feasible = false; end
+if ~isfield(opts,'freeze_wbar'),     opts.freeze_wbar = false; end
 if ~isfield(opts,'wbar_fixed'),      opts.wbar_fixed = []; end
 if ~isfield(opts,'feas_opts') || isempty(opts.feas_opts)
     opts.feas_opts = struct('require_PrND', true, 'minPrND', 1e-10, 'eps_mono', 1e-10);
@@ -158,8 +158,11 @@ for it = 1:opts.maxit
 
                 % one-period flow
                 % D = wtilde + bp - kp;
-                % ********************************* questionable
-                proceeds = bp / (1 + par.r*(1 - par.tau_i));
+                % Treat bp as face value; proceeds are discounted
+                proceeds = bp;
+                if bp > 0
+                    proceeds = bp / (1 + rt*(1 - par.tau_i));
+                end
                 D = wtilde + proceeds - kp;
 
                 if D >= 0

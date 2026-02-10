@@ -39,9 +39,7 @@ opts.omega_rtilde  = 0.05;
 opts.cap_rtilde    = 2;
 opts.minPrND       = 1e-10;
 
-% Damping and caps for wbar
-opts.damp_wbar = true;
-opts.eta_wbar = 0.5;
+%
 
 % Inner (Howard) controls
 opts.inner_maxit    = 30;

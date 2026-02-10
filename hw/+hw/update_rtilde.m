@@ -115,8 +115,7 @@ for iz = 1:Nz
             end
 
             % damping + default nudge
-            rtilde_for_default = (1-omega)*rtilde_old(ik, ib, iz) + omega*r_new;
-            rtilde_new(ik, ib, iz) = min(rtilde_for_default, par.r + 0.1);
+            rtilde_new(ik, ib, iz) = (1-omega)*rtilde_old(ik, ib, iz) + omega*r_new;
         end
     end
 end

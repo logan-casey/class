@@ -47,9 +47,13 @@ for ik = 1:grid.Nk
 
         % Flow to equity today via net distribution D = wtilde + bp - kp
         % D = wtilde + bp - kp;
-                % ********************************* questionable
-                proceeds = bp / (1 + par.r*(1 - par.tau_i));
-                D = wtilde + proceeds - kp;
+        % Treat bp as face value; proceeds are discounted
+        proceeds = bp;
+        if bp > 0
+            proceeds = bp / (1 + rt*(1 - par.tau_i));
+        end
+        D = wtilde + proceeds - kp;
+
         if D >= 0
             flow = D - hw.tax_dist(D, par);
         else

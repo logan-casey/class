@@ -39,8 +39,8 @@ if ~isfield(par, "tau_c_pos") || ~isfield(par, "r")
     error("Need par.tau_c_pos and par.r.");
 end
 
-% bmax = (1 - par.tau_c_pos) * (grid.kbar^par.alpha) / par.r;
-bmax = 600; % for debug !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+bmax = (1 - par.tau_c_pos) * (grid.kbar^par.alpha) / par.r;
+% bmax = 600; % for debug !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 grid.bmin = -bmax;
 grid.bmax =  bmax;
 

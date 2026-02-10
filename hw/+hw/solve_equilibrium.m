@@ -46,6 +46,8 @@ if ~isfield(opts,'tol_V'),         opts.tol_V = 1e-5; end
 if ~isfield(opts,'outer_verbose'), opts.outer_verbose = true; end
 if ~isfield(opts,'omega_rtilde'),  opts.omega_rtilde = 0.2; end
 if ~isfield(opts,'cap_rtilde'),    opts.cap_rtilde = 10; end
+if ~isfield(opts,'damp_wbar'),     opts.damp_wbar = false; end
+if ~isfield(opts,'eta_wbar'),      opts.eta_wbar = 0; end
 if ~isfield(opts,'minPrND'),       opts.minPrND = 1e-10; end
 
 % ---- defaults: inner (Howard) ----
@@ -104,7 +106,11 @@ for outer_it = 1:opts.outer_maxit
     upd_opts.minPrND = opts.minPrND;
 
     % damping for better solution
-    eta = 0.1;
+    if opts.damp_wbar
+        eta = opts.eta_wbar;
+    else
+        eta = 1;
+    end
     if ~exist('wbar_old','var')
         wbar_old = wbar_new;
     end
