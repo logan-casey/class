@@ -83,14 +83,12 @@ par.Nz_sim   = 60;
 par.tauchen_m = 4;     % support width in std deviations (m in Tauchen)
 
 % k-grid construction defaults (paper uses kbar*(1-delta)^[0,0.5,1,...,15])
-par.k_exponents = [0, 0.5, 1:15];
-% par.k_exponents = [0, 0.5, 1:2:16];
+par.k_exponents = 0:0.5:15;
 
 % Suggested baseline grid sizes
 par.Nk = numel(par.k_exponents);
-% par.Nb = par.Nk/2;     % paper: b grid has half as many points as k grid
+par.Nb = par.Nk/2;     % paper: b grid has half as many points as k grid
 % note should be integer
-par.Nb = 21;
 
 % Basic validation hook (optional)
 par = hw_validate_params_basic(par);

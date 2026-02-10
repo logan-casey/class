@@ -25,7 +25,7 @@ if ~isfield(opts,'freeze_feasible'), opts.freeze_feasible = false; end
 if ~isfield(opts,'freeze_wbar'),     opts.freeze_wbar = false; end
 if ~isfield(opts,'wbar_fixed'),      opts.wbar_fixed = []; end
 if ~isfield(opts,'feas_opts') || isempty(opts.feas_opts)
-    opts.feas_opts = struct('require_PrND', true, 'minPrND', 1e-10, 'eps_mono', 1e-10);
+    opts.feas_opts = struct('require_PrND', false, 'minPrND', 1e-10, 'eps_mono', 1e-10);
 end
 
 Nw = length(wgrid);
@@ -135,73 +135,73 @@ for it = 1:opts.maxit
     % ------------------------------------------------------------
     % (B) Howard Policy Evaluation: fixed policy
     % ------------------------------------------------------------
+    beta = 1 / (1 + par.r * (1 - par.tau_i));   % compute once
+    
     for h = 1:opts.howard_iters
+        Vprev_h = V;
+        for izp = 1:Nz
+            F{izp} = griddedInterpolant(wgrid, V(:,izp), 'linear', 'nearest');
+        end
         Vnew = zeros(Nw, Nz);
-
+    
         for iz = 1:Nz
             prob_row = Pz(iz, :).';
             zvec = zgrid(:);
             wbarvec = wbar_used(:);
-
+    
             for iw = 1:Nw
                 wtilde = wgrid(iw);
-
+    
                 ik = pol_ik(iw, iz);
                 ib = pol_ib(iw, iz);
-
-                % clamp to frozen/current feasibility set
+    
                 ib = min(ib, ibmax_used(ik, iz));
-
+    
                 kp = grid.kgrid(ik);
                 bp = grid.bgrid(ib);
                 rt = rtilde(ik, ib, iz);
-
-                % one-period flow
-                % D = wtilde + bp - kp;
-                % Treat bp as face value; proceeds are discounted
+    
+                % proceeds if bp is face value
                 proceeds = bp;
                 if bp > 0
                     proceeds = bp / (1 + rt*(1 - par.tau_i));
                 end
                 D = wtilde + proceeds - kp;
-
+    
                 if D >= 0
                     flow = D - hw.tax_dist(D, par);
                 else
                     E = -D;
                     flow = -E - hw.equity_cost(E, par);
                 end
-
-                % continuation across z'
+    
                 profit_vec = zvec .* (kp^par.alpha);
                 taxbase_vec = profit_vec - par.delta*kp - rt*bp;
                 Tc_vec = par.tau_c_pos .* max(taxbase_vec, 0) + par.tau_c_neg .* min(taxbase_vec, 0);
-
+    
                 w_real_vec = (1 - par.delta)*kp + profit_vec - Tc_vec - (1 + rt)*bp;
                 w_next_vec = max(wbarvec, w_real_vec);
-
+    
                 Vnext_vec = zeros(Nz,1);
                 for izp = 1:Nz
                     Vnext_vec(izp) = F{izp}(w_next_vec(izp));
                 end
-
+    
                 EV = prob_row' * Vnext_vec;
-
-                Vnew(iw, iz) = flow + (1/(1+par.r)) * EV;
+    
+                Vnew(iw, iz) = flow + beta * EV;
             end
         end
-
+    
         V = Vnew;
-    end
-
-    % check convergence across outer loops (after Howard eval)
-    diff = max(abs(V(:) - Vimp(:)));
-    if opts.verbose
-        fprintf("Howard outer it=%d: end-of-outer diff~%.3e\n", it, diff);
-    end
-
-    if diff < opts.tol
-        break;
+    
+        how_diff = max(abs(V(:) - Vprev_h(:)));
+        if opts.verbose
+            fprintf("  Howard eval h=%d: supdiff=%.3e\n", h, how_diff);
+        end
+        if how_diff < opts.tol
+            break;  % break out of Howard loop only
+        end
     end
 end
 

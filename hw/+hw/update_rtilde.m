@@ -31,6 +31,8 @@ if nargin < 7, opts = struct(); end
 if ~isfield(opts,'omega'),   opts.omega = 1.0; end
 if ~isfield(opts,'cap'),     opts.cap = 1e3; end
 if ~isfield(opts,'minPrND'), opts.minPrND = 1e-12; end
+if ~isfield(opts,'smooth_default'), opts.smooth_default = false; end
+if ~isfield(opts,'smooth_s'),       opts.smooth_s = 5; end
 
 omega   = opts.omega;
 cap     = opts.cap;
@@ -98,19 +100,42 @@ for iz = 1:Nz
 
                 w_real = one_minus_delta_kp_scalar + profit_vec - Tc - (1 + r_guess) * bp;
 
-                default_mask = (w_real < wbar);      % [Nz x 1]
-                nd_mask = ~default_mask;
+                if opts.smooth_default
+                    s = opts.smooth_s;
+                    % pdef in (0,1), smooth approximation to 1{w_real < wbar}
+                    pdef = 1 ./ (1 + exp((w_real - wbar)/s));
+                    PrND = sum(prob_row .* (1 - pdef));
+                else
+                    default_mask = (w_real < wbar);
+                    PrND = sum(prob_row .* (~default_mask));
+                end
 
-                PrND = sum(prob_row .* nd_mask);
 
                 if PrND <= minPrND
                     r_new = cap;
                 else
-                    ED = sum(prob_row .* default_mask .* (R_mat(:,ik) ./ bp));
-                    % exact formula you provided:
-                    r_new = inv_one_minus_tau_i * ( (gross_rf_after_tax - ED)/PrND - 1 );
-                    if ~isfinite(r_new), r_new = cap; end
-                    r_new = min(r_new, cap);
+                    if opts.smooth_default
+                        % pdef already computed above
+                        ED = sum(prob_row .* pdef .* (R_mat(:,ik) ./ max(bp,1e-12)));
+                    else
+                        ED = sum(prob_row .* default_mask .* (R_mat(:,ik) ./ max(bp,1e-12)));
+                    end
+
+                    PrND_eff = max(PrND, minPrND);          % even if you don’t take the if-branch
+                    num = gross_rf_after_tax - ED;
+                    % optional: if num < 0, you’re implying negative bond price in this mapping
+                    %           => just set to cap (or treat as infeasible).
+                    if num <= 0
+                        r_new = cap;
+                    else
+                        r_new = inv_one_minus_tau_i * ( num/PrND_eff - 1 );
+                    end
+                    r_new = min(max(r_new, rmin), cap);
+                    
+                    if ~isfinite(r_new)
+                        r_new = cap;
+                    end
+                    r_new = min(max(r_new, 0), cap);   % e.g. rmin = 0 or -0.01
                 end
             end
 

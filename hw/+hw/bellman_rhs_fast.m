@@ -79,7 +79,8 @@ for ik = 1:grid.Nk
 
         EV = prob_row' * Vnext_vec;
 
-        Vcand = flow + (1 / (1 + par.r)) * EV;
+        beta = 1 / (1 + par.r * (1 - par.tau_i));
+        Vcand = flow + beta * EV;
 
         if Vcand > Vbest
             Vbest   = Vcand;

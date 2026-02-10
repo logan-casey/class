@@ -79,6 +79,7 @@ history.diff_r = zeros(opts.outer_maxit,1);
 history.diff_V = zeros(opts.outer_maxit,1);
 
 V_prev = [];
+pol_change = NaN;
 
 for outer_it = 1:opts.outer_maxit
 
@@ -91,6 +92,16 @@ for outer_it = 1:opts.outer_maxit
     inner_opts.improve_every = opts.improve_every;
     inner_opts.V_init        = V_init;
     inner_opts.pol_init      = pol_init;
+    inner_opts.freeze_feasible = false;
+    inner_opts.feas_opts = struct('require_PrND', false, 'minPrND', 1e-10, 'eps_mono', 1e-10);
+    
+    % adaptive damping
+    % tighten when policy jumps
+    if ~isnan(pol_change) && pol_change > 0.05
+        inner_opts.howard_iters = 80;
+        inner_opts.improve_every = 2;
+        inner_opts.inner_maxit = 30;
+    end
 
     sol = hw.solve_vfi_howard(wgrid, zgrid, Pz, rtilde, par, grid, inner_opts);
 
@@ -99,11 +110,45 @@ for outer_it = 1:opts.outer_maxit
     pol_ib = sol.pol_ib;
     wbar_new   = sol.wbar;
 
+    if outer_it > 1
+        pol_change = mean( (pol_ik(:) ~= pol_ik_prev(:)) | (pol_ib(:) ~= pol_ib_prev(:)) );
+    else
+        pol_change = NaN;
+    end
+    pol_ik_prev = pol_ik; pol_ib_prev = pol_ib;
+
+    % tighten when policy jumps
+
+    if opts.outer_verbose
+        % monotonicity in z (weak)
+        mono_viol = max(max( max(0, V(:,1:end-1) - V(:,2:end)) ));
+        fprintf("max violation V(w,z) nondecreasing in z: %.3e\n", mono_viol);
+        wbar_viol = max(max(0, diff(wbar_new))); % positive diff means increasing -> violation
+        fprintf("max violation wbar nonincreasing in z: %.3e\n", wbar_viol);
+    end
+
+
     % ---- Outer update of rtilde via equation (20) ----
     upd_opts = struct();
-    upd_opts.omega   = opts.omega_rtilde;
+    % upd_opts.omega   = opts.omega_rtilde;
     upd_opts.cap     = opts.cap_rtilde;
     upd_opts.minPrND = opts.minPrND;
+    upd_opts.smooth_default = true;
+    upd_opts.smooth_s = 5;   % try 2,5,10
+
+    % adaptive omega damping -- depends on pol_change above
+    omega = opts.omega_rtilde;
+    % If policy is moving a lot, damp rtilde update more
+    if ~isnan(pol_change) && pol_change > 0.1
+        omega_eff = min(omega, 0.01);
+    elseif ~isnan(pol_change) && pol_change > 0.03
+        omega_eff = min(omega, 0.02);
+    else
+        omega_eff = omega;
+    end
+    upd_opts.omega = omega_eff;
+
+
 
     % damping for better solution
     if opts.damp_wbar
@@ -131,9 +176,9 @@ for outer_it = 1:opts.outer_maxit
 
     if opts.outer_verbose
         if isnan(diff_V)
-            fprintf("Outer it=%d: supdiff rtilde=%.3e\n", outer_it, diff_r);
+            fprintf("Outer it=%d: pol_change=%.3e\n", outer_it, pol_change);
         else
-            fprintf("Outer it=%d: supdiff rtilde=%.3e, supdiff V=%.3e\n", outer_it, diff_r, diff_V);
+            fprintf("Outer it=%d: pol_change=%.3e, supdiff V=%.3e\n", outer_it, pol_change, diff_V);
         end
     end
 
@@ -158,6 +203,23 @@ for outer_it = 1:opts.outer_maxit
         end
         break;
     end
+
+
+    % more diagnositcs
+    if mod(eq_it,5)==0   % every 5 iterations
+
+        fprintf('\n--- Quick diagnostic ---\n');
+    
+        PrND_vec = PrND_mat(:);   % from your diagnostic block
+    
+        fprintf('PrND mean = %.3f\n', mean(PrND_vec));
+        fprintf('PrND degenerate share = %.3f\n', ...
+            mean(PrND_vec<1e-6 | PrND_vec>1-1e-6));
+    
+        fprintf('max |rtilde diff| = %.4e\n', ...
+            max(abs(rtilde_new(:)-rtilde(:))));
+    end
+
 end
 
 % Trim history

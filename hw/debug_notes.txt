@@ -1,0 +1,28 @@
+Having run the code with the grid used for debug and the grid used in the paper, it still does not seem to converge. In particular, it seems like diff_r is not declining -- so maybe there is an issue with the rtilde update, and hopefully not also with the value function iteration/bellman.
+
+There is almost no variation in choice of k, b across values of z (but there is variation across w). The value function backs this up -- it looks like it's a plane that is increasing in k but basically flat across z. In both cases, about 60% of k, b, z points imply certain default/non-default. In the case with the grid from the paper, about 1/3 of the chosen k, b values are degenerate (certain default/non-default), while in the case zoomed in on the middle values of b, only 11% are degenerate. This could still be ok, as I do not know if firms would reach these degenerate areas without highly unlikely sequences of z shocks.
+
+
+Case 1: Nk = 17, Nb = 91, Nw = 120, Nz = 15; k grid with every other point, bgrid zoomed/expanded as in debugging, wgrid restricted.
+
+
+Case 2: Nk = 31, Nb = 16, Nw = 120, Nz = 15; k, b grids as defined in paper.
+
+For context, 30 iterations with the suggested smoothing parameters takes 30 minutes-1 hour depending on the grid used.
+
+[x, y] = meshgrid(zgrid, wgrid);
+surf(x,y,eq.V)
+
+
+
+
+tot = 0;
+deg_pol = 0;
+for iw = 1:length(wgrid)
+    for iz= 1:length(zgrid)
+        ed_i = ED(eq.pol_ik(iw, iz),eq.pol_ib(iw, iz),iz);
+        deg_pol = deg_pol + (ed_i==0) + (ed_i==1);
+        tot = tot+1;
+    end
+end
+deg_pol/tot
