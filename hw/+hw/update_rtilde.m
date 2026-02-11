@@ -36,6 +36,7 @@ if ~isfield(opts,'smooth_s'),       opts.smooth_s = 5; end
 
 omega   = opts.omega;
 cap     = opts.cap;
+rmin    = 0;
 minPrND = opts.minPrND;
 
 wbar = wbar(:); % [Nz x 1]
@@ -92,54 +93,38 @@ for iz = 1:Nz
                 % Not meaningful for “bond yield” if bp<=0; set to risk-free
                 r_new = par.r;
             else
+
                 r_guess = rtilde_old(ik, ib, iz);
 
-                % Realized net worth w(k,b,z') uses r_guess (for default test)
                 taxbase = profit_vec - delta_kp_scalar - r_guess * bp;
                 Tc = par.tau_c_pos .* max(taxbase,0) + par.tau_c_neg .* min(taxbase,0);
-
                 w_real = one_minus_delta_kp_scalar + profit_vec - Tc - (1 + r_guess) * bp;
-
+                
                 if opts.smooth_default
                     s = opts.smooth_s;
-                    % pdef in (0,1), smooth approximation to 1{w_real < wbar}
-                    pdef = 1 ./ (1 + exp((w_real - wbar)/s));
+                    pdef = 1 ./ (1 + exp((w_real - wbar)/s));      % [Nz x 1]
                     PrND = sum(prob_row .* (1 - pdef));
+                    ED   = sum(prob_row .* pdef .* (R_mat(:,ik) ./ max(bp,1e-12)));
                 else
                     default_mask = (w_real < wbar);
                     PrND = sum(prob_row .* (~default_mask));
+                    ED   = sum(prob_row .* default_mask .* (R_mat(:,ik) ./ max(bp,1e-12)));
                 end
-
-
-                if PrND <= minPrND
+                
+                PrND_eff = max(PrND, minPrND);
+                num = gross_rf_after_tax - ED;
+                
+                if num <= 0 || PrND <= minPrND
                     r_new = cap;
                 else
-                    if opts.smooth_default
-                        % pdef already computed above
-                        ED = sum(prob_row .* pdef .* (R_mat(:,ik) ./ max(bp,1e-12)));
-                    else
-                        ED = sum(prob_row .* default_mask .* (R_mat(:,ik) ./ max(bp,1e-12)));
-                    end
-
-                    PrND_eff = max(PrND, minPrND);          % even if you don’t take the if-branch
-                    num = gross_rf_after_tax - ED;
-                    % optional: if num < 0, you’re implying negative bond price in this mapping
-                    %           => just set to cap (or treat as infeasible).
-                    if num <= 0
-                        r_new = cap;
-                    else
-                        r_new = inv_one_minus_tau_i * ( num/PrND_eff - 1 );
-                    end
-                    r_new = min(max(r_new, rmin), cap);
-                    
-                    if ~isfinite(r_new)
-                        r_new = cap;
-                    end
-                    r_new = min(max(r_new, 0), cap);   % e.g. rmin = 0 or -0.01
+                    r_new = inv_one_minus_tau_i * ( num/PrND_eff - 1 ); % eq 20
+                    if ~isfinite(r_new), r_new = cap; end
+                    r_new = min(max(r_new, rmin), cap); % cap
                 end
+
             end
 
-            % damping + default nudge
+            % damping
             rtilde_new(ik, ib, iz) = (1-omega)*rtilde_old(ik, ib, iz) + omega*r_new;
         end
     end

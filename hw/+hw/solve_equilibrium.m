@@ -206,11 +206,101 @@ for outer_it = 1:opts.outer_maxit
 
 
     % more diagnositcs
-    if mod(eq_it,5)==0   % every 5 iterations
 
-        fprintf('\n--- Quick diagnostic ---\n');
+    if mod(outer_it,5)==0   % every 5 iterations
+
+        % ============================================================
+        % Diagnostics: PrND distribution, worst rtilde error, caps
+        % ============================================================
+        
+        fprintf('\n---- EQUILIBRIUM DIAGNOSTICS ----\n');
+        
+        Nk = grid.Nk;
+        Nb = grid.Nb;
+        Nz = length(zgrid);
+        
+        PrND_mat = zeros(Nk, Nb, Nz);
+        DefaultShare = zeros(Nk, Nb, Nz);
+        
+        
+        for iz = 1:Nz
+            prob_row = Pz(iz,:).';
+            for ik = 1:Nk
+        
+                kp = grid.kgrid(ik);
+                profit_vec = zgrid(:) .* (kp^par.alpha);
+        
+                for ib = 1:Nb
+        
+                    bp = grid.bgrid(ib);
+                    rt = rtilde(ik,ib,iz);
+        
+                    % taxes
+                    taxbase_vec = profit_vec - par.delta*kp - rt*bp;
+                    Tc_vec = par.tau_c_pos .* max(taxbase_vec,0) ...
+                           + par.tau_c_neg .* min(taxbase_vec,0);
+        
+                    % next-period realized net worth
+                    wreal = (1-par.delta)*kp + profit_vec - Tc_vec ...
+                            - (1+rt)*bp;
+        
+                    def = (wreal < wbar);
+        
+                    PrND_mat(ik,ib,iz) = sum(prob_row .* (~def));
+                    DefaultShare(ik,ib,iz) = mean(def);
+        
+                end
+            end
+        end
+        
+        % ---- Distribution summary
+        fprintf('PrND summary:\n');
+        fprintf('   min = %.4f\n', min(PrND_mat(:)));
+        fprintf('   max = %.4f\n', max(PrND_mat(:)));
+        fprintf('   mean = %.4f\n', mean(PrND_mat(:)));
+        
+        fprintf('Share degenerate (PrND≈0 or 1): %.3f\n', ...
+            mean(PrND_mat(:)<1e-6 | PrND_mat(:)>1-1e-6));
+        
+        % ============================================================
+        % Argmax of r_diff
+        % ============================================================
+        
+        [~, idx_max] = max(abs(rtilde_new(:) - rtilde(:)));
+        [ik_star, ib_star, iz_star] = ind2sub(size(rtilde), idx_max);
+        
+        fprintf('\nWorst rtilde update at:\n');
+        fprintf('   ik=%d, ib=%d, iz=%d\n', ik_star, ib_star, iz_star);
+        fprintf('   k=%.3f, b=%.3f, z=%.3f\n', ...
+                grid.kgrid(ik_star), ...
+                grid.bgrid(ib_star), ...
+                zgrid(iz_star));
+        
+        fprintf('   r_old=%.4f, r_new=%.4f, diff=%.4f\n', ...
+                rtilde(ik_star,ib_star,iz_star), ...
+                rtilde_new(ik_star,ib_star,iz_star), ...
+                rtilde_new(ik_star,ib_star,iz_star) ...
+              - rtilde(ik_star,ib_star,iz_star));
+        
+        fprintf('   PrND=%.4f, default share=%.4f\n', ...
+                PrND_mat(ik_star,ib_star,iz_star), ...
+                DefaultShare(ik_star,ib_star,iz_star));
+        
+        % ============================================================
+        % How often feasibility cap binds
+        % ============================================================
+        
+        cap_bind = (pol_ib >= ibmax_used(pol_ik + (0:numel(pol_ik)-1)*0)); % safe placeholder
+                
+        fprintf('\nFeasibility cap binding frequency: %.3f\n', ...
+                mean(cap_bind(:)));
+        
+        fprintf('----------------------------------\n');
+
+
+        fprintf('\n--- diagnostic ---\n');
     
-        PrND_vec = PrND_mat(:);   % from your diagnostic block
+        PrND_vec = PrND_mat(:);
     
         fprintf('PrND mean = %.3f\n', mean(PrND_vec));
         fprintf('PrND degenerate share = %.3f\n', ...
