@@ -5,7 +5,22 @@ similar to Table IV. Discuss your findings.
 
 
 README
+outer_loop_test_fullgrid.m sets up parameters using params.m, grids.m,
+    overrides some of these for debugging purposes
+    (ie caps on change in values, damping of value updates)
+    it calls:
+solve_equilibrium.m iterates the firm's problem and bank's problem
+solve_vfi_howard.m solves the firm's problem given interest rate schedule r by iterating the value function
+    it includes special partial "howard" iterations for speed (thanks ChatGPT)
+update_rtilde.m sets the interest rate schedule given the firm's value/policy functions
+default_wbar.m is a key step in update_rtilde -- it determines which states the firm defaults in
 
+everything else should be simple, and much of it is actually unused
+tauchen.m discretizes the AR(1) productivity shock z
+
+------------------------------------------------
+All scripts:
+------------------------------------------------
 params -- defines params, including estimated & calibrated values, size of grid
 
 MODEL EQUATIONS
