@@ -246,8 +246,8 @@ for outer_it = 1:opts.outer_maxit
         
                     def = (wreal < wbar);
         
-                    PrND_mat(ik,ib,iz) = sum(prob_row .* (~def));
-                    DefaultShare(ik,ib,iz) = mean(def);
+                    PrND_mat(ik,ib,iz) = sum(prob_row .* (~def),"all");
+                    DefaultShare(ik,ib,iz) = mean(def, "all");
         
                 end
             end
@@ -290,12 +290,12 @@ for outer_it = 1:opts.outer_maxit
         % How often feasibility cap binds
         % ============================================================
         
-        cap_bind = (pol_ib >= ibmax_used(pol_ik + (0:numel(pol_ik)-1)*0)); % safe placeholder
-                
-        fprintf('\nFeasibility cap binding frequency: %.3f\n', ...
-                mean(cap_bind(:)));
-        
-        fprintf('----------------------------------\n');
+        % cap_bind = (pol_ib >= ibmax_used(pol_ik + (0:numel(pol_ik)-1)*0)); % safe placeholder
+        % 
+        % fprintf('\nFeasibility cap binding frequency: %.3f\n', ...
+        %         mean(cap_bind(:)));
+        % 
+        % fprintf('----------------------------------\n');
 
 
         fprintf('\n--- diagnostic ---\n');
