@@ -26,3 +26,18 @@ for iw = 1:length(wgrid)
     end
 end
 deg_pol/tot
+
+
+
+
+
+
+
+
+
+Feb 13
+everything finished fast after small w for paper grid; warm start for tight grid
+also higher wbar smoothing ***
+paper grid with smaller w grid -- converges but trivial borrowing decision
+	wbar not constant at least, but default still degenerate
+tight grid -- pretty much the same -- must be trivial borrowing decision if we smooth wbar too much

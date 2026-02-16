@@ -1,4 +1,5 @@
 assignment:
+Replicate the calibrated model of Hennessy & Whited (2014).
 Using the point estimates of Panel B, table I, simulate the model and report the
 simulated moments as they appear on Table I. Repeat this exercise for Table II. Produce a table
 similar to Table IV. Discuss your findings.
@@ -17,6 +18,7 @@ default_wbar.m is a key step in update_rtilde -- it determines which states the 
 
 everything else should be simple, and much of it is actually unused
 tauchen.m discretizes the AR(1) productivity shock z
+
 
 ------------------------------------------------
 All scripts:

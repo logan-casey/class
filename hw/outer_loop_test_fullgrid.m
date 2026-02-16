@@ -1,5 +1,15 @@
 % main_solve.m
 
+
+load('hw_solution_papergrid_feb15_s5a.mat')
+opts = struct();
+% % initialize
+opts.rtilde_init = eq.rtilde;
+% Warm starts for V/policy
+opts.V_init = eq.V;
+opts.pol_init = struct('pol_ik', eq.pol_ik, 'pol_ib', eq.pol_ib);
+clearvars -except opts
+
 par = hw.params("full");
 
 % Shock discretization for solve
@@ -8,15 +18,14 @@ par = hw.params("full");
 % Capital/debt grids
 grid = hw.grids(par, zgrid);
 
-Nw = 120;
+Nw = 30;
 % wmax = (1-par.tau_c_pos)*grid.kbar^par.alpha/par.r;
 % wgrid = linspace(-wmax, wmax, Nw);
 % Revised net worth grid (debugging starter)
-wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw);
+wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw)';
 
 % Solve equilibrium
-opts = struct();
-opts.outer_maxit   = 60;
+opts.outer_maxit   = 400;
 opts.tol_rtilde    = 1e-3;
 opts.outer_verbose = true;
 
@@ -28,6 +37,7 @@ opts.minPrND       = 1e-4;
 % Damping and caps for wbar
 opts.damp_wbar = true;
 opts.eta_wbar = 0.5;
+opts.wbar_s = 1;
 
 % Inner (Howard) controls
 opts.inner_maxit    = 5;
@@ -36,6 +46,7 @@ opts.howard_iters   = 20;
 opts.improve_every  = 10;
 opts.inner_verbose  = true;
 
+
 eq = hw.solve_equilibrium(wgrid, zgrid, Pz, par, grid, opts);
 
-save('hw_solution_papergrid_feb10_4p.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');
+save('hw_solution_papergrid_feb15_s1a.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');

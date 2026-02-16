@@ -1,4 +1,4 @@
-function eq = solve_equilibrium(wgrid, zgrid, Pz, par, grid, opts)
+function eq = solve_rtilde(wgrid, zgrid, Pz, par, grid, opts)
 %HW.SOLVE_EQUILIBRIUM  Full solution with outer iteration on bond yields.
 %
 % eq = hw.solve_equilibrium(wgrid, zgrid, Pz, par, grid, opts)
@@ -97,25 +97,25 @@ for outer_it = 1:opts.outer_maxit
     
     % adaptive damping
     % tighten when policy jumps
-    if ~isnan(pol_change) && pol_change > 0.05
-        inner_opts.howard_iters = 80;
-        inner_opts.improve_every = 2;
-        inner_opts.inner_maxit = 30;
-    end
+    % if ~isnan(pol_change) && pol_change > 0.05
+    %     inner_opts.howard_iters = 80;
+    %     inner_opts.improve_every = 2;
+    %     inner_opts.inner_maxit = 30;
+    % end
 
-    sol = hw.solve_vfi_howard(wgrid, zgrid, Pz, rtilde, par, grid, inner_opts);
+    % sol = hw.solve_vfi_howard(wgrid, zgrid, Pz, rtilde, par, grid, inner_opts);
+    % 
+    V      = opts.V_init;
+    pol_ik = opts.pol_init.pol_ik;
+    pol_ib = opts.pol_init.pol_ib;
+    wbar_new   = opts.wbar_init;
 
-    V      = sol.V;
-    pol_ik = sol.pol_ik;
-    pol_ib = sol.pol_ib;
-    wbar_new   = sol.wbar;
-
-    if outer_it > 1
-        pol_change = mean( (pol_ik(:) ~= pol_ik_prev(:)) | (pol_ib(:) ~= pol_ib_prev(:)) );
-    else
-        pol_change = NaN;
-    end
-    pol_ik_prev = pol_ik; pol_ib_prev = pol_ib;
+    % if outer_it > 1
+    %     pol_change = mean( (pol_ik(:) ~= pol_ik_prev(:)) | (pol_ib(:) ~= pol_ib_prev(:)) );
+    % else
+    %     pol_change = NaN;
+    % end
+    % pol_ik_prev = pol_ik; pol_ib_prev = pol_ib;
 
     % tighten when policy jumps
 

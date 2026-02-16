@@ -1,4 +1,4 @@
-function rtilde_new = update_rtilde(rtilde_old, zgrid, Pz, wbar, par, grid, opts)
+function [rtilde_new, def_diag] = update_rtilde(rtilde_old, zgrid, Pz, wbar, par, grid, opts)
 %HW.UPDATE_RTILDE  Vectorized bond-yield update using discrete eq. (20).
 %
 % rtilde_new = hw.update_rtilde(rtilde_old, zgrid, Pz, wbar, par, grid, opts)
@@ -74,6 +74,20 @@ bankrupt_cost_k = par.xi .* (one_minus_delta_kp);     % [Nk x 1]
 R_mat = (one_minus_delta_kp') + profit_mat - Tc_def_mat ...
         - (bankrupt_cost_k') - (wbar);  % wbar broadcasts down rows
 
+
+% --- diagnostics storage ---
+def_diag.min_gap   = NaN(grid.Nk, grid.Nb, Nz);
+def_diag.max_gap   = NaN(grid.Nk, grid.Nb, Nz);
+def_diag.crosses   = false(grid.Nk, grid.Nb, Nz);
+
+if opts.smooth_default
+    def_diag.pdef_min  = NaN(grid.Nk, grid.Nb, Nz);
+    def_diag.pdef_max  = NaN(grid.Nk, grid.Nb, Nz);
+    def_diag.pdef_mean = NaN(grid.Nk, grid.Nb, Nz);
+else
+    def_diag.def_share = NaN(grid.Nk, grid.Nb, Nz);  % fraction of default states
+end
+
 % Loop over current z index (outermost): cheap (Nz ~ 15)
 for iz = 1:Nz
     prob_row = Pz(iz, :).'; % [Nz x 1]
@@ -114,20 +128,51 @@ for iz = 1:Nz
                 PrND_eff = max(PrND, minPrND);
                 num = gross_rf_after_tax - ED;
                 
-                if num <= 0 || PrND <= minPrND
-                    r_new = cap;
-                else
+                % if num <= 0 || PrND <= minPrND
+                %     r_new = cap;
+                % else
                     r_new = inv_one_minus_tau_i * ( num/PrND_eff - 1 ); % eq 20
                     if ~isfinite(r_new), r_new = cap; end
                     r_new = min(max(r_new, rmin), cap); % cap
+                % end
+
+
+
+                % diagnostics
+                gap = w_real - wbar;     % [Nz x 1]
+
+                min_gap = min(gap);
+                max_gap = max(gap);
+                
+                def_diag.min_gap(ik,ib,iz) = min_gap;
+                def_diag.max_gap(ik,ib,iz) = max_gap;
+                def_diag.crosses(ik,ib,iz) = (min_gap < 0) && (max_gap > 0);
+                
+                if opts.smooth_default
+                    def_diag.pdef_min(ik,ib,iz)  = min(pdef);
+                    def_diag.pdef_max(ik,ib,iz)  = max(pdef);
+                    def_diag.pdef_mean(ik,ib,iz) = mean(pdef);
+                else
+                    def_diag.def_share(ik,ib,iz) = mean(default_mask);
                 end
+
 
             end
 
+
+            if def_diag.crosses(ik,ib,iz)
+                omega_loc = 0.005;
+            else
+                omega_loc = omega;
+            end
+
             % damping
-            rtilde_new(ik, ib, iz) = (1-omega)*rtilde_old(ik, ib, iz) + omega*r_new;
+            rtilde_new(ik, ib, iz) = (1-omega_loc)*rtilde_old(ik, ib, iz) + omega_loc*r_new;
         end
     end
 end
+
+fprintf('Interior default cells: %d / %d\n', ...
+    nnz(def_diag.crosses), numel(def_diag.crosses));
 
 end
