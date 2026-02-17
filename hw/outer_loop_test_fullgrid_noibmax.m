@@ -1,7 +1,7 @@
 % main_solve.m
 
 
-load('hw_solution_papergrid_feb16_nodamping.mat')
+load('hw_solution_papergrid_feb15_nos.mat')
 opts = struct();
 % % initialize
 opts.rtilde_init = eq.rtilde;
@@ -25,17 +25,17 @@ Nw = 30;
 wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw)';
 
 % Solve equilibrium
-opts.outer_maxit   = 1000;
+opts.outer_maxit   = 200;
 opts.tol_rtilde    = 1e-3;
 opts.outer_verbose = true;
 
 % Damping and caps for rtilde
 opts.omega_rtilde  = 0.02;%0.02;
-opts.cap_rtilde    = 1e4;%0.5;
+opts.cap_rtilde    = 0.5;%0.5;
 opts.minPrND       = 1e-4;
 
 % Damping and caps for wbar
-opts.damp_wbar = false;
+opts.damp_wbar = true;
 opts.eta_wbar = 0.5;
 opts.wbar_s = 0.1;
 
@@ -49,4 +49,4 @@ opts.inner_verbose  = true;
 
 eq = hw.solve_equilibrium(wgrid, zgrid, Pz, par, grid, opts);
 
-save('hw_solution_papergrid_feb16_nodamping_b.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');
+save('hw_solution_papergrid_feb16_noibmax.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');

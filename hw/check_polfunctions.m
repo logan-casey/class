@@ -15,3 +15,7 @@ for i = 1:size(eq.pol_ik,1)
 end
 figure
 surf(x,y,zk);
+
+figure
+surf(x,y,eq.V);
+

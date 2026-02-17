@@ -1,5 +1,5 @@
 % main_solve.m
-load('hw_solution_tightgrid_feb15_s10d.mat')
+load('hw_solution_tightgrid_feb15_s10e.mat')
 opts = struct();
 % initialize
 opts.rtilde_init = eq.rtilde;
@@ -39,7 +39,7 @@ Nw = 120;
 wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw);
 
 % Solve equilibrium
-opts.outer_maxit   = 90;
+opts.outer_maxit   = 900;
 opts.tol_rtilde    = 1e-3;
 opts.outer_verbose = true;
 
@@ -62,4 +62,4 @@ opts.inner_verbose  = true;
 
 eq = hw.solve_equilibrium(wgrid, zgrid, Pz, par, grid, opts);
 
-save('hw_solution_tightgrid_feb15_s10e.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');
+save('hw_solution_tightgrid_feb15_s10f.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');

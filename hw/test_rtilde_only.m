@@ -1,7 +1,7 @@
 % main_solve.m
 
 
-load('hw_solution_tightgrid_feb15_s10d.mat')
+load('hw_solution_tightgrid_rtildeonly_feb15_s10.mat')
 opts = struct();
 % % initialize
 opts.rtilde_init = eq.rtilde;
@@ -17,16 +17,32 @@ par = hw.params("full");
 [zgrid, Pz] = hw.tauchen(par.rho, par.sigma_eps, par.Nz_solve, par.tauchen_m);
 
 % Capital/debt grids
+par.k_exponents = [0,0.5,1:15];
 grid = hw.grids(par, zgrid);
 
-Nw = 30;
-% wmax = (1-par.tau_c_pos)*grid.kbar^par.alpha/par.r;
-% wgrid = linspace(-wmax, wmax, Nw);
+% bmin = grid.bgrid(1);
+% bmax = grid.bgrid(end);
+bmin = -600;
+bmax = -bmin;
+
+% coarse negative grid
+bneg = linspace(bmin, 0, 11)';
+
+% dense positive grid up to bmax (concentrate near 0 with power >1)
+Nbpos = 81;
+x = linspace(0,1,Nbpos)'; 
+bpos = (x.^1.5) * bmax;   % 1.5 concentrates more points near 0
+
+grid.bgrid = unique([bneg; bpos]);  % unique removes duplicate 0
+grid.Nb = numel(grid.bgrid);
+
+
 % Revised net worth grid (debugging starter)
-wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw)';
+Nw = 120;
+wgrid = linspace(-2*grid.kbar, 2*grid.kbar, Nw);
 
 % Solve equilibrium
-opts.outer_maxit   = 60;
+opts.outer_maxit   = 900;
 opts.tol_rtilde    = 1e-3;
 opts.outer_verbose = true;
 
@@ -50,4 +66,4 @@ opts.inner_verbose  = true;
 
 eq = hw.solve_rtilde(wgrid, zgrid, Pz, par, grid, opts);
 
-save('hw_solution_papergrid_rtildeonly_feb15_s10.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');
+save('hw_solution_tightgrid_rtildeonly_feb15_s10.mat.mat', 'eq', 'par', 'grid', 'wgrid', 'zgrid', 'Pz');

@@ -41,3 +41,12 @@ also higher wbar smoothing ***
 paper grid with smaller w grid -- converges but trivial borrowing decision
 	wbar not constant at least, but default still degenerate
 tight grid -- pretty much the same -- must be trivial borrowing decision if we smooth wbar too much
+
+
+
+
+Feb 16
+steps:
+check V is not monotone
+find out what part of RHS changes with b
+write code to iterate separately

@@ -67,7 +67,7 @@ end
 if opts.freeze_feasible
     ibmax_used = hw.feasible_ibmax(rtilde, zgrid, Pz, wbar_used, par, grid, opts.feas_opts);
 else
-    ibmax_used = ones(grid.Nk, Nz);
+    ibmax_used = ones(grid.Nk, Nz)*grid.Nb;
 end
 
 for it = 1:opts.maxit
