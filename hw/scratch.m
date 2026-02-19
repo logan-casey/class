@@ -34,3 +34,78 @@ else
     disp('zgrid  w_real   wbar   indicator (w_real<wbar)');
     disp([zgrid(:), w_real, eq.wbar(:), (w_real < eq.wbar(:))]);
 end
+
+
+
+
+fprintf('V min/max by z: ');
+for iz=1:length(zgrid)
+    fprintf('[z%d: %.4g/%.4g] \n', iz, min(eq.V(:,iz)), max(eq.V(:,iz)));
+end
+fprintf('\n');
+fprintf('wbar: '); disp(eq.wbar);
+
+
+
+% Check Bellman satisfaction at a few states
+% test_states = [1,1,1; 15,10,5; 30,15,10]; % [iw, iz] pairs
+test_states = [1,1,1; 100,10,5; 120,15,10]; % [iw, iz] pairs
+for i=1:size(test_states,1)
+    iw = test_states(i,1); iz = test_states(i,2);
+    V_current = eq.V(iw, iz);
+    
+    % Get policy choice
+    ik_opt = eq.pol_ik(iw, iz);
+    ib_opt = eq.pol_ib(iw, iz);
+    
+    w = wgrid(iw);
+    kp = grid.kgrid(ik_opt);
+    bp = grid.bgrid(ib_opt);
+    r = eq.rtilde(ik_opt, ib_opt, iz);
+    
+    % Distribution/issuance flow
+    proceeds = bp;
+    if bp > 0
+        proceeds = bp / (1 + r*(1-par.tau_i));
+    end
+    D = w + proceeds - kp;
+    if D >= 0
+        flow = D - hw.tax_dist(D, par);
+    else
+        flow = -D - hw.equity_cost(-D, par);
+    end
+    
+    % Continuation value (loop over izp)
+    EV = 0;
+    for izp = 1:length(zgrid)
+        profit = zgrid(izp) * (kp^par.alpha);
+        taxbase = profit - par.delta*kp - r*bp;
+        Tc = par.tau_c_pos*max(taxbase,0) + par.tau_c_neg*min(taxbase,0);
+        wreal = (1-par.delta)*kp + profit - Tc - (1+r)*bp;
+        w_next = max(eq.wbar(izp), wreal);
+        V_next = interp1(wgrid, eq.V(:,izp), w_next, 'linear', 'extrap');
+        EV = EV + Pz(iz,izp) * V_next;  % correct: just transition weight
+    end
+    
+    beta = 1/(1 + par.r*(1-par.tau_i));
+    V_bellman = flow + beta * EV;
+    
+    fprintf('(iw=%d,iz=%d): V_curr=%.4g, V_bellman=%.4g, diff=%.4g\n', iw, iz, V_current, V_bellman, V_current - V_bellman);
+end
+
+
+
+
+
+% At this state, what does rtilde look like as b increases?
+ik = 17; iz = 1;
+fprintf('rtilde schedule for (ik=%d, iz=%d):\n', ik, iz);
+fprintf('ib    b      rtilde   monotone_ok?\n');
+last_r = -Inf;
+for ib = 1:grid.Nb
+    r = eq.rtilde(ik, ib, iz);
+    ok = (r >= last_r - 1e-10);
+    fprintf('%2d  %.4g  %.6g  %d\n', ib, grid.bgrid(ib), r, ok);
+    % if ~ok, break; end
+    last_r = r;
+end

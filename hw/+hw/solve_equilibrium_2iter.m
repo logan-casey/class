@@ -79,7 +79,7 @@ for outer_it = 1:opts.outer_maxit
     inner_opts.V_init          = V_init;
     inner_opts.pol_init        = pol_init;
     inner_opts.freeze_feasible = false;
-    inner_opts.feas_opts = struct('require_PrND', false, 'minPrND', 1e-10, 'eps_mono', 1e-10);
+    inner_opts.feas_opts = opts.feas_opts;
 
     sol = hw.solve_vfi_howard(wgrid, zgrid, Pz, rtilde, par, grid, inner_opts);
 
