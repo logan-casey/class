@@ -12,20 +12,24 @@ function ibmax = feasible_ibmax(rtilde, zgrid, Pz, wbar, par, grid, opts)
 %   rtilde : [Nk x Nb x Nz] current yield schedule
 %   zgrid, Pz, wbar, par, grid : as usual
 %   opts : struct (optional)
-%       .eps_mono   tolerance for monotonicity, default 1e-10
-%       .minPrND    default 1e-10
-%       .require_PrND (true/false), default true
+%       .eps_mono       tolerance for monotonicity, default 1e-10
+%       .minPrND        default 1e-10
+%       .require_PrND   (true/false), default true
+%       .relax_monotonicity (true/false), default false
+%           if true: skip monotonicity check, only enforce PrND if require_PrND=true
 %
 % Output
 %   ibmax : [Nk x Nz] integer, maximum feasible ib index (>=1)
 
 if nargin < 7, opts = struct(); end
-if ~isfield(opts,'eps_mono'),     opts.eps_mono = 1e-10; end
-if ~isfield(opts,'minPrND'),      opts.minPrND = 1e-10; end
-if ~isfield(opts,'require_PrND'), opts.require_PrND = true; end
+if ~isfield(opts,'eps_mono'),           opts.eps_mono = 1e-10; end
+if ~isfield(opts,'minPrND'),            opts.minPrND = 1e-10; end
+if ~isfield(opts,'require_PrND'),       opts.require_PrND = true; end
+if ~isfield(opts,'relax_monotonicity'), opts.relax_monotonicity = false; end
 
 eps_mono = opts.eps_mono;
 minPrND  = opts.minPrND;
+relax_mono = opts.relax_monotonicity;
 
 Nz = length(zgrid);
 ibmax = ones(grid.Nk, Nz);
@@ -39,7 +43,7 @@ for iz = 1:Nz
     for ik = 1:grid.Nk
         kp = grid.kgrid(ik);
 
-        % We'll scan b from low to high and stop when monotonicity breaks
+        % We'll scan b from low to high and stop when constraint breaks
         last_r = -Inf;
         last_ok = 1;
 
@@ -47,9 +51,11 @@ for iz = 1:Nz
             bp = grid.bgrid(ib);
             rt = rtilde(ik, ib, iz);
 
-            % Enforce monotonicity in b (nondecreasing yields)
-            if rt + eps_mono < last_r
-                break;
+            % Check monotonicity (unless relaxed)
+            if ~relax_mono
+                if rt + eps_mono < last_r
+                    break;
+                end
             end
             last_r = rt;
 

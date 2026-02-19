@@ -111,3 +111,21 @@ Simulation summary (last 14 periods, 10 firms):
   StdDevIncomeAssets: 0.0415
 
 
+
+
+Returned stats:
+              AverageEquityIssuanceAssets: 0.0875
+             VarianceEquityIssuanceAssets: 0.0024
+                 VarianceInvestmentAssets: 0.0019
+                  FrequencyEquityIssuance: 0.8787
+                              PayoutRatio: 0.2986
+                    FrequencyNegativeDebt: 0.9999
+                    VarianceDistributions: 0.0030
+                   AverageDebtAssetsRatio: -0.4455
+    CovarianceInvestmentAndEquityIssuance: -0.0014
+          CovarianceInvestmentAndLeverage: -1.2676e-04
+            SerialCorrelationIncomeAssets: 0.4474
+                       StdDevIncomeAssets: 0.0475
+
+
+
