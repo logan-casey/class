@@ -3,6 +3,7 @@ function stats = simulate_from_eq(eq, par, grid, wgrid, zgrid, Pz, Nf, T, L, rng
 % stats = simulate_from_eq(eq, par, grid, wgrid, zgrid, Pz, Nf, T, rngseed)
 %
 % Defaults: Nf=20000, T=200, rngseed=1
+% to be added: interpolation over 60-point z grid
 
 if nargin < 7 || isempty(Nf), Nf = 20000; end
 if nargin < 8 || isempty(T), T = 200; end

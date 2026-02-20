@@ -10,7 +10,7 @@ opts.minPrND = 1e-12;
 opts.wbar_s = 10;
 opts.V_init = eq.V;
 opts.pol_init = struct('pol_ik', eq.pol_ik, 'pol_ib', eq.pol_ib);
-opts.rtilde_init = eq.rtilde;
+opts.rtilde_init = min(eq.rtilde, opts.cap_rtilde);
 opts.inner_verbose = false;
 opts.feas_opts = struct('require_PrND', true, 'minPrND', 1e-12, 'eps_mono', 1e-4);  % relax eps_mono
 

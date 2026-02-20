@@ -1,0 +1,93 @@
+function [Vbest, ik_best, ib_best] = bellman_rhs_fast(iw, iz, V, wgrid, zgrid, Pz, rtilde, par, grid, wbar, F, ibmax)
+%HW.BELLMAN_RHS_FAST  Fast Bellman RHS for one state (wtilde_i, z_i).
+%
+% Same objective as hw.bellman_rhs but:
+%   - vectorized over future shocks z'
+%   - uses griddedInterpolant handles F{izp} for continuation values
+%
+% Inputs:
+%   iw, iz : indices
+%   V      : [Nw x Nz] current value function guess
+%   wgrid  : [Nw x 1]
+%   zgrid  : [Nz x 1]
+%   Pz     : [Nz x Nz]
+%   rtilde : [Nk x Nb x Nz]
+%   par    : params
+%   grid   : grids struct
+%   wbar   : [1 x Nz] (or [Nz x 1]) default boundary
+%   F      : cell{Nz,1} griddedInterpolant for V(:,izp)
+%
+% Outputs:
+%   Vbest, ik_best, ib_best
+
+wtilde = wgrid(iw);
+prob_row = Pz(iz, :).';        % [Nz x 1]
+zvec     = zgrid(:);           % [Nz x 1]
+wbarvec  = wbar(:);            % [Nz x 1]
+Nz = length(zvec);
+
+Vbest   = -Inf;
+ik_best = NaN;
+ib_best = NaN;
+
+% Precompute kp-dependent terms in the inner loops where possible
+for ik = 1:grid.Nk
+    kp = grid.kgrid(ik);
+
+    % profit(z') = z' * kp^alpha
+    profit_vec = zvec .* (kp^par.alpha);                % [Nz x 1]
+    one_minus_delta_kp = (1 - par.delta) * kp;
+    delta_kp = par.delta * kp;
+
+    ib_cap = ibmax(ik, iz);
+    for ib = 1:ib_cap
+        bp = grid.bgrid(ib);
+
+        rt = rtilde(ik, ib, iz);
+
+        % Flow to equity today via net distribution D = wtilde + bp - kp
+        % D = wtilde + bp - kp;
+        % Treat bp as face value; proceeds are discounted
+        proceeds = bp;
+        if bp > 0
+            proceeds = bp / (1 + rt*(1 - par.tau_i));
+        end
+        D = wtilde + proceeds - kp;
+
+        if D >= 0
+            flow = D - hw.tax_dist(D, par);
+        else
+            E = -D;
+            flow = -E - hw.equity_cost(E, par);
+        end
+
+        % Realized net worth vector for all z'
+        % taxable income uses rt*bp
+        taxbase_vec = profit_vec - delta_kp - rt * bp;
+        Tc_vec = par.tau_c_pos .* max(taxbase_vec, 0) + par.tau_c_neg .* min(taxbase_vec, 0);
+
+        w_real_vec = one_minus_delta_kp + profit_vec - Tc_vec - (1 + rt) * bp;
+
+        % Revised net worth wtilde' = max(wbar(z'), w_real)
+        w_next_vec = max(wbarvec, w_real_vec);
+
+        % Continuation values V(w_next, z')
+        Vnext_vec = zeros(Nz, 1);
+        for izp = 1:Nz
+            Vnext_vec(izp) = F{izp}(w_next_vec(izp));
+        end
+
+        EV = prob_row' * Vnext_vec;
+
+        beta = 1 / (1 + par.r * (1 - par.tau_i));
+        Vcand = flow + beta * EV;
+
+        if Vcand > Vbest
+            Vbest   = Vcand;
+            ik_best = ik;
+            ib_best = ib;
+        end
+    end
+end
+
+end

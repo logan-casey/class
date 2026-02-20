@@ -131,10 +131,12 @@ for outer_it = 1:opts.outer_maxit
     % ---- Outer update of rtilde via equation (20) ----
     upd_opts = struct();
     % upd_opts.omega   = opts.omega_rtilde;
-    upd_opts.cap     = opts.cap_rtilde;
-    upd_opts.minPrND = opts.minPrND;
-    upd_opts.smooth_default = true;
-    upd_opts.smooth_s = opts.wbar_s;   % try 2,5,10
+    if isfield(opts.smooth_default) && opts.smoooth_default == true
+        upd_opts.cap     = opts.cap_rtilde;
+        upd_opts.minPrND = opts.minPrND;
+        upd_opts.smooth_default = true;
+        upd_opts.smooth_s = opts.wbar_s;
+    end
 
     % adaptive omega damping -- depends on pol_change above
     omega = opts.omega_rtilde;

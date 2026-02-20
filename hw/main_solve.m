@@ -1,1 +1,0 @@
-cd 'C:\Users\logan\Documents\secondyear\corpfin2\hw'

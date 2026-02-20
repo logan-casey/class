@@ -7,6 +7,7 @@ for i = 1:size(eq.pol_ib,1)
 end
 figure
 surf(x,y,zb);
+saveas(gcf, 'pol_ib.png','png')
 zk = zeros(size(eq.pol_ik));
 for i = 1:size(eq.pol_ik,1)
     for j = 1:size(eq.pol_ik,2)
@@ -15,7 +16,9 @@ for i = 1:size(eq.pol_ik,1)
 end
 figure
 surf(x,y,zk);
+saveas(gcf, 'pol_ik.png','png')
 
 figure
 surf(x,y,eq.V);
+saveas(gcf, 'val.png','png')
 

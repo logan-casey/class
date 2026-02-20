@@ -48,8 +48,8 @@ fprintf('wbar: '); disp(eq.wbar);
 
 
 % Check Bellman satisfaction at a few states
-% test_states = [1,1,1; 15,10,5; 30,15,10]; % [iw, iz] pairs
-test_states = [1,1,1; 100,10,5; 120,15,10]; % [iw, iz] pairs
+test_states = [1,1,1; 15,10,5; 30,15,10]; % [iw, iz] pairs
+% test_states = [1,1,1; 100,10,5; 120,15,10]; % [iw, iz] pairs
 for i=1:size(test_states,1)
     iw = test_states(i,1); iz = test_states(i,2);
     V_current = eq.V(iw, iz);
@@ -109,3 +109,49 @@ for ib = 1:grid.Nb
     % if ~ok, break; end
     last_r = r;
 end
+
+
+
+% Inspect PrND and ED across b for one (ik,iz)
+ik = 17; iz = 1;
+kp = grid.kgrid(ik);
+Nz = length(zgrid);
+Nb = grid.Nb;
+
+% Precompute profit and R_mat as in update_rtilde
+profit_vec = zgrid(:) * (kp^par.alpha);            % [Nz x 1]
+taxbase_def = profit_vec - par.delta * kp;
+Tc_def = par.tau_c_pos .* max(taxbase_def,0) + par.tau_c_neg .* min(taxbase_def,0);
+bankrupt_cost_k = par.xi .* ((1-par.delta) * kp);
+R_vec = (1-par.delta)*kp + profit_vec - Tc_def - bankrupt_cost_k - eq.wbar(:); % [Nz x 1]
+
+PrND = nan(Nb,1);
+ED   = nan(Nb,1);
+rvec = squeeze(eq.rtilde(ik, :, iz));   % [1 x Nb] -> [Nb x1]
+bvec = grid.bgrid(:);
+
+for ib = 1:Nb
+    bp = bvec(ib);
+    r = rvec(ib);
+
+    taxbase = profit_vec - par.delta * kp - r * bp;
+    Tc = par.tau_c_pos .* max(taxbase,0) + par.tau_c_neg .* min(taxbase,0);
+    w_real = (1-par.delta)*kp + profit_vec - Tc - (1 + r) * bp;
+
+    default_mask = (w_real < eq.wbar(:));       % [Nz x 1]
+    PrND(ib) = sum(Pz(iz,:)' .* (~default_mask));
+    if bp == 0
+        ED(ib) = 0;
+    else
+        ED(ib) = sum(Pz(iz,:)' .* default_mask .* (R_vec ./ max(bp,1e-12)));
+    end
+end
+
+T = table((1:Nb)', bvec, rvec', PrND, ED, 'VariableNames', {'ib','b','rtilde','PrND','ED'});
+disp(T);
+
+% quick plots
+figure;
+subplot(2,1,1); plot(bvec, rvec, '-o'); ylabel('rtilde'); grid on;
+subplot(2,1,2); yyaxis left; plot(bvec, PrND, '-o'); ylabel('PrND'); yyaxis right; plot(bvec, ED, '-x'); ylabel('ED'); grid on;
+saveas(gcf, 'prnd.png', 'png')

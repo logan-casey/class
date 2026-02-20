@@ -47,8 +47,6 @@ else
     pol_ib = ones(Nw, Nz);
 end
 
-Vimp = V; % ensure defined
-
 % ------------------------------------------------------------
 % Compute (frozen) wbar to be used inside the solver
 % ------------------------------------------------------------
