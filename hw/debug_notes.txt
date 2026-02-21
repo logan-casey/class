@@ -1,0 +1,134 @@
+Having run the code with the grid used for debug and the grid used in the paper, it still does not seem to converge. In particular, it seems like diff_r is not declining -- so maybe there is an issue with the rtilde update, and hopefully not also with the value function iteration/bellman.
+
+There is almost no variation in choice of k, b across values of z (but there is variation across w). The value function backs this up -- it looks like it's a plane that is increasing in k but basically flat across z. In both cases, about 60% of k, b, z points imply certain default/non-default. In the case with the grid from the paper, about 1/3 of the chosen k, b values are degenerate (certain default/non-default), while in the case zoomed in on the middle values of b, only 11% are degenerate. This could still be ok, as I do not know if firms would reach these degenerate areas without highly unlikely sequences of z shocks.
+
+
+Case 1: Nk = 17, Nb = 91, Nw = 120, Nz = 15; k grid with every other point, bgrid zoomed/expanded as in debugging, wgrid restricted.
+
+
+Case 2: Nk = 31, Nb = 16, Nw = 120, Nz = 15; k, b grids as defined in paper.
+
+For context, 30 iterations with the suggested smoothing parameters takes 30 minutes-1 hour depending on the grid used.
+
+[x, y] = meshgrid(zgrid, wgrid);
+surf(x,y,eq.V)
+
+
+
+
+tot = 0;
+deg_pol = 0;
+for iw = 1:length(wgrid)
+    for iz= 1:length(zgrid)
+        ed_i = ED(eq.pol_ik(iw, iz),eq.pol_ib(iw, iz),iz);
+        deg_pol = deg_pol + (ed_i==0) + (ed_i==1);
+        tot = tot+1;
+    end
+end
+deg_pol/tot
+
+
+
+
+
+
+
+
+
+Feb 13
+everything finished fast after small w for paper grid; warm start for tight grid
+also higher wbar smoothing ***
+paper grid with smaller w grid -- converges but trivial borrowing decision
+	wbar not constant at least, but default still degenerate
+tight grid -- pretty much the same -- must be trivial borrowing decision if we smooth wbar too much
+
+
+
+
+Feb 16
+steps:
+check V is not monotone
+find out what part of RHS changes with b
+write code to iterate separately
+
+
+
+
+the code in this folder relates to the model of Henessy & Whited (2014). an outline of the files is in notes.txt . given the output of a file like solve_equilibrium.m, write a script to simulate from the model. the plan is. for 20,000 firms, to take a random draw of the discretized z shock for 200 time periods, and follow the firm according to the shared policy and value functions. then we will keep the last 14 periods, calculate the new variables pasted at the below, and then create a table like the one pasted at the end of this prompt.
+
+
+% Output eq
+eq = struct();
+eq.rtilde   = rtilde;
+eq.V        = V;
+eq.pol_ik   = pol_ik;
+eq.pol_ib   = pol_ib;
+eq.wbar     = wbar;
+
+Investment/Book Real Assets
+Cash Flow/Book Real Assets
+Tobin’s q
+Operating Income/
+Book Real Assets
+Debt/Market Value Real Assets
+(k−(1−δ)k)/k
+[zkα − Tc(k,b, z−, z) −(1+ ˜r(k,b, z−))b]/k
+[V( ˜w, z) + (1 + ˜r(k, b, z−))b]/k
+zkα/k
+b/(V( ˜w, z) + b)
+(Equity Issuance or Distributions)/ (k− ˜w − b)/k
+Book Real Assets
+
+AverageEquityIssuance/Assets 0.0892 0.0963
+VarianceofEquityIssuance/Assets 0.0911 0.0847
+VarianceofInvestment/Assets 0.0068 0.0117
+FrequencyofEquityIssuance 0.1751 0.2305
+PayoutRatio 0.2226 0.2026
+FrequencyofNegativeDebt 0.3189 0.3258
+VarianceofDistributions 0.0013 0.0037
+AverageDebt-AssetsRatio(NetofCash) 0.1204 0.1104
+CovarianceofInvestmentandEquityIssuance 0.0004 0.0005
+CovarianceofInvestmentandLeverage −0.0018 −0.0025
+SerialCorrelationofIncome/Assets 0.5121 0.5661
+StandardDeviationoftheShocktoIncome/Assets 0.1185 0.1057
+
+
+
+
+
+Simulation summary (last 14 periods, 10 firms):
+  AverageEquityIssuanceAssets: 0.0929
+  VarianceEquityIssuanceAssets: 0.0023
+  VarianceInvestmentAssets: 0.0012
+  FrequencyEquityIssuance: 0.8714
+  PayoutRatio: 0.3080
+  FrequencyNegativeDebt: 1.0000
+  VarianceDistributions: 0.0030
+  AverageDebtAssetsRatio: -0.4446
+  CovarianceInvestmentAndEquityIssuance: -0.0015
+  CovarianceInvestmentAndLeverage: -0.0002
+  SerialCorrelationIncomeAssets: 0.4418
+  StdDevIncomeAssets: 0.0415
+
+
+
+
+Returned stats:
+              AverageEquityIssuanceAssets: 0.0875
+             VarianceEquityIssuanceAssets: 0.0024
+                 VarianceInvestmentAssets: 0.0019
+                  FrequencyEquityIssuance: 0.8787
+                              PayoutRatio: 0.2986
+                    FrequencyNegativeDebt: 0.9999
+                    VarianceDistributions: 0.0030
+                   AverageDebtAssetsRatio: -0.4455
+    CovarianceInvestmentAndEquityIssuance: -0.0014
+          CovarianceInvestmentAndLeverage: -1.2676e-04
+            SerialCorrelationIncomeAssets: 0.4474
+                       StdDevIncomeAssets: 0.0475
+
+
+
+
+
+unfreeze ib, wbar
