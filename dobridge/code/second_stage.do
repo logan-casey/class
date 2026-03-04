@@ -44,10 +44,11 @@ foreach y of local outcomes {
         pre_0203_loss pre_0203_loss2 ///
         i.ffi48 ///
         (refund_0203 = zv1_0203 zv2_0203) ///
-        if regflag_0203, vce(cluster ffi48)
+        if regflag_0203 == 1, vce(cluster ffi48)
     estimates store ss_0203_`y'
 }
 
 display as text "Stored estimates created for first-policy (2002/2003) regressions."
+
 
 

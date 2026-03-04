@@ -424,7 +424,11 @@ void policy2002() {
                 }
             }
 
-            profits_adj_9601 = adjust_2yr_profits(profits_9601, losses_9601)
+            // Exclude 2001 policy loss from the generic 2yr adjustment pass;
+            // it is consumed separately via the 2002-policy oldest-year rule.
+            losses_for_adj_9601 = losses_9601
+            losses_for_adj_9601[6] = 0
+            profits_adj_9601 = adjust_2yr_profits(profits_9601, losses_for_adj_9601)
             loss_2001 = losses_9601[6]
             profits_remaining = apply_loss_oldest(loss_2001, profits_adj_9601)
 
@@ -515,13 +519,14 @@ void policy2009() {
         }
 
         if (refund_A >= refund_B) {
-            loss_for_2010 = loss_2008 + loss_2009
+            // 2010 refund amount is based on the chosen 5yr-loss year (2008 here).
+            loss_for_2010 = loss_2008
             r2010[i]  = refund_A
             lappl[i]  = loss_for_2010
             u08[i]    = 1
             // Assignment V for 2010 refund year when 2008 option is chosen:
             // available profits in 2003-2007 minus (2008 + 2009) policy losses
-            v2010[i]  = sum(profits_A) - loss_for_2010
+            v2010[i]  = sum(profits_A) - (loss_2008 + loss_2009)
         }
         else {
             loss_for_2010 = loss_2009

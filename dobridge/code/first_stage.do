@@ -3,15 +3,25 @@ set more off
 
 use "../data/main_data.dta", clear
 
-
-
-
-
-
+capture confirm variable ffi48
+if _rc {
+    di as err "Missing industry variable ffi48. Run clean_data.do first."
+    exit 111
+}
+capture confirm variable regflag_0203
+if _rc {
+    di as err "Missing regflag_0203. Re-run clean_data.do."
+    exit 111
+}
+capture confirm variable regflag_2010
+if _rc {
+    di as err "Missing regflag_2010. Re-run clean_data.do."
+    exit 111
+}
 
 xtset gvkey fyear
 
-* Assignment variable V in levels ($M): profits minus losses
+* Assignment variable V in levels ($M): paper definition from clean_data.do
 gen v_level = assignment_v
 
 * ---------------------------------------------------------------------
@@ -39,11 +49,12 @@ reg refund_0203 ///
     pre_0203_leverage pre_0203_ln_assets ///
     pre_0203_loss pre_0203_loss2 ///
     i.ffi48 ///
-    if regflag_0203, vce(cluster ffi48)
+    if regflag_0203 == 1, vce(cluster ffi48)
 
 test zv1_0203 zv2_0203
 estimates store fs_0203
 
+break
 * ---------------------------------------------------------------------
 * First stage: 2009 policy period
 * Run separate cross-sections for 2010 and 2011 outcomes.
@@ -56,7 +67,7 @@ foreach c in tobinq roa cf_assets sales_assets leverage ln_assets {
 }
 
 foreach yy in 2010 2011 {
-    gen in_`yy' = (fyear == `yy') & regflag_2010
+    gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
 
     gen refund_`yy'_reg = refund_2010_val if in_`yy'
     gen v_`yy'      = v_2009_val      if in_`yy'
@@ -89,4 +100,3 @@ foreach yy in 2010 2011 {
 }
 
 display as text "Stored estimates: fs_0203 fs_2010 fs_2011"
-
