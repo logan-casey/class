@@ -12,7 +12,7 @@ if _rc {
 xtset gvkey fyear
 
 * Assignment variable V in levels ($M): profits minus losses
-gen v_level = profit - loss
+gen v_level = assignment_v
 
 * Outcomes from specification (first policy only)
 * "other" = change in short-term investments + change in long-term investments + acquisitions
@@ -44,8 +44,10 @@ foreach y of local outcomes {
         pre_0203_loss pre_0203_loss2 ///
         i.ffi48 ///
         (refund_0203 = zv1_0203 zv2_0203) ///
-        if inlist(fyear, 2002, 2003), vce(cluster ffi48)
+        if regflag_0203, vce(cluster ffi48)
     estimates store ss_0203_`y'
 }
 
 display as text "Stored estimates created for first-policy (2002/2003) regressions."
+
+

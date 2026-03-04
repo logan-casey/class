@@ -41,9 +41,9 @@ gen pre_2010_full = inrange(fyear, 2003, 2009)
 bysort gvkey: egen n_pre_2010_full = total(pre_2010_full)
 gen firm_complete_2010 = (n_pre_2010_full == 7)
 
-* Row-level flags used directly in regression samples
-gen regflag_0203 = inlist(fyear, 2002, 2003) & firm_complete_0203
-gen regflag_2010 = inlist(fyear, 2010, 2011) & firm_complete_2010
+* Row-level flags are finalized after all period-specific restrictions (Step 7)
+gen byte regflag_0203 = .
+gen byte regflag_2010 = .
 
 drop pre2002 pre2003 pre2009 years_pre2002 years_pre2003 years_pre2009
 drop pre_0203_full pre_2010_full n_pre_0203_full n_pre_2010_full
@@ -337,7 +337,7 @@ end
 
 ********************************************************************************
 * STEP 4: 2002 POLICY - Refunds based on 2001 and 2002 losses
-* Window for 2001 loss: profits from 1996-2001 (after 2yr carryback adj)
+* Window for 2001 loss: profits from 1996-2000 (after 2yr carryback adj)
 * Window for 2002 loss: profits from 1997-2001 (after 2yr carryback adj)
 ********************************************************************************
 
@@ -345,6 +345,8 @@ gen refund_2002 = .
 gen refund_2003 = .
 gen loss_2002   = .
 gen loss_2003   = .
+gen assign_v_2002 = .
+gen assign_v_2003 = .
 
 mata:
 void policy2002() {
@@ -357,6 +359,8 @@ void policy2002() {
     st_view(r2003,  ., "refund_2003")
     st_view(l2002,  ., "loss_2002")
     st_view(l2003,  ., "loss_2003")
+    st_view(v2002,  ., "assign_v_2002")
+    st_view(v2003,  ., "assign_v_2003")
 
     n = rows(gv)
 
@@ -374,13 +378,13 @@ void policy2002() {
             }
             l2002[i] = loss_amt
 
-            profits = J(6, 1, 0)
-            losses  = J(6, 1, 0)
-            rates   = J(6, 1, 0)
-            years   = (1996, 1997, 1998, 1999, 2000, 2001)
+            profits = J(5, 1, 0)
+            losses  = J(5, 1, 0)
+            rates   = J(5, 1, 0)
+            years   = (1996, 1997, 1998, 1999, 2000)
             for (j = 1; j <= n; j++) {
                 if (gv[j] != g) continue
-                for (k = 1; k <= 6; k++) {
+                for (k = 1; k <= 5; k++) {
                     if (fy[j] == years[k]) {
                         profits[k] = pv[j]
                         losses[k]  = lv[j]
@@ -389,6 +393,9 @@ void policy2002() {
                 }
             }
             profits_adj = adjust_2yr_profits(profits, losses)
+            // Assignment V for 2002 refund year:
+            // available profits in 1996-2000 minus 2001 policy loss
+            v2002[i] = sum(profits_adj) - loss_amt
             r2002[i] = calc_refund(loss_amt, profits_adj, rates, 0)
         }
 
@@ -423,6 +430,9 @@ void policy2002() {
 
             profits_2003 = profits_remaining[2::6]
             rates_2003   = rates_9601[2::6]
+            // Assignment V for 2003 refund year:
+            // available profits in 1997-2001 minus 2002 policy loss
+            v2003[i] = sum(profits_2003) - loss_amt
             r2003[i] = calc_refund(loss_amt, profits_2003, rates_2003, 0)
         }
     }
@@ -442,6 +452,7 @@ mata: policy2002()
 gen refund_2010       = .
 gen loss_applied_2010 = .
 gen used_2008_loss    = .
+gen assign_v_2010     = .
 
 mata:
 void policy2009() {
@@ -453,6 +464,7 @@ void policy2009() {
     st_view(r2010,   ., "refund_2010")
     st_view(lappl,   ., "loss_applied_2010")
     st_view(u08,     ., "used_2008_loss")
+    st_view(v2010,   ., "assign_v_2010")
 
     n = rows(gv)
 
@@ -507,12 +519,18 @@ void policy2009() {
             r2010[i]  = refund_A
             lappl[i]  = loss_for_2010
             u08[i]    = 1
+            // Assignment V for 2010 refund year when 2008 option is chosen:
+            // available profits in 2003-2007 minus (2008 + 2009) policy losses
+            v2010[i]  = sum(profits_A) - loss_for_2010
         }
         else {
             loss_for_2010 = loss_2009
             r2010[i]  = refund_B
             lappl[i]  = loss_for_2010
             u08[i]    = 0
+            // Assignment V for 2010 refund year when 2009 option is chosen:
+            // available profits in 2004-2008 minus 2009 policy loss
+            v2010[i]  = sum(profits_B) - loss_for_2010
         }
     }
 }
@@ -525,6 +543,8 @@ bysort gvkey (fyear): replace refund_2010    = refund_2010[_n-1]    ///
     if fyear == 2009 & missing(refund_2010)
 bysort gvkey (fyear): replace used_2008_loss = used_2008_loss[_n-1] ///
     if fyear == 2009 & missing(used_2008_loss)
+bysort gvkey (fyear): replace assign_v_2010 = assign_v_2010[_n-1] ///
+    if fyear == 2009 & missing(assign_v_2010)
 
 ********************************************************************************
 * STEP 6: Consolidate refund variables
@@ -536,6 +556,18 @@ replace potential_refund = refund_2002 if fyear == 2001
 replace potential_refund = refund_2003 if fyear == 2002
 replace potential_refund = refund_2010 if inlist(fyear, 2008, 2009)
 
+* Assignment variable V = carryback-window profits available - policy losses
+* 2002 refund (fyear==2001): sum profits 1996-2000 - 2001 loss
+* 2003 refund (fyear==2002): sum profits 1997-2001 - 2002 loss
+* 2010 refund (fyear==2008/2009): either
+*   sum profits 2003-2007 - (2008+2009 losses), or
+*   sum profits 2004-2008 - 2009 loss,
+* depending on the chosen policy-loss year (higher refund option)
+gen assignment_v = .
+replace assignment_v = assign_v_2002 if fyear == 2001
+replace assignment_v = assign_v_2003 if fyear == 2002
+replace assignment_v = assign_v_2010 if inlist(fyear, 2008, 2009)
+
 * Scale by assets for use as a regressor (common in the paper)
 gen refund_assets = potential_refund / L.at
 
@@ -545,84 +577,140 @@ label var refund_2010      "Estimated 2010 tax refund (2008 or 2009 loss)"
 label var used_2008_loss   "=1 if firm applies 2008 loss to 5yr carryback"
 label var potential_refund "Potential refund from carryback policy"
 label var refund_assets    "Potential refund / lagged assets"
+label var assignment_v     "Assignment variable V (available carryback profits - policy losses)"
 
 ********************************************************************************
-* STEP 7: Final Sample Restrictions
+* STEP 7: Period-Specific Regression Sample Flags
 ********************************************************************************
 
-* Policy-year indicator
-gen byte policy_year = inlist(fyear, 2001, 2002, 2008, 2009)
+* V = assignment variable in levels ($M)
+gen v = assignment_v
 
-* V = profits minus losses (in $M)
-gen v = profit - loss
-
-* Keep only policy-window observations with assets > $1M
-gen byte drop_assets = policy_year & (missing(at) | at <= 1)
-
-* 1% tails for V and investment (computed in policy years)
-quietly _pctile v if policy_year & !missing(v), p(1 99)
-scalar v_p1  = r(r1)
-scalar v_p99 = r(r2)
-
-quietly _pctile investment if policy_year & !missing(investment), p(1 99)
-scalar inv_p1  = r(r1)
-scalar inv_p99 = r(r2)
-
-gen byte drop_v_tail   = policy_year & !missing(v) & (v < v_p1 | v > v_p99)
-gen byte drop_inv_tail = policy_year & !missing(investment) & ///
-    (investment < inv_p1 | investment > inv_p99)
-
-* Additional outlier screens for flow variables:
-* Scale by lagged assets (fallback to current assets if lag is missing)
+* Scale flows by lagged assets (fallback to current assets if lag is missing)
 gen flow_scale_at = L.at
 replace flow_scale_at = at if missing(flow_scale_at) | flow_scale_at <= 0
+gen d_cash_scaled = d_cash / flow_scale_at
+gen d_debt_scaled = d_totdebt / flow_scale_at
+gen d_inv_scaled  = d_inv / flow_scale_at
+gen payout_scaled = payout / flow_scale_at
 
-gen d_cash_scaled   = d_cash / flow_scale_at
-gen d_debt_scaled   = d_totdebt / flow_scale_at
-gen d_inv_scaled    = d_inv / flow_scale_at
-gen payout_scaled   = payout / flow_scale_at
+* Policy-period windows (for restriction calculations)
+gen byte policy_0203 = inlist(fyear, 2001, 2002)
+gen byte policy_2010 = inlist(fyear, 2008, 2009)
 
-quietly _pctile d_cash_scaled if policy_year & !missing(d_cash_scaled), p(1 99)
-scalar cash_p1  = r(r1)
-scalar cash_p99 = r(r2)
+* Loss eligibility by policy period
+gen byte loss_elig_0203_obs = (loss_2002 > 0 | loss_2003 > 0)
+bysort gvkey: egen byte firm_has_policy_loss_0203 = max(loss_elig_0203_obs)
 
-quietly _pctile d_debt_scaled if policy_year & !missing(d_debt_scaled), p(1 99)
-scalar debt_p1  = r(r1)
-scalar debt_p99 = r(r2)
+gen byte loss_elig_2010_obs = (loss_applied_2010 > 0)
+bysort gvkey: egen byte firm_has_policy_loss_2010 = max(loss_elig_2010_obs)
 
-quietly _pctile d_inv_scaled if policy_year & !missing(d_inv_scaled), p(1 99)
-scalar dinv_p1  = r(r1)
-scalar dinv_p99 = r(r2)
+* Asset restriction by policy window (at > $1M in all policy years of that window)
+gen byte at_ok_0203_obs = policy_0203 & at > 1 & !missing(at)
+bysort gvkey: egen n_at_ok_0203 = total(at_ok_0203_obs)
+gen byte firm_assets_ok_0203 = (n_at_ok_0203 == 2)
 
-quietly _pctile payout_scaled if policy_year & !missing(payout_scaled), p(1 99)
-scalar payout_p1  = r(r1)
-scalar payout_p99 = r(r2)
+gen byte at_ok_2010_obs = policy_2010 & at > 1 & !missing(at)
+bysort gvkey: egen n_at_ok_2010 = total(at_ok_2010_obs)
+gen byte firm_assets_ok_2010 = (n_at_ok_2010 == 2)
 
-gen byte drop_cash_tail = policy_year & !missing(d_cash_scaled) & ///
-    (d_cash_scaled < cash_p1 | d_cash_scaled > cash_p99)
-gen byte drop_debt_tail = policy_year & !missing(d_debt_scaled) & ///
-    (d_debt_scaled < debt_p1 | d_debt_scaled > debt_p99)
-gen byte drop_dinv_tail = policy_year & !missing(d_inv_scaled) & ///
-    (d_inv_scaled < dinv_p1 | d_inv_scaled > dinv_p99)
-gen byte drop_payout_tail = policy_year & !missing(payout_scaled) & ///
-    (payout_scaled < payout_p1 | payout_scaled > payout_p99)
+* ---------- Outlier rules for 2002/2003 sample ----------
+quietly _pctile v if policy_0203 & !missing(v), p(1 99)
+scalar v_p1_0203  = r(r1)
+scalar v_p99_0203 = r(r2)
 
-* Extreme refund outliers: top 0.5% of estimated refunds in policy years
-quietly _pctile potential_refund if policy_year & !missing(potential_refund), p(99.5)
-scalar refund_p995 = r(r1)
-gen byte drop_refund_outlier = policy_year & !missing(potential_refund) & ///
-    (potential_refund > refund_p995)
+quietly _pctile investment if policy_0203 & !missing(investment), p(1 99)
+scalar inv_p1_0203  = r(r1)
+scalar inv_p99_0203 = r(r2)
 
-* Drop firms if any policy-year observation hits one of the exclusion rules
-bysort gvkey: egen byte drop_firm = max(drop_assets | drop_v_tail | drop_inv_tail | ///
-    drop_cash_tail | drop_debt_tail | drop_dinv_tail | drop_payout_tail | ///
-    drop_refund_outlier)
-drop if drop_firm
+quietly _pctile d_cash_scaled if policy_0203 & !missing(d_cash_scaled), p(1 99)
+scalar cash_p1_0203  = r(r1)
+scalar cash_p99_0203 = r(r2)
 
-drop policy_year v flow_scale_at d_cash_scaled d_debt_scaled d_inv_scaled payout_scaled
-drop drop_assets drop_v_tail drop_inv_tail drop_cash_tail drop_debt_tail
-drop drop_dinv_tail drop_payout_tail drop_refund_outlier drop_firm
-scalar drop v_p1 v_p99 inv_p1 inv_p99 cash_p1 cash_p99 debt_p1 debt_p99
-scalar drop dinv_p1 dinv_p99 payout_p1 payout_p99 refund_p995
+quietly _pctile d_debt_scaled if policy_0203 & !missing(d_debt_scaled), p(1 99)
+scalar debt_p1_0203  = r(r1)
+scalar debt_p99_0203 = r(r2)
+
+quietly _pctile d_inv_scaled if policy_0203 & !missing(d_inv_scaled), p(1 99)
+scalar dinv_p1_0203  = r(r1)
+scalar dinv_p99_0203 = r(r2)
+
+quietly _pctile payout_scaled if policy_0203 & !missing(payout_scaled), p(1 99)
+scalar payout_p1_0203  = r(r1)
+scalar payout_p99_0203 = r(r2)
+
+quietly _pctile potential_refund if policy_0203 & !missing(potential_refund), p(99.5)
+scalar refund_p995_0203 = r(r1)
+
+gen byte drop_0203_obs = policy_0203 & ///
+    ((v < v_p1_0203 | v > v_p99_0203) | ///
+    (investment < inv_p1_0203 | investment > inv_p99_0203) | ///
+    (d_cash_scaled < cash_p1_0203 | d_cash_scaled > cash_p99_0203) | ///
+    (d_debt_scaled < debt_p1_0203 | d_debt_scaled > debt_p99_0203) | ///
+    (d_inv_scaled < dinv_p1_0203 | d_inv_scaled > dinv_p99_0203) | ///
+    (payout_scaled < payout_p1_0203 | payout_scaled > payout_p99_0203) | ///
+    (potential_refund > refund_p995_0203))
+bysort gvkey: egen byte drop_firm_0203 = max(drop_0203_obs)
+
+* ---------- Outlier rules for 2010/2011 sample ----------
+quietly _pctile v if policy_2010 & !missing(v), p(1 99)
+scalar v_p1_2010  = r(r1)
+scalar v_p99_2010 = r(r2)
+
+quietly _pctile investment if policy_2010 & !missing(investment), p(1 99)
+scalar inv_p1_2010  = r(r1)
+scalar inv_p99_2010 = r(r2)
+
+quietly _pctile d_cash_scaled if policy_2010 & !missing(d_cash_scaled), p(1 99)
+scalar cash_p1_2010  = r(r1)
+scalar cash_p99_2010 = r(r2)
+
+quietly _pctile d_debt_scaled if policy_2010 & !missing(d_debt_scaled), p(1 99)
+scalar debt_p1_2010  = r(r1)
+scalar debt_p99_2010 = r(r2)
+
+quietly _pctile d_inv_scaled if policy_2010 & !missing(d_inv_scaled), p(1 99)
+scalar dinv_p1_2010  = r(r1)
+scalar dinv_p99_2010 = r(r2)
+
+quietly _pctile payout_scaled if policy_2010 & !missing(payout_scaled), p(1 99)
+scalar payout_p1_2010  = r(r1)
+scalar payout_p99_2010 = r(r2)
+
+quietly _pctile potential_refund if policy_2010 & !missing(potential_refund), p(99.5)
+scalar refund_p995_2010 = r(r1)
+
+gen byte drop_2010_obs = policy_2010 & ///
+    ((v < v_p1_2010 | v > v_p99_2010) | ///
+    (investment < inv_p1_2010 | investment > inv_p99_2010) | ///
+    (d_cash_scaled < cash_p1_2010 | d_cash_scaled > cash_p99_2010) | ///
+    (d_debt_scaled < debt_p1_2010 | d_debt_scaled > debt_p99_2010) | ///
+    (d_inv_scaled < dinv_p1_2010 | d_inv_scaled > dinv_p99_2010) | ///
+    (payout_scaled < payout_p1_2010 | payout_scaled > payout_p99_2010) | ///
+    (potential_refund > refund_p995_2010))
+bysort gvkey: egen byte drop_firm_2010 = max(drop_2010_obs)
+
+* Final firm-level sample flags by policy period
+gen byte sample_firm_0203 = firm_complete_0203 & firm_has_policy_loss_0203 & ///
+    firm_assets_ok_0203 & (drop_firm_0203 == 0)
+gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010 & ///
+    firm_assets_ok_2010 & (drop_firm_2010 == 0)
+
+* Row-level regression flags (use these in first/second-stage scripts)
+replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203
+replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010
+
+* Cleanup temporary variables and scalars
+drop flow_scale_at d_cash_scaled d_debt_scaled d_inv_scaled payout_scaled
+drop policy_0203 policy_2010
+drop loss_elig_0203_obs loss_elig_2010_obs
+drop at_ok_0203_obs at_ok_2010_obs n_at_ok_0203 n_at_ok_2010
+drop drop_0203_obs drop_2010_obs drop_firm_0203 drop_firm_2010
+scalar drop v_p1_0203 v_p99_0203 inv_p1_0203 inv_p99_0203 cash_p1_0203 cash_p99_0203
+scalar drop debt_p1_0203 debt_p99_0203 dinv_p1_0203 dinv_p99_0203 payout_p1_0203 payout_p99_0203
+scalar drop refund_p995_0203
+scalar drop v_p1_2010 v_p99_2010 inv_p1_2010 inv_p99_2010 cash_p1_2010 cash_p99_2010
+scalar drop debt_p1_2010 debt_p99_2010 dinv_p1_2010 dinv_p99_2010 payout_p1_2010 payout_p99_2010
+scalar drop refund_p995_2010
 
 save "../data/main_data.dta", replace
