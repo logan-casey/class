@@ -1,5 +1,5 @@
 assignment:
-Replicate the calibrated model of Hennessy & Whited (2014).
+Replicate the calibrated model of Hennessy & Whited (207).
 Using the point estimates of Panel B, table I, simulate the model and report the
 simulated moments as they appear on Table I. Repeat this exercise for Table II. Produce a table
 similar to Table IV. Discuss your findings.
