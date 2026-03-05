@@ -628,59 +628,57 @@ bysort gvkey: egen byte firm_has_policy_loss_0203 = max(loss_elig_0203_obs)
 gen byte loss_elig_2010_obs = (loss_applied_2010 > 0)
 bysort gvkey: egen byte firm_has_policy_loss_2010 = max(loss_elig_2010_obs)
 
-* ---------- Outlier rules for 2002/2003 sample ----------
-quietly _pctile v if policy_0203 & !missing(v), p(1 99)
+* ---------- Outlier rules for first-stage samples (row-level only) ----------
+* 2002/2003 outcomes use lagged policy-year assignment/refund.
+gen v_fs_0203 = L.assignment_v if inlist(fyear, 2002, 2003)
+gen refund_fs_0203 = L.potential_refund if inlist(fyear, 2002, 2003)
+
+quietly _pctile v_fs_0203 if !missing(v_fs_0203), p(1 99)
 scalar v_p1_0203  = r(r1)
 scalar v_p99_0203 = r(r2)
 
-quietly _pctile investment if policy_0203 & !missing(investment), p(1 99)
-scalar inv_p1_0203  = r(r1)
-scalar inv_p99_0203 = r(r2)
-
-quietly _pctile potential_refund if policy_0203 & !missing(potential_refund), p(99.5)
+quietly _pctile refund_fs_0203 if !missing(refund_fs_0203), p(99.5)
 scalar refund_p995_0203 = r(r1)
 
-gen byte drop_0203_obs = policy_0203 & ///
-    ((v < v_p1_0203 | v > v_p99_0203) | ///
-    (investment < inv_p1_0203 | investment > inv_p99_0203) | ///
-    (potential_refund > refund_p995_0203))
-bysort gvkey: egen byte drop_firm_0203 = max(drop_0203_obs)
+gen byte outlier_fs_0203 = inlist(fyear, 2002, 2003) & !missing(v_fs_0203, refund_fs_0203) & ///
+    ((v_fs_0203 < v_p1_0203 | v_fs_0203 > v_p99_0203) | ///
+     (refund_fs_0203 > refund_p995_0203))
 
-* ---------- Outlier rules for 2010/2011 sample ----------
-quietly _pctile v if policy_2010 & !missing(v), p(1 99)
+* 2010/2011 outcomes use 2009 policy-year assignment/refund carried by firm.
+bysort gvkey: egen v_2009_for_2010 = max(cond(fyear == 2009, assignment_v, .))
+bysort gvkey: egen refund_2009_for_2010 = max(cond(fyear == 2009, potential_refund, .))
+gen v_fs_2010 = v_2009_for_2010 if inlist(fyear, 2010, 2011)
+gen refund_fs_2010 = refund_2009_for_2010 if inlist(fyear, 2010, 2011)
+
+quietly _pctile v_fs_2010 if !missing(v_fs_2010), p(1 99)
 scalar v_p1_2010  = r(r1)
 scalar v_p99_2010 = r(r2)
 
-quietly _pctile investment if policy_2010 & !missing(investment), p(1 99)
-scalar inv_p1_2010  = r(r1)
-scalar inv_p99_2010 = r(r2)
-
-quietly _pctile potential_refund if policy_2010 & !missing(potential_refund), p(99.5)
+quietly _pctile refund_fs_2010 if !missing(refund_fs_2010), p(99.5)
 scalar refund_p995_2010 = r(r1)
 
-gen byte drop_2010_obs = policy_2010 & ///
-    ((v < v_p1_2010 | v > v_p99_2010) | ///
-    (investment < inv_p1_2010 | investment > inv_p99_2010) | ///
-    (potential_refund > refund_p995_2010))
-bysort gvkey: egen byte drop_firm_2010 = max(drop_2010_obs)
+gen byte outlier_fs_2010 = inlist(fyear, 2010, 2011) & !missing(v_fs_2010, refund_fs_2010) & ///
+    ((v_fs_2010 < v_p1_2010 | v_fs_2010 > v_p99_2010) | ///
+     (refund_fs_2010 > refund_p995_2010))
 
 * Final firm-level sample flags by policy period
-gen byte sample_firm_0203 = firm_complete_0203 & firm_has_policy_loss_0203 & ///
-    (drop_firm_0203 == 0)
-gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010 & ///
-    (drop_firm_2010 == 0)
+gen byte sample_firm_0203 = firm_complete_0203 & firm_has_policy_loss_0203
+gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010
 
 * Row-level regression flags (use these in first/second-stage scripts)
-replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203
-replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010
+replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203 & ///
+    !missing(v_fs_0203, refund_fs_0203) & (outlier_fs_0203 == 0)
+replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010 & ///
+    !missing(v_fs_2010, refund_fs_2010) & (outlier_fs_2010 == 0)
 
 * Cleanup temporary variables and scalars
 drop policy_0203 policy_2010
 drop loss_elig_0203_obs loss_elig_2010_obs
-drop drop_0203_obs drop_2010_obs drop_firm_0203 drop_firm_2010
-scalar drop v_p1_0203 v_p99_0203 inv_p1_0203 inv_p99_0203
+drop v_fs_0203 refund_fs_0203 v_2009_for_2010 refund_2009_for_2010 v_fs_2010 refund_fs_2010
+drop outlier_fs_0203 outlier_fs_2010
+scalar drop v_p1_0203 v_p99_0203
 scalar drop refund_p995_0203
-scalar drop v_p1_2010 v_p99_2010 inv_p1_2010 inv_p99_2010
+scalar drop v_p1_2010 v_p99_2010
 scalar drop refund_p995_2010
 
 save "../data/main_data.dta", replace

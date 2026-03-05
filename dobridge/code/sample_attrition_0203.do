@@ -37,7 +37,8 @@ gen byte has_timing_inputs = row_0203 & !missing(refund_0203, v_0203)
 * Firm-level restrictions (as implemented)
 gen byte pass_complete = (firm_complete_0203 == 1)
 gen byte pass_losselig = (firm_has_policy_loss_0203 == 1)
-gen byte pass_no_outlier = (sample_firm_0203 == 1) if pass_complete & pass_losselig
+gen byte pass_samplefirm = (sample_firm_0203 == 1)
+gen byte pass_regflag = (regflag_0203 == 1)
 
 display as text "============================================================"
 display as text "ATTRITION DECOMPOSITION: 2002/2003 FIRST-STAGE SAMPLE"
@@ -62,14 +63,14 @@ local n3 = r(N)
 display as result "After firm_has_policy_loss_0203==1: " %9.0f `n3' ///
     "   drop = " %9.0f (`n2' - `n3')
 
-count if has_timing_inputs & sample_firm_0203 == 1
+count if has_timing_inputs & pass_samplefirm
 local n4 = r(N)
-display as result "After sample_firm_0203==1 (includes outlier rule): " %9.0f `n4' ///
+display as result "After sample_firm_0203==1 (firm-level rules only): " %9.0f `n4' ///
     "   drop = " %9.0f (`n3' - `n4')
 
-count if regflag_0203 == 1
+count if pass_regflag
 local n5 = r(N)
-display as result "Final regflag_0203 rows: " %9.0f `n5' ///
+display as result "Final regflag_0203 rows (adds row-level outlier trim): " %9.0f `n5' ///
     "   delta vs prior = " %9.0f (`n4' - `n5')
 
 display as text "------------------------------------------------------------"
@@ -89,10 +90,10 @@ count if tag_firm & pass_complete & pass_losselig
 local f2 = r(N)
 display as result "Firms passing complete+loss-eligibility: " %9.0f `f2'
 
-count if tag_firm & sample_firm_0203 == 1
+count if tag_firm & pass_samplefirm
 local f3 = r(N)
 display as result "Firms in sample_firm_0203: " %9.0f `f3'
-display as result "Implied firm drop at outlier stage: " %9.0f (`f2' - `f3')
+display as result "Firm drop after loss-eligibility (should be minimal now): " %9.0f (`f2' - `f3')
 
 display as text "------------------------------------------------------------"
 display as text "Shares relative to row base"
@@ -104,4 +105,3 @@ display as result "Final regflag share: " %6.3f (`n5'/`n0')
 display as text "============================================================"
 display as text "Done."
 display as text "============================================================"
-
