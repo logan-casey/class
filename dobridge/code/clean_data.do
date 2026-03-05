@@ -592,12 +592,12 @@ label var assignment_v     "Assignment variable V (available carryback profits -
 gen v = assignment_v
 
 * Scale flows by lagged assets (fallback to current assets if lag is missing)
-gen flow_scale_at = L.at
-replace flow_scale_at = at if missing(flow_scale_at) | flow_scale_at <= 0
-gen d_cash_scaled = d_cash / flow_scale_at
-gen d_debt_scaled = d_totdebt / flow_scale_at
-gen d_inv_scaled  = d_inv / flow_scale_at
-gen payout_scaled = payout / flow_scale_at
+// gen flow_scale_at = L.at
+// replace flow_scale_at = at if missing(flow_scale_at) | flow_scale_at <= 0
+// gen d_cash_scaled = d_cash / flow_scale_at
+// gen d_debt_scaled = d_totdebt / flow_scale_at
+// gen d_inv_scaled  = d_inv / flow_scale_at
+// gen payout_scaled = payout / flow_scale_at
 
 * Policy-period windows (for restriction calculations)
 gen byte policy_0203 = inlist(fyear, 2001, 2002)
@@ -610,15 +610,6 @@ bysort gvkey: egen byte firm_has_policy_loss_0203 = max(loss_elig_0203_obs)
 gen byte loss_elig_2010_obs = (loss_applied_2010 > 0)
 bysort gvkey: egen byte firm_has_policy_loss_2010 = max(loss_elig_2010_obs)
 
-* Asset restriction by policy window (at > $1M in all policy years of that window)
-gen byte at_ok_0203_obs = policy_0203 & at > 1 & !missing(at)
-bysort gvkey: egen n_at_ok_0203 = total(at_ok_0203_obs)
-gen byte firm_assets_ok_0203 = (n_at_ok_0203 == 2)
-
-gen byte at_ok_2010_obs = policy_2010 & at > 1 & !missing(at)
-bysort gvkey: egen n_at_ok_2010 = total(at_ok_2010_obs)
-gen byte firm_assets_ok_2010 = (n_at_ok_2010 == 2)
-
 * ---------- Outlier rules for 2002/2003 sample ----------
 quietly _pctile v if policy_0203 & !missing(v), p(1 99)
 scalar v_p1_0203  = r(r1)
@@ -628,21 +619,21 @@ quietly _pctile investment if policy_0203 & !missing(investment), p(1 99)
 scalar inv_p1_0203  = r(r1)
 scalar inv_p99_0203 = r(r2)
 
-quietly _pctile d_cash_scaled if policy_0203 & !missing(d_cash_scaled), p(1 99)
-scalar cash_p1_0203  = r(r1)
-scalar cash_p99_0203 = r(r2)
+// quietly _pctile d_cash_scaled if policy_0203 & !missing(d_cash_scaled), p(1 99)
+// scalar cash_p1_0203  = r(r1)
+// scalar cash_p99_0203 = r(r2)
 
-quietly _pctile d_debt_scaled if policy_0203 & !missing(d_debt_scaled), p(1 99)
-scalar debt_p1_0203  = r(r1)
-scalar debt_p99_0203 = r(r2)
+// quietly _pctile d_debt_scaled if policy_0203 & !missing(d_debt_scaled), p(1 99)
+// scalar debt_p1_0203  = r(r1)
+// scalar debt_p99_0203 = r(r2)
 
-quietly _pctile d_inv_scaled if policy_0203 & !missing(d_inv_scaled), p(1 99)
-scalar dinv_p1_0203  = r(r1)
-scalar dinv_p99_0203 = r(r2)
+// quietly _pctile d_inv_scaled if policy_0203 & !missing(d_inv_scaled), p(1 99)
+// scalar dinv_p1_0203  = r(r1)
+// scalar dinv_p99_0203 = r(r2)
 
-quietly _pctile payout_scaled if policy_0203 & !missing(payout_scaled), p(1 99)
-scalar payout_p1_0203  = r(r1)
-scalar payout_p99_0203 = r(r2)
+// quietly _pctile payout_scaled if policy_0203 & !missing(payout_scaled), p(1 99)
+// scalar payout_p1_0203  = r(r1)
+// scalar payout_p99_0203 = r(r2)
 
 quietly _pctile potential_refund if policy_0203 & !missing(potential_refund), p(99.5)
 scalar refund_p995_0203 = r(r1)
@@ -650,10 +641,10 @@ scalar refund_p995_0203 = r(r1)
 gen byte drop_0203_obs = policy_0203 & ///
     ((v < v_p1_0203 | v > v_p99_0203) | ///
     (investment < inv_p1_0203 | investment > inv_p99_0203) | ///
-    (d_cash_scaled < cash_p1_0203 | d_cash_scaled > cash_p99_0203) | ///
-    (d_debt_scaled < debt_p1_0203 | d_debt_scaled > debt_p99_0203) | ///
-    (d_inv_scaled < dinv_p1_0203 | d_inv_scaled > dinv_p99_0203) | ///
-    (payout_scaled < payout_p1_0203 | payout_scaled > payout_p99_0203) | ///
+    // (d_cash_scaled < cash_p1_0203 | d_cash_scaled > cash_p99_0203) | ///
+    // (d_debt_scaled < debt_p1_0203 | d_debt_scaled > debt_p99_0203) | ///
+    // (d_inv_scaled < dinv_p1_0203 | d_inv_scaled > dinv_p99_0203) | ///
+    // (payout_scaled < payout_p1_0203 | payout_scaled > payout_p99_0203) | ///
     (potential_refund > refund_p995_0203))
 bysort gvkey: egen byte drop_firm_0203 = max(drop_0203_obs)
 
@@ -666,21 +657,21 @@ quietly _pctile investment if policy_2010 & !missing(investment), p(1 99)
 scalar inv_p1_2010  = r(r1)
 scalar inv_p99_2010 = r(r2)
 
-quietly _pctile d_cash_scaled if policy_2010 & !missing(d_cash_scaled), p(1 99)
-scalar cash_p1_2010  = r(r1)
-scalar cash_p99_2010 = r(r2)
+// quietly _pctile d_cash_scaled if policy_2010 & !missing(d_cash_scaled), p(1 99)
+// scalar cash_p1_2010  = r(r1)
+// scalar cash_p99_2010 = r(r2)
 
-quietly _pctile d_debt_scaled if policy_2010 & !missing(d_debt_scaled), p(1 99)
-scalar debt_p1_2010  = r(r1)
-scalar debt_p99_2010 = r(r2)
+// quietly _pctile d_debt_scaled if policy_2010 & !missing(d_debt_scaled), p(1 99)
+// scalar debt_p1_2010  = r(r1)
+// scalar debt_p99_2010 = r(r2)
 
-quietly _pctile d_inv_scaled if policy_2010 & !missing(d_inv_scaled), p(1 99)
-scalar dinv_p1_2010  = r(r1)
-scalar dinv_p99_2010 = r(r2)
+// quietly _pctile d_inv_scaled if policy_2010 & !missing(d_inv_scaled), p(1 99)
+// scalar dinv_p1_2010  = r(r1)
+// scalar dinv_p99_2010 = r(r2)
 
-quietly _pctile payout_scaled if policy_2010 & !missing(payout_scaled), p(1 99)
-scalar payout_p1_2010  = r(r1)
-scalar payout_p99_2010 = r(r2)
+// quietly _pctile payout_scaled if policy_2010 & !missing(payout_scaled), p(1 99)
+// scalar payout_p1_2010  = r(r1)
+// scalar payout_p99_2010 = r(r2)
 
 quietly _pctile potential_refund if policy_2010 & !missing(potential_refund), p(99.5)
 scalar refund_p995_2010 = r(r1)
@@ -688,34 +679,34 @@ scalar refund_p995_2010 = r(r1)
 gen byte drop_2010_obs = policy_2010 & ///
     ((v < v_p1_2010 | v > v_p99_2010) | ///
     (investment < inv_p1_2010 | investment > inv_p99_2010) | ///
-    (d_cash_scaled < cash_p1_2010 | d_cash_scaled > cash_p99_2010) | ///
-    (d_debt_scaled < debt_p1_2010 | d_debt_scaled > debt_p99_2010) | ///
-    (d_inv_scaled < dinv_p1_2010 | d_inv_scaled > dinv_p99_2010) | ///
-    (payout_scaled < payout_p1_2010 | payout_scaled > payout_p99_2010) | ///
+    // (d_cash_scaled < cash_p1_2010 | d_cash_scaled > cash_p99_2010) | ///
+    // (d_debt_scaled < debt_p1_2010 | d_debt_scaled > debt_p99_2010) | ///
+    // (d_inv_scaled < dinv_p1_2010 | d_inv_scaled > dinv_p99_2010) | ///
+    // (payout_scaled < payout_p1_2010 | payout_scaled > payout_p99_2010) | ///
     (potential_refund > refund_p995_2010))
 bysort gvkey: egen byte drop_firm_2010 = max(drop_2010_obs)
 
 * Final firm-level sample flags by policy period
 gen byte sample_firm_0203 = firm_complete_0203 & firm_has_policy_loss_0203 & ///
-    firm_assets_ok_0203 & (drop_firm_0203 == 0)
+    (drop_firm_0203 == 0)
 gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010 & ///
-    firm_assets_ok_2010 & (drop_firm_2010 == 0)
+    (drop_firm_2010 == 0)
 
 * Row-level regression flags (use these in first/second-stage scripts)
 replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203
 replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010
 
 * Cleanup temporary variables and scalars
-drop flow_scale_at d_cash_scaled d_debt_scaled d_inv_scaled payout_scaled
+// drop flow_scale_at d_cash_scaled d_debt_scaled d_inv_scaled payout_scaled
 drop policy_0203 policy_2010
 drop loss_elig_0203_obs loss_elig_2010_obs
 drop at_ok_0203_obs at_ok_2010_obs n_at_ok_0203 n_at_ok_2010
 drop drop_0203_obs drop_2010_obs drop_firm_0203 drop_firm_2010
-scalar drop v_p1_0203 v_p99_0203 inv_p1_0203 inv_p99_0203 cash_p1_0203 cash_p99_0203
-scalar drop debt_p1_0203 debt_p99_0203 dinv_p1_0203 dinv_p99_0203 payout_p1_0203 payout_p99_0203
+scalar drop v_p1_0203 v_p99_0203 inv_p1_0203 inv_p99_0203
+// scalar drop debt_p1_0203 debt_p99_0203 dinv_p1_0203 dinv_p99_0203 payout_p1_0203 payout_p99_0203  cash_p1_0203 cash_p99_0203
 scalar drop refund_p995_0203
-scalar drop v_p1_2010 v_p99_2010 inv_p1_2010 inv_p99_2010 cash_p1_2010 cash_p99_2010
-scalar drop debt_p1_2010 debt_p99_2010 dinv_p1_2010 dinv_p99_2010 payout_p1_2010 payout_p99_2010
+scalar drop v_p1_2010 v_p99_2010 inv_p1_2010 inv_p99_2010
+// scalar drop debt_p1_2010 debt_p99_2010 dinv_p1_2010 dinv_p99_2010 payout_p1_2010 payout_p99_2010 cash_p1_2010 cash_p99_2010
 scalar drop refund_p995_2010
 
 save "../data/main_data.dta", replace
