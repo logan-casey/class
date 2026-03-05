@@ -537,8 +537,8 @@ void policy2009() {
             vpwin[i]  = sum(profits_A)
             vch[i]    = loss_for_2010
             // Assignment V for 2010 refund year when 2008 option is chosen:
-            // available profits in 2003-2007 minus (2008 + 2009) policy losses
-            v2010[i]  = sum(profits_A) - (loss_2008 + loss_2009)
+            // available profits in 2003-2007 minus chosen policy loss (2008)
+            v2010[i]  = sum(profits_A) - loss_for_2010
         }
         else {
             loss_for_2010 = loss_2009
@@ -587,7 +587,7 @@ replace potential_refund = refund_2010 if inlist(fyear, 2008, 2009)
 * 2002 refund (fyear==2001): sum profits 1996-2000 - 2001 loss
 * 2003 refund (fyear==2002): sum profits 1997-2001 - 2002 loss
 * 2010 refund (fyear==2008/2009): either
-*   sum profits 2003-2007 - (2008+2009 losses), or
+*   sum profits 2003-2007 - 2008 loss, or
 *   sum profits 2004-2008 - 2009 loss,
 * depending on the chosen policy-loss year (higher refund option)
 gen assignment_v = .
