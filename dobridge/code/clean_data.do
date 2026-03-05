@@ -457,6 +457,10 @@ gen refund_2010       = .
 gen loss_applied_2010 = .
 gen used_2008_loss    = .
 gen assign_v_2010     = .
+gen v2010_profit_window = .
+gen v2010_loss_2008     = .
+gen v2010_loss_2009     = .
+gen v2010_chosen_loss   = .
 
 mata:
 void policy2009() {
@@ -469,6 +473,10 @@ void policy2009() {
     st_view(lappl,   ., "loss_applied_2010")
     st_view(u08,     ., "used_2008_loss")
     st_view(v2010,   ., "assign_v_2010")
+    st_view(vpwin,   ., "v2010_profit_window")
+    st_view(vl08,    ., "v2010_loss_2008")
+    st_view(vl09,    ., "v2010_loss_2009")
+    st_view(vch,     ., "v2010_chosen_loss")
 
     n = rows(gv)
 
@@ -499,6 +507,8 @@ void policy2009() {
 
         loss_2008 = loss_all[6]
         loss_2009 = loss_all[7]
+        vl08[i] = loss_2008
+        vl09[i] = loss_2009
 
         if (loss_2008 > 0) {
             profits_A = adjust_2yr_profits(profits_all[1::5], loss_all[1::5])
@@ -524,6 +534,8 @@ void policy2009() {
             r2010[i]  = refund_A
             lappl[i]  = loss_for_2010
             u08[i]    = 1
+            vpwin[i]  = sum(profits_A)
+            vch[i]    = loss_for_2010
             // Assignment V for 2010 refund year when 2008 option is chosen:
             // available profits in 2003-2007 minus (2008 + 2009) policy losses
             v2010[i]  = sum(profits_A) - (loss_2008 + loss_2009)
@@ -533,6 +545,8 @@ void policy2009() {
             r2010[i]  = refund_B
             lappl[i]  = loss_for_2010
             u08[i]    = 0
+            vpwin[i]  = sum(profits_B)
+            vch[i]    = loss_for_2010
             // Assignment V for 2010 refund year when 2009 option is chosen:
             // available profits in 2004-2008 minus 2009 policy loss
             v2010[i]  = sum(profits_B) - loss_for_2010
@@ -550,6 +564,14 @@ bysort gvkey (fyear): replace used_2008_loss = used_2008_loss[_n-1] ///
     if fyear == 2009 & missing(used_2008_loss)
 bysort gvkey (fyear): replace assign_v_2010 = assign_v_2010[_n-1] ///
     if fyear == 2009 & missing(assign_v_2010)
+bysort gvkey (fyear): replace v2010_profit_window = v2010_profit_window[_n-1] ///
+    if fyear == 2009 & missing(v2010_profit_window)
+bysort gvkey (fyear): replace v2010_loss_2008 = v2010_loss_2008[_n-1] ///
+    if fyear == 2009 & missing(v2010_loss_2008)
+bysort gvkey (fyear): replace v2010_loss_2009 = v2010_loss_2009[_n-1] ///
+    if fyear == 2009 & missing(v2010_loss_2009)
+bysort gvkey (fyear): replace v2010_chosen_loss = v2010_chosen_loss[_n-1] ///
+    if fyear == 2009 & missing(v2010_chosen_loss)
 
 ********************************************************************************
 * STEP 6: Consolidate refund variables
@@ -580,6 +602,10 @@ label var refund_2002      "Estimated 2002 tax refund (2001 loss)"
 label var refund_2003      "Estimated 2003 tax refund (2002 loss)"
 label var refund_2010      "Estimated 2010 tax refund (2008 or 2009 loss)"
 label var used_2008_loss   "=1 if firm applies 2008 loss to 5yr carryback"
+label var v2010_profit_window "2010-policy V component: sum of adjusted carryback-window profits"
+label var v2010_loss_2008     "2010-policy V component: 2008 loss"
+label var v2010_loss_2009     "2010-policy V component: 2009 loss"
+label var v2010_chosen_loss   "2010-policy V component: chosen policy loss (2008 or 2009)"
 label var potential_refund "Potential refund from carryback policy"
 label var refund_assets    "Potential refund / lagged assets"
 label var assignment_v     "Assignment variable V (available carryback profits - policy losses)"
