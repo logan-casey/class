@@ -510,13 +510,19 @@ void policy2009() {
         vl08[i] = loss_2008
         vl09[i] = loss_2009
 
+        // Initialize option-specific objects each loop to avoid stale values
+        profits_A = J(5,1,0)
+        rates_A   = J(5,1,.)
+        profits_B = J(5,1,0)
+        rates_B   = J(5,1,.)
+
         if (loss_2008 > 0) {
             profits_A = adjust_2yr_profits(profits_all[1::5], loss_all[1::5])
             rates_A   = rates_all[1::5]
             refund_A  = calc_refund(loss_2008, profits_A, rates_A, 1)
         }
         else {
-            refund_A = 0
+            refund_A = .
         }
 
         if (loss_2009 > 0) {
@@ -525,10 +531,14 @@ void policy2009() {
             refund_B  = calc_refund(loss_2009, profits_B, rates_B, 1)
         }
         else {
-            refund_B = 0
+            refund_B = .
         }
 
-        if (refund_A >= refund_B) {
+        // No eligible policy loss year: leave outputs missing
+        if (loss_2008 <= 0 & loss_2009 <= 0) continue
+
+        // Choose among eligible options only
+        if (loss_2008 > 0 & (loss_2009 <= 0 | refund_A >= refund_B)) {
             // 2010 refund amount is based on the chosen 5yr-loss year (2008 here).
             loss_for_2010 = loss_2008
             r2010[i]  = refund_A
@@ -587,7 +597,7 @@ replace potential_refund = refund_2010 if inlist(fyear, 2008, 2009)
 * 2002 refund (fyear==2001): sum profits 1996-2000 - 2001 loss
 * 2003 refund (fyear==2002): sum profits 1997-2001 - 2002 loss
 * 2010 refund (fyear==2008/2009): either
-*   sum profits 2003-2007 - 2008 loss, or
+*   sum profits 2003-2007 - (2008+2009 losses), or
 *   sum profits 2004-2008 - 2009 loss,
 * depending on the chosen policy-loss year (higher refund option)
 gen assignment_v = .
