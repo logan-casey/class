@@ -4,169 +4,56 @@ FirmOutcome_{i,t} = \alpha_0 + \Beta_1 \hat{TaxRefund}_{i,t} + \sum_{p=1}^P [\al
 
 
 
-the dataset does not yet match the one in the paper. first check if you can read the tables below. then see if there are any red flags. the only restrictions listed in the paper are those we have applied. also, it seems like we have close to twice as many observations.
+let's compare my dataset with the paper's. I have removed the restrictions I had that were not explicitly mentioned in the paper (non-financial firms, outliers in outcome variables). I have 1926 firm-year refunds in my 2002/3 regression; the paper has 3337. for 2009, I have the opposite problem, but let's focus on 2002. the first table below summarizes my data. the one below that shows the values in the paper. which discrepancies are concerning? what might the source be? I am hopeful the sample is similar and our variables are constructed right. I notice we may need to remove outliers from long-term investment growth (though I do not think this variable is used in first stage). the z-score and o-score also look a bit different. I am missing data on bankruptcies that is in the paper. I can try to add that if it is causing problems (would make sample smaller). I also do not have distance to default or credit ratings.
 
-Policy period: 2002
-V (Profits - Losses) ()
-  mean =      39.0325   sd =     276.9185   N =      9384
-Tax Refund ()
-  mean =       2.8050   sd =      18.3857   N =      9384
-Investment ()
-  mean =      64.6314   sd =     204.6870   N =      7276
-Change in Cash ()
-  mean =      11.6820   sd =     133.3668   N =      9026
-Payout ()
-  mean =      37.8521   sd =     168.0526   N =      8480
-Change in Debt ()
-  mean =      18.9819   sd =     369.6852   N =      9110
-Change in Short-term Investments ()
-  mean =       0.7712   sd =      96.5665   N =      9025
-Change in Long-term Investments ()
-  mean =      34.2483   sd =     368.6871   N =      8913
-Change in Employment (Thousands)
-  mean =       0.0112   sd =       4.8886   N =      8626
-Altman's z-score
-  mean =      -0.1071   sd =       7.1587   N =      9015
-Ohlson's o-score
-  mean =       0.5222   sd =       9.2196   N =      9102
+
 ----------------------------------------
-Policy period: 2009
-V (Profits - Losses) ()
-  mean =     109.3379   sd =     467.3887   N =      6290
+Regression sample period: 2002
+V (Assignment Variable, )
+  mean =      -5.9801   sd =     215.0779   N =      2063
 Tax Refund ()
-  mean =       8.7726   sd =      36.4736   N =      6278
+  mean =       3.4465   sd =      18.5755   N =      2063
 Investment ()
-  mean =     118.9181   sd =     327.5667   N =      4820
+  mean =      20.4103   sd =      95.3388   N =      2003
 Change in Cash ()
-  mean =      31.2879   sd =     272.5298   N =      6184
+  mean =       2.4212   sd =      69.9295   N =      2046
 Payout ()
-  mean =      94.6271   sd =     343.5767   N =      5895
+  mean =       5.2330   sd =      39.9949   N =      1748
 Change in Debt ()
-  mean =      32.6107   sd =     475.3468   N =      6236
+  mean =       1.5404   sd =     203.1381   N =      2050
 Change in Short-term Investments ()
-  mean =       1.1748   sd =     272.8930   N =      6181
+  mean =      -1.1685   sd =      63.1977   N =      2046
 Change in Long-term Investments ()
-  mean =      70.5360   sd =     546.8946   N =      5942
+  mean =      65.2844   sd =    1481.3849   N =      1988
 Change in Employment (Thousands)
-  mean =      -0.1640   sd =       3.6777   N =      5992
+  mean =      -0.0662   sd =       0.9355   N =      1980
 Altman's z-score
-  mean =      -0.3788   sd =      10.2290   N =      6054
+  mean =      -5.1287   sd =      15.5620   N =      1950
 Ohlson's o-score
-  mean =      -0.3351   sd =       6.0584   N =      6146
+  mean =       3.8861   sd =      12.9167   N =      1953
 
-paper table:
-Table 2: Data Sample Summary Statistics
-2002 Policy
-2009 Policy
-Mean
-V (Profits Minus Losses) ($M)
-Tax Refund ($M)
-Investment ($M)
-Change in Cash ($M)
-Payout ($M)
-Change in Debt ($M)
-Change in Short-term Investments ($M)
-Change in Long-term Investments ($M)
-Change in Employment (Thousands)
-Altman's z-score
-Ohlson's o-score
-Bankruptcy or Liqudation, 1yrF
-Bankruptcy or Liqudation, 2yrF
-S&P Credit Downgrade, 1yrF
-S&P Credit Downgrade, 2yrF
-S&P Credit Downgrade, 3yrF
-S&P Credit Upgrade, 1yrF
-S&P Credit Upgrade, 2yrF
-S&P Credit Upgrade, 3yrF
-Distance-to-default, 1yr
-Distance-to-default, 2yr
-11.27
-8.84
-28.72
-5.00
-7.37-11.04-0.30
-23.70-0.17-1.99
-1.63
-0.00
-0.01
-0.26
-0.35
-0.43
-0.13
-0.24
-0.32
-0.11
-0.11
-Std. Dev
-290.13
-44.70
-97.35
-86.03
-45.90
-198.70
-64.76
-225.99
-1.98
-10.10
-8.55
-0.03
-0.07
-0.44
-0.48
-0.50
-0.34
-0.43
-0.47
-0.23
-0.24
-Mean
-28.95
-12.51
-50.20-2.10
-18.66-5.04
-5.14
-38.40
-0.07-2.60
-0.47
-0.00
-0.00
-0.14
-0.20
-0.26
-0.27
-0.36
-0.47
-0.03
-0.03
-Std. Dev
-480.43
-50.70
-146.77
-171.99
-94.95
-262.75
-85.35
-244.39
-3.21
-11.89
-6.73
-0.03
-0.06
-0.35
-0.40
-0.44
-0.44
-0.48
-0.50
-0.12
-0.12 
+
+
+Reconstructed Table 2: Data Sample Summary Statistics
+Variable	Mean (2002)	Std.Dev (2002)	Mean (2009)	Std.Dev (2009)
+V (Profits Minus Losses) ($M)	11.27	290.13	28.95	480.43
+Tax Refund ($M)	8.84	44.70	12.51	50.70
+Investment ($M)	28.72	97.35	50.20	146.77
+Change in Cash ($M)	5.00	86.03	-2.10	171.99
+Payout ($M)	7.37	45.90	18.66	94.95
+Change in Debt ($M)	-11.04	198.70	-5.04	262.75
+Change in Short-term Investments ($M)	-0.30	64.76	5.14	85.35
+Change in Long-term Investments ($M)	23.70	225.99	38.40	244.39
+Change in Employment (Thousands)	-0.17	1.98	0.07	3.21
+Altman's z-score	-1.99	10.10	-2.60	11.89
+Ohlson's o-score	1.63	8.55	0.47	6.73
 
 
 
 
 
 extreme values of V
-why so many firms missing
+why so many firms missing-- or extra?
 non-financial firms?
 
 
