@@ -3,6 +3,11 @@ set more off
 
 use "../data/main_data.dta", clear
 
+capture confirm variable ffi48
+if _rc {
+    di as err "Missing industry variable ffi48. Run clean_data.do first."
+    exit 111
+}
 capture confirm variable regflag_0203
 if _rc {
     di as err "Missing regflag_0203. Re-run clean_data.do."
@@ -32,9 +37,9 @@ gen zv1_0203    = d_0203 * v1_0203
 gen zv2_0203    = d_0203 * v2_0203
 
 foreach c in tobinq roa cf_assets sales_assets leverage ln_assets {
-    gen pre_0203_`c' = `c' if inlist(fyear, 2002, 2003)
+    gen pre_0203_`c' = L.`c' if inlist(fyear, 2002, 2003)
 }
-gen pre_0203_loss  = loss      if inlist(fyear, 2002, 2003)
+gen pre_0203_loss  = L.loss    if inlist(fyear, 2002, 2003)
 gen pre_0203_loss2 = pre_0203_loss^2
 
 reg refund_0203 ///
@@ -49,12 +54,17 @@ reg refund_0203 ///
 test zv1_0203 zv2_0203
 estimates store fs_0203
 
+break
 * ---------------------------------------------------------------------
 * First stage: 2009 policy period
 * Run separate cross-sections for 2010 and 2011 outcomes.
 * ---------------------------------------------------------------------
 bysort gvkey: egen refund_2010_val = max(cond(fyear == 2009, potential_refund, .))
 bysort gvkey: egen v_2009_val      = max(cond(fyear == 2009, v_level, .))
+bysort gvkey: egen loss_2009_val   = max(cond(fyear == 2009, loss, .))
+foreach c in tobinq roa cf_assets sales_assets leverage ln_assets {
+    bysort gvkey: egen `c'_2009_val = max(cond(fyear == 2009, `c', .))
+}
 
 foreach yy in 2010 2011 {
     gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
@@ -67,13 +77,13 @@ foreach yy in 2010 2011 {
     gen zv1_`yy'    = d_`yy' * v1_`yy'
     gen zv2_`yy'    = d_`yy' * v2_`yy'
 
-    gen pre_`yy'_tobinq       = tobinq       if in_`yy'
-    gen pre_`yy'_roa          = roa          if in_`yy'
-    gen pre_`yy'_cf_assets    = cf_assets    if in_`yy'
-    gen pre_`yy'_sales_assets = sales_assets if in_`yy'
-    gen pre_`yy'_leverage     = leverage     if in_`yy'
-    gen pre_`yy'_ln_assets    = ln_assets    if in_`yy'
-    gen pre_`yy'_loss         = loss         if in_`yy'
+    gen pre_`yy'_tobinq       = tobinq_2009_val       if in_`yy'
+    gen pre_`yy'_roa          = roa_2009_val          if in_`yy'
+    gen pre_`yy'_cf_assets    = cf_assets_2009_val    if in_`yy'
+    gen pre_`yy'_sales_assets = sales_assets_2009_val if in_`yy'
+    gen pre_`yy'_leverage     = leverage_2009_val     if in_`yy'
+    gen pre_`yy'_ln_assets    = ln_assets_2009_val    if in_`yy'
+    gen pre_`yy'_loss         = loss_2009_val         if in_`yy'
     gen pre_`yy'_loss2        = pre_`yy'_loss^2
 
     reg refund_`yy'_reg ///
