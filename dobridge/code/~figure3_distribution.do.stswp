@@ -38,7 +38,7 @@ histogram v_0203 if regflag_0203 == 1 & !missing(v_0203) & inrange(v_0203, -15, 
     start(-15) ///
     width(0.25) frequency ///
     xline(0, lcolor(red) lpattern(dash)) ///
-    xlabel(-15(10)15) ///
+    xlabel(-(10)50) ///
     xtitle("Assignment variable V ($M)") ///
     ytitle("Number of firms") ///
     title("2002 Policy Period") ///

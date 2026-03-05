@@ -151,7 +151,7 @@ gen d_emp = emp - emp_lag
 ffi48_macro sic, gen(ffi48) desc(ffi48_desc) replace
 
 * Drop financial firms: FF48 = Banks (44), Insur (45), RlEst (46), Fin (47)
-drop if inrange(ffi48, 44, 47)
+// drop if inrange(ffi48, 44, 47)
 
 * Altman's Z-score
 * EBIT approximated as OIADP (operating income after depreciation) or use ebit if available

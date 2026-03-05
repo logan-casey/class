@@ -15,7 +15,7 @@ cap mkdir "../output"
 * ---------------------------------------------------------------------
 * Build 2002-period regression sample variables (same timing as first_stage.do)
 * ---------------------------------------------------------------------
-gen v = L.assignment_v if regflag_0203 == 1
+capture confirm variable v
 gen tax_refund = L.potential_refund if regflag_0203 == 1
 gen inv = investment if regflag_0203 == 1
 
@@ -62,15 +62,25 @@ tempfile binned
 save `binned'
 restore
 
+* Merge binned moments back to plotting sample (avoids twoway using-syntax conflicts)
+gen bin = floor(v)
+gen bin_mid = bin + 0.5
+merge m:1 bin bin_mid using `binned', nogen keep(master match)
+bysort bin: gen byte bin_tag = (_n == 1) if !missing(bin)
+
 * ---------------------------------------------------------------------
 * Left panel: Tax refund kink
 * ---------------------------------------------------------------------
 twoway ///
-    (lfit tax_refund_resid v if regflag_0203 == 1 & v < 0, lcolor(blue) lwidth(medthick)) ///
-    (lfit tax_refund_resid v if regflag_0203 == 1 & v >= 0, lcolor(blue) lwidth(medthick)) ///
-    (rarea tax_lo99 tax_hi99 bin_mid using `binned', color(gs12%45) lcolor(none)) ///
-    (scatter tax_mean bin_mid using `binned', mcolor(blue) msymbol(Oh) msize(small)), ///
+    (lfit tax_refund_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(tax_refund_resid, -10, 10) & v < 0, lcolor(blue) lwidth(medthick)) ///
+    (lfit tax_refund_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(tax_refund_resid, -10, 10) & v >= 0, lcolor(blue) lwidth(medthick)) ///
+    (rarea tax_lo99 tax_hi99 bin_mid if bin_tag == 1 & inrange(tax_lo99,-10,10) & inrange(tax_hi99,-10,10) & inrange(bin_mid, -50, 50), color(gs12%45) lcolor(none)) ///
+    (scatter tax_mean bin_mid if bin_tag == 1 & inrange(tax_mean,-10,10) & inrange(bin_mid, -50, 50), mcolor(blue) msymbol(Oh) msize(small)), ///
     xline(0, lcolor(red) lpattern(dash)) ///
+    xscale(range(-50 50) noextend) ///
+    xlabel(-50(10)50) ///
+    yscale(range(-10 10)) ///
+    ylabel(-10(2)10) ///
     xtitle("Assignment variable V ($M)") ///
     ytitle("Tax Refund Residual ($M)") ///
     title("Tax Refund (2002 Policy Period)") ///
@@ -81,11 +91,15 @@ twoway ///
 * Right panel: Investment kink
 * ---------------------------------------------------------------------
 twoway ///
-    (lfit inv_resid v if regflag_0203 == 1 & v < 0, lcolor(navy) lwidth(medthick)) ///
-    (lfit inv_resid v if regflag_0203 == 1 & v >= 0, lcolor(navy) lwidth(medthick)) ///
-    (rarea inv_lo99 inv_hi99 bin_mid using `binned', color(gs12%45) lcolor(none)) ///
-    (scatter inv_mean bin_mid using `binned', mcolor(navy) msymbol(Oh) msize(small)), ///
+    (lfit inv_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(inv_resid, -50, 50) & v < 0, lcolor(navy) lwidth(medthick)) ///
+    (lfit inv_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(inv_resid, -50, 50) & v >= 0, lcolor(navy) lwidth(medthick)) ///
+    (rarea inv_lo99 inv_hi99 bin_mid if bin_tag == 1 & inrange(inv_lo99,-50,50) & inrange(inv_hi99,-50,50) & inrange(bin_mid, -50, 50), color(gs12%45) lcolor(none)) ///
+    (scatter inv_mean bin_mid if bin_tag == 1 & inrange(inv_mean,-50,50) & inrange(bin_mid, -50, 50), mcolor(navy) msymbol(Oh) msize(small)), ///
     xline(0, lcolor(red) lpattern(dash)) ///
+    xscale(range(-50 50) noextend) ///
+    xlabel(-50(10)50) ///
+    yscale(range(-50 50)) ///
+    ylabel(-50(10)50) ///
     xtitle("Assignment variable V ($M)") ///
     ytitle("Investment Residual ($M)") ///
     title("Investment (2002 Policy Period)") ///
