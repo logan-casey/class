@@ -691,4 +691,56 @@ scalar drop refund_p995_0203
 scalar drop v_p1_2010 v_p99_2010
 scalar drop refund_p995_2010
 
+********************************************************************************
+* STEP 8: Flag firms/observations with a valid CRSP link (CCM)
+********************************************************************************
+
+* Observation date used for link validity: datadate if available, else year-end.
+gen double obsdate = datadate
+replace obsdate = mdy(12, 31, fyear) if missing(obsdate) & !missing(fyear)
+format obsdate %td
+
+* Stable row id for merge-back after many-to-many join.
+gen long obs_id = _n
+
+preserve
+keep obs_id gvkey obsdate
+tempfile base_obs
+save `base_obs'
+restore
+
+preserve
+use "../data/ccm_link.dta", clear
+rename GVKEY gvkey
+rename LPERMNO permno
+rename LINKDT linkdt
+rename LINKENDDT linkend
+replace linkend = td(31dec9999) if missing(linkend)
+destring gvkey, replace
+keep gvkey permno linkdt linkend
+drop if missing(gvkey) | missing(permno)
+tempfile ccm
+save `ccm'
+restore
+
+preserve
+use `base_obs', clear
+joinby gvkey using `ccm'
+keep if inrange(obsdate, linkdt, linkend)
+bysort obs_id: keep if _n == 1
+keep obs_id
+gen byte has_crsp_link_obs = 1
+tempfile crsp_hits
+save `crsp_hits'
+restore
+
+merge 1:1 obs_id using `crsp_hits', nogen
+replace has_crsp_link_obs = 0 if missing(has_crsp_link_obs)
+bysort gvkey: egen byte has_crsp_link_firm = max(has_crsp_link_obs)
+
+label var has_crsp_link_obs  "Obs has valid CCM gvkey-permno link at obsdate"
+label var has_crsp_link_firm "Firm has any valid CCM gvkey-permno link in sample"
+
+drop obs_id obsdate
+
 save "../data/main_data.dta", replace
