@@ -648,12 +648,9 @@ gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010 & ///
 replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203
 replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010
 
-save "../data/main_data_dropvars.dta", replace
-
 * Cleanup temporary variables and scalars
 drop policy_0203 policy_2010
 drop loss_elig_0203_obs loss_elig_2010_obs
-drop at_ok_0203_obs at_ok_2010_obs n_at_ok_0203 n_at_ok_2010
 drop drop_0203_obs drop_2010_obs drop_firm_0203 drop_firm_2010
 scalar drop v_p1_0203 v_p99_0203 inv_p1_0203 inv_p99_0203
 scalar drop refund_p995_0203

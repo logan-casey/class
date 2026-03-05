@@ -28,9 +28,9 @@ display as result "2002 sample nonmissing V: " r(N)
 count if regflag_0203 == 1 & !missing(v_0203) & (v_0203 < -50 | v_0203 > 50)
 display as result "2002 sample outside [-50,50] $M: " r(N)
 
-count if regflag_2010 == 1 & fyear == 2009 & !missing(v_2010)
+count if regflag_2010 == 1 & fyear == 2010 & !missing(v_2010)
 display as result "2009 sample nonmissing V: " r(N)
-count if regflag_2010 == 1 & fyear == 2009 & !missing(v_2010) & (v_2010 < -50 | v_2010 > 50)
+count if regflag_2010 == 1 & fyear == 2010 & !missing(v_2010) & (v_2010 < -50 | v_2010 > 50)
 display as result "2009 sample outside [-50,50] $M: " r(N)
 
 * Left panel: 2002 policy period sample (outcome years 2002/2003)
@@ -45,7 +45,7 @@ histogram v_0203 if regflag_0203 == 1 & !missing(v_0203) & inrange(v_0203, -15, 
     name(fig3_left, replace)
 
 * Right panel: 2009 policy period sample (outcome years 2010/2011)
-histogram v_2010 if regflag_2010 == 1 & fyear == 2009 & !missing(v_2010) & inrange(v_2010, -15, 15), ///
+histogram v_2010 if regflag_2010 == 1 & fyear == 2010 & !missing(v_2010) & inrange(v_2010, -15, 15), ///
     start(-15) ///
     width(0.25) frequency ///
     xline(0, lcolor(red) lpattern(dash)) ///

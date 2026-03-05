@@ -168,3 +168,7 @@ Std. Dev
 extreme values of V
 why so many firms missing
 non-financial firms?
+
+
+"If I estimate that the firm would have applied the 2008 losses to the five-year carryback 
+policy, losses that apply to the policy for the 2010 refund equal 2008 plus 2009 losses. " ??? -- firms could carry back two years of losses?
