@@ -70,23 +70,23 @@ gen pi_calc = oiadp - xint + spi + nopi
 * Fill missing pi with pi_calc
 replace pi = pi_calc if missing(pi)
 
-* --- Step 2: Construct taxable income ---
+* --- Step 2: Construct taxable income (as in dobridge_na.R) ---
 local tau = 0.35
 
 * Replace missing XIDO with zero
 replace xido = 0 if missing(xido)
 
-* Primary: use PIDOM and TXDFED
-gen taxinc = pidom - txdfed / `tau' + xido / (1 - `tau') ///
-    if !missing(pidom) & !missing(txdfed)
+* Fallback PIDOM definition: PIDOM, else PI - PIFO
+gen pidom_imp = pidom
+replace pidom_imp = pi - cond(missing(pifo), 0, pifo) if missing(pidom_imp) & !missing(pi)
 
-* Secondary: use PI and TXDI when PIDOM or TXDFED are missing
-replace taxinc = pi - txdi / `tau' + xido / (1 - `tau') ///
-    if missing(taxinc) & !missing(pi) & !missing(txdi)
+* MTR-style txfed fallback for TI: use TXDFED if available, else TXDI
+gen txdfed_for_ti = txdfed
+replace txdfed_for_ti = txdi if missing(txdfed_for_ti)
+replace txdfed_for_ti = 0 if missing(txdfed_for_ti)
 
-* If TXDI is also missing, use PI with no deferred tax adjustment
-replace taxinc = pi + xido / (1 - `tau') ///
-    if missing(taxinc) & !missing(pi) & missing(txdi)
+* Taxable income used in refunds
+gen taxinc = pidom_imp - txdfed_for_ti / `tau' + xido / (1 - `tau')
 
 * --- Step 3: Construct Federal Income Taxes ---
 * Replace missing components with zero before computing fallback
@@ -110,9 +110,7 @@ replace taxrate = . if taxrate < 0.01 | taxrate > 0.52
 * Fallback Marginal Tax Rate (Graham and Mills, 2008)
 ********************************************************************************
 
-* Build PIDOM fallback used in the MTR formula when PIDOM is missing.
-gen pidom_imp = pidom
-replace pidom_imp = pi - coalesce(pifo, 0) if missing(pidom_imp) & !missing(pi)
+* Reuse pidom_imp for MTR fallback, when PIDOM is missing.
 
 * MTR ratio: TXFED/PIDOM, with fallback TXT/PI when needed.
 gen double tax_ratio_gm = .
@@ -123,7 +121,7 @@ replace tax_ratio_gm = txt / pi if missing(tax_ratio_gm) & !missing(txt) & !miss
 gen double mtr = 0.331 ///
     - 0.075 * (tax_ratio_gm < 0.1) ///
     - 0.012 * (tlcf > 0) ///
-    - 1.83 * (pi < 0) ///
+    - 0.106 * (pi < 0) ///
     + 0.037 * (abs(pifo / pi) > 0.05)
 
 replace mtr = . if missing(tax_ratio_gm) & missing(txt) & missing(txfed_use)
