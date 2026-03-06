@@ -2,7 +2,7 @@ clear all
 set more off
 
 use "../data/main_data.dta", clear
-
+gen mtr = 0
 capture confirm variable ffi48
 if _rc {
     di as err "Missing industry variable ffi48. Run clean_data.do first."

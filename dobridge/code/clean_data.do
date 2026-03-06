@@ -107,6 +107,28 @@ replace taxrate = txfed_use / taxinc if !missing(txfed_use) & txfed_use > 0 & !m
 replace taxrate = . if taxrate < 0.01 | taxrate > 0.52
 
 ********************************************************************************
+* Fallback Marginal Tax Rate (Graham and Mills, 2008)
+********************************************************************************
+
+* Build PIDOM fallback used in the MTR formula when PIDOM is missing.
+gen pidom_imp = pidom
+replace pidom_imp = pi - coalesce(pifo, 0) if missing(pidom_imp) & !missing(pi)
+
+* MTR ratio: TXFED/PIDOM, with fallback TXT/PI when needed.
+gen double tax_ratio_gm = .
+replace tax_ratio_gm = txfed_use / pidom_imp if !missing(txfed_use) & !missing(pidom_imp) & pidom_imp != 0
+replace tax_ratio_gm = txt / pi if missing(tax_ratio_gm) & !missing(txt) & !missing(pi) & pi != 0
+
+* Graham-Mills fallback.
+gen double mtr = 0.331 ///
+    - 0.075 * (tax_ratio_gm < 0.1) ///
+    - 0.012 * (tlcf > 0) ///
+    - 1.83 * (pi < 0) ///
+    + 0.037 * (abs(pifo / pi) > 0.05)
+
+replace mtr = . if missing(tax_ratio_gm) & missing(txt) & missing(txfed_use)
+
+********************************************************************************
 * Lagged Variables (needed for changes)
 ********************************************************************************
 
@@ -237,6 +259,7 @@ label var cf_assets   "Cash Flow / Assets"
 label var ln_assets   "Ln(Assets)"
 label var leverage    "Leverage"
 label var sales_assets "Sales / Assets"
+label var mtr         "Marginal tax rate (Graham-Mills fallback)"
 
 
 

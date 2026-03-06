@@ -30,20 +30,20 @@ gen v2_0203     = v_0203^2
 gen zv1_0203    = d_0203 * v1_0203
 gen zv2_0203    = d_0203 * v2_0203
 
-foreach c in tobinq roa cf_assets sales_assets leverage ln_assets {
+foreach c in tobinq roa cf_assets sales_assets leverage ln_assets mtr {
     gen pre_0203_`c' = L.`c' if inlist(fyear, 2002, 2003)
 }
 gen pre_0203_loss  = L.loss    if inlist(fyear, 2002, 2003)
 gen pre_0203_loss2 = pre_0203_loss^2
 
 foreach y of local outcomes {
-    ivregress 2sls `y' ///
-        v1_0203 v2_0203 ///
-        pre_0203_tobinq pre_0203_roa pre_0203_cf_assets pre_0203_sales_assets ///
-        pre_0203_leverage pre_0203_ln_assets ///
-        pre_0203_loss pre_0203_loss2 ///
-        i.ffi48 ///
-        (refund_0203 = zv1_0203 zv2_0203) ///
+     ivregress 2sls `y' ///
+         v1_0203 v2_0203 ///
+         pre_0203_tobinq pre_0203_roa pre_0203_cf_assets pre_0203_sales_assets ///
+         pre_0203_leverage pre_0203_ln_assets pre_0203_mtr ///
+         pre_0203_loss pre_0203_loss2 ///
+         i.ffi48 ///
+         (refund_0203 = zv1_0203 zv2_0203) ///
         if regflag_0203 == 1, vce(cluster ffi48)
     estimates store ss_0203_`y'
 }
