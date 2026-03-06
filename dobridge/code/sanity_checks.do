@@ -128,7 +128,7 @@ foreach p in 2002 2009 {
     display as text "----------------------------------------"
     display as text "Regression sample period: `p'"
     foreach v of local table_vars {
-        quietly summarize `v' if reg_period == `p', detail
+        quietly summarize `v' if reg_period == `p' & has_crsp_link_obs == 1, detail
         display as text "`: variable label `v''"
         display as result "  mean = " %12.4f r(mean) "   sd = " %12.4f r(sd) "   N = " %9.0f r(N)
     }

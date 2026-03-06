@@ -11,8 +11,18 @@ destring(gvkey), replace
 keep if at > 1 & !missing(at)
 
 * Sort for panel operations
-gsort gvkey fyear -datadate
-duplicates drop gvkey fyear, force
+gen strL datafmt_l = lower(trim(datafmt))
+gen byte datafmt_pref = (datafmt_l != "indl")
+gen strL consol_l = lower(trim(consol))
+gen byte consol_pref = (consol_l != "c")
+gen double at_keep = at
+replace at_keep = 0 if missing(at_keep)
+
+* Prioritize consolidated industrial data, then by largest assets.
+sort gvkey fyear datafmt_pref consol_pref -at_keep
+by gvkey fyear: keep if _n == 1
+
+drop datafmt_l datafmt_pref consol_l consol_pref at_keep
 
 * Generate indicators for policy-specific year coverage
 * 2002 refund period coverage: 1996-2001
@@ -92,8 +102,9 @@ gen txfed_use = txfed
 replace txfed_use = txfed_calc if missing(txfed_use)
 
 * --- Step 4: Tax Rate ---
-gen taxrate = txfed_use / taxinc
-* Winsorize or bound as needed in later steps; raw rate constructed here
+gen taxrate = .
+replace taxrate = txfed_use / taxinc if !missing(txfed_use) & txfed_use > 0 & !missing(taxinc) & taxinc > 0
+replace taxrate = . if taxrate < 0.01 | taxrate > 0.52
 
 ********************************************************************************
 * Lagged Variables (needed for changes)
@@ -671,25 +682,43 @@ gen byte outlier_fs_2010 = inlist(fyear, 2010, 2011) & !missing(v_fs_2010, refun
     ((v_fs_2010 < v_p1_2010 | v_fs_2010 > v_p99_2010) | ///
      (refund_fs_2010 > refund_p995_2010))
 
+* Align with R: trim investment by 1st and 99th percentiles by period sample
+quietly _pctile investment if inlist(fyear, 2002, 2003), p(1 99)
+scalar invest_p1_0203  = r(r1)
+scalar invest_p99_0203 = r(r2)
+quietly _pctile investment if inlist(fyear, 2010, 2011), p(1 99)
+scalar invest_p1_2010  = r(r1)
+scalar invest_p99_2010 = r(r2)
+
+gen byte invest_trim_0203 = inlist(fyear, 2002, 2003) & ///
+    !missing(investment) & (investment >= invest_p1_0203 & investment <= invest_p99_0203)
+gen byte invest_trim_2010 = inlist(fyear, 2010, 2011) & ///
+    !missing(investment) & (investment >= invest_p1_2010 & investment <= invest_p99_2010)
+
 * Final firm-level sample flags by policy period
 gen byte sample_firm_0203 = firm_complete_0203 & firm_has_policy_loss_0203
 gen byte sample_firm_2010 = firm_complete_2010 & firm_has_policy_loss_2010
 
 * Row-level regression flags (use these in first/second-stage scripts)
 replace regflag_0203 = inlist(fyear, 2002, 2003) & sample_firm_0203 & ///
-    !missing(v_fs_0203, refund_fs_0203) & (outlier_fs_0203 == 0)
+    !missing(v_fs_0203, refund_fs_0203) & (outlier_fs_0203 == 0) & ///
+    (invest_trim_0203 == 1)
 replace regflag_2010 = inlist(fyear, 2010, 2011) & sample_firm_2010 & ///
-    !missing(v_fs_2010, refund_fs_2010) & (outlier_fs_2010 == 0)
+    !missing(v_fs_2010, refund_fs_2010) & (outlier_fs_2010 == 0) & ///
+    (invest_trim_2010 == 1)
 
 * Cleanup temporary variables and scalars
 drop policy_0203 policy_2010
 drop loss_elig_0203_obs loss_elig_2010_obs
 drop v_fs_0203 refund_fs_0203 v_2009_for_2010 refund_2009_for_2010 v_fs_2010 refund_fs_2010
 drop outlier_fs_0203 outlier_fs_2010
+drop invest_trim_0203 invest_trim_2010
 scalar drop v_p1_0203 v_p99_0203
 scalar drop refund_p995_0203
 scalar drop v_p1_2010 v_p99_2010
 scalar drop refund_p995_2010
+scalar drop invest_p1_0203 invest_p99_0203
+scalar drop invest_p1_2010 invest_p99_2010
 
 ********************************************************************************
 * STEP 8: Flag firms/observations with a valid CRSP link (CCM)
@@ -715,9 +744,52 @@ rename GVKEY gvkey
 rename LPERMNO permno
 rename LINKDT linkdt
 rename LINKENDDT linkend
-replace linkend = td(31dec9999) if missing(linkend)
+capture confirm variable LINKTYPE
+if (_rc == 0) rename LINKTYPE linktype
+capture confirm variable LINKPRIM
+if (_rc == 0) rename LINKPRIM linkprim
+
+capture confirm variable linktype
+if (_rc == 0) {
+    tostring linktype, replace
+    replace linktype = trim(upper(linktype))
+}
+
+capture confirm variable linkprim
+if (_rc == 0) {
+    tostring linkprim, replace
+    replace linkprim = trim(upper(linkprim))
+}
+
+capture confirm numeric variable linkdt
+if (_rc) {
+    gen double linkdt_num = date(linkdt, "YMD")
+    replace linkdt_num = date(linkdt, "MDY") if missing(linkdt_num) & !missing(linkdt)
+}
+else {
+    gen double linkdt_num = linkdt
+}
+
+capture confirm numeric variable linkend
+if (_rc) {
+    gen double linkend_num = date(linkend, "YMD")
+    replace linkend_num = date(linkend, "MDY") if missing(linkend_num) & !missing(linkend)
+}
+else {
+    gen double linkend_num = linkend
+}
+
+replace linkend_num = td(31dec9999) if missing(linkend_num)
+format linkdt_num linkend_num %td
 destring gvkey, replace
-keep gvkey permno linkdt linkend
+
+* Keep CCM link types used in R: LC/LU/LS and P/C
+capture confirm variable linktype
+if (_rc == 0) keep if inlist(linktype, "LC", "LU", "LS")
+capture confirm variable linkprim
+if (_rc == 0) keep if inlist(linkprim, "P", "C")
+
+keep gvkey permno linkdt_num linkend_num
 drop if missing(gvkey) | missing(permno)
 tempfile ccm
 save `ccm'
@@ -726,7 +798,7 @@ restore
 preserve
 use `base_obs', clear
 joinby gvkey using `ccm'
-keep if inrange(obsdate, linkdt, linkend)
+keep if inrange(obsdate, linkdt_num, linkend_num)
 bysort obs_id: keep if _n == 1
 keep obs_id
 gen byte has_crsp_link_obs = 1
