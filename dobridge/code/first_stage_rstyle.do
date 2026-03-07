@@ -57,7 +57,14 @@ reg refund_0203 ///
      i.ffi48 ///
      if regflag_0203 == 1, vce(cluster ffi48)
 
+scalar b_0203  = _b[zv1_0203]
+scalar se_0203 = _se[zv1_0203]
+scalar p_0203  = 2*ttail(e(df_r), abs(_b[zv1_0203]/_se[zv1_0203]))
+scalar N_0203  = e(N)
+scalar r2_0203 = e(r2)
+
 test zv1_0203 zv2_0203
+scalar pF_0203 = r(p)
 estimates store fs_0203
 
 * ---------------------------------------------------------------------
@@ -100,7 +107,64 @@ reg refund_`yy'_reg ///
     i.ffi48 ///
     if in_`yy', vce(cluster ffi48)
 
+scalar b_2010  = _b[zv1_`yy']
+scalar se_2010 = _se[zv1_`yy']
+scalar p_2010  = 2*ttail(e(df_r), abs(_b[zv1_`yy']/_se[zv1_`yy']))
+scalar N_2010  = e(N)
+scalar r2_2010 = e(r2)
+
 test zv1_`yy' zv2_`yy'
+scalar pF_2010 = r(p)
 estimates store fs_`yy'
 
+* ---------------------------------------------------------------------
+* Export LaTeX first-stage table (zv1 coefficient = change in slope at kink)
+* ---------------------------------------------------------------------
+cap mkdir "../output"
+
+local star_0203 ""
+if (scalar(p_0203) < 0.10) local star_0203 "*"
+if (scalar(p_0203) < 0.05) local star_0203 "**"
+if (scalar(p_0203) < 0.01) local star_0203 "***"
+
+local star_2010 ""
+if (scalar(p_2010) < 0.10) local star_2010 "*"
+if (scalar(p_2010) < 0.05) local star_2010 "**"
+if (scalar(p_2010) < 0.01) local star_2010 "***"
+
+local b0203   : display %6.3f scalar(b_0203)
+local se0203  : display %7.4f scalar(se_0203)
+local pf0203  : display %4.2f scalar(pF_0203)
+local n0203   : display %12.0fc scalar(N_0203)
+local r20203  : display %5.3f scalar(r2_0203)
+
+local b2010   : display %6.3f scalar(b_2010)
+local se2010  : display %7.4f scalar(se_2010)
+local pf2010  : display %4.2f scalar(pF_2010)
+local n2010   : display %12.0fc scalar(N_2010)
+local r22010  : display %5.3f scalar(r2_2010)
+
+file open fh using "../output/first_stage_table_rstyle.tex", write replace
+file write fh "\begin{table}[htbp]" _n
+file write fh "\centering" _n
+file write fh "\caption{First-stage regression: tax refund kink coefficients}" _n
+file write fh "\begin{tabular}{lcc}" _n
+file write fh "\hline\hline" _n
+file write fh "Dependent variable = Tax Refund & 2002 Policy & 2009 Policy \\" _n
+file write fh " & (1) & (2) \\" _n
+file write fh "\hline" _n
+file write fh "Change in Slope & `b0203'`star_0203' & `b2010'`star_2010' \\" _n
+file write fh " & [`se0203'] & [`se2010'] \\" _n
+file write fh "Controls & + & + \\" _n
+file write fh "Industry F.E. & + & + \\" _n
+file write fh "F-test (p-value) & `pf0203' & `pf2010' \\" _n
+file write fh "Chi-squared test for coefficient differences (p-value) &  &  \\" _n
+file write fh "Observations & `n0203' & `n2010' \\" _n
+file write fh "R-squared & `r20203' & `r22010' \\" _n
+file write fh "\hline\hline" _n
+file write fh "\end{tabular}" _n
+file write fh "\end{table}" _n
+file close fh
+
 display as text "Stored estimates: fs_0203 fs_2010"
+display as text "LaTeX table written: ../output/first_stage_table_rstyle.tex"
