@@ -658,10 +658,12 @@ gen byte policy_0203 = inlist(fyear, 2001, 2002)
 gen byte policy_2010 = inlist(fyear, 2008, 2009)
 
 * Loss eligibility by policy period
-gen byte loss_elig_0203_obs = (loss_2002 > 0 | loss_2003 > 0)
+gen byte loss_elig_0203_obs = ///
+    ((!missing(loss_2002) & loss_2002 > 0) | ///
+     (!missing(loss_2003) & loss_2003 > 0))
 bysort gvkey: egen byte firm_has_policy_loss_0203 = max(loss_elig_0203_obs)
 
-gen byte loss_elig_2010_obs = (loss_applied_2010 > 0)
+gen byte loss_elig_2010_obs = (!missing(loss_applied_2010) & loss_applied_2010 > 0)
 bysort gvkey: egen byte firm_has_policy_loss_2010 = max(loss_elig_2010_obs)
 
 * ---------- Outlier rules for first-stage samples (row-level only) ----------

@@ -23,14 +23,23 @@ gen v_level = assignment_v
 * "other" = change in short-term investments + change in long-term investments + acquisitions
 gen other = d_stinv + d_inv + acquisitions
 
-* Winsorize outcomes at 1/99 within the 2002/2003 regression sample
-* before constructing total uses.
-foreach y in investment d_cash d_totdebt payout other d_emp {
-    quietly _pctile `y' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & !missing(`y'), p(1 99)
-    local p1_`y' = r(r1)
-    local p99_`y' = r(r2)
-    replace `y' = `p1_`y'' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & `y' < `p1_`y''
-    replace `y' = `p99_`y'' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & `y' > `p99_`y''
+* Winsorization mode for second-stage outcomes (2002/2003 sample):
+*   none   = no winsorization (default; relies on sample-construction trim)
+*   noninv = winsorize non-investment outcomes only
+*   all    = winsorize all outcomes including investment
+local winsor_mode "none"
+local winsor_list ""
+if "`winsor_mode'" == "all"    local winsor_list "investment d_cash d_totdebt payout other d_emp"
+if "`winsor_mode'" == "noninv" local winsor_list "d_cash d_totdebt payout other d_emp"
+
+if "`winsor_list'" != "" {
+    foreach y of local winsor_list {
+        quietly _pctile `y' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & !missing(`y'), p(1 99)
+        local p1_`y' = r(r1)
+        local p99_`y' = r(r2)
+        replace `y' = `p1_`y'' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & !missing(`y') & `y' < `p1_`y''
+        replace `y' = `p99_`y'' if regflag_0203 == 1 & inlist(fyear, 2002, 2003) & !missing(`y') & `y' > `p99_`y''
+    }
 }
 
 * "total" adds uses and nets out debt issuance (so debt enters with opposite sign)
@@ -51,7 +60,7 @@ gen zv2_0203    = d_0203 * v2_0203
 * Control timing switch:
 * 0 = contemporaneous controls (year of refund receipt)
 * 1 = lagged controls (year before refund receipt)
-local use_lagged_controls 0
+local use_lagged_controls 1
 
 foreach c in tobinq roa cf_assets sales_assets leverage ln_assets mtr {
     gen pre_0203_`c' = `c' if inlist(fyear, 2002, 2003)
@@ -65,6 +74,21 @@ if `use_lagged_controls' {
 }
 gen pre_0203_loss2 = pre_0203_loss^2
 
+* Optional: enforce a balanced second-stage sample (common observations
+* across all outcomes and all RHS variables), without changing values.
+local enforce_balance 0
+gen byte ss_balanced = 1 if regflag_0203 == 1 & inlist(fyear, 2002, 2003)
+foreach v in investment d_cash d_totdebt payout other total d_emp ///
+             refund_0203 v1_0203 v2_0203 zv1_0203 zv2_0203 ///
+             pre_0203_tobinq pre_0203_roa pre_0203_cf_assets pre_0203_sales_assets ///
+             pre_0203_leverage pre_0203_ln_assets pre_0203_mtr pre_0203_loss pre_0203_loss2 ffi48 {
+    replace ss_balanced = 0 if ss_balanced == 1 & missing(`v')
+}
+count if regflag_0203 == 1 & inlist(fyear, 2002, 2003)
+display as text "Raw second-stage sample (regflag_0203): " %12.0fc r(N)
+count if ss_balanced == 1
+display as text "Balanced second-stage sample:          " %12.0fc r(N)
+
 foreach y of local outcomes {
      ivregress 2sls `y' ///
          v1_0203 v2_0203 ///
@@ -73,7 +97,7 @@ foreach y of local outcomes {
          pre_0203_loss pre_0203_loss2 ///
          i.ffi48 ///
          (refund_0203 = zv1_0203 zv2_0203) ///
-        if regflag_0203 == 1, vce(cluster ffi48)
+         if regflag_0203 == 1 & (`enforce_balance' == 0 | ss_balanced == 1), vce(cluster ffi48)
     estimates store ss_0203_`y'
 
     scalar b_`y'  = _b[refund_0203]
@@ -138,5 +162,3 @@ file close fh
 
 display as text "Stored estimates created for first-policy (2002/2003) regressions."
 display as text "LaTeX table written: ../output/table5_second_stage_2002.tex"
-
-
