@@ -66,6 +66,7 @@ estimates store fs_0203
 * ---------------------------------------------------------------------
 bysort gvkey: egen refund_2010_val = max(cond(fyear == 2009, potential_refund, .))
 bysort gvkey: egen v_2009_val      = max(cond(fyear == 2009, v_level, .))
+bysort gvkey: egen loss_2010_val   = max(cond(inlist(fyear, 2008, 2009), loss_applied_2010, .))
 
 local yy = 2010
 gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
@@ -79,7 +80,7 @@ gen zv1_`yy'    = d_`yy' * v1_`yy'
 gen zv2_`yy'    = d_`yy' * v2_`yy'
 
 * Match R timing: 2010 outcome uses 2009 controls (t-1).
-* Match R definition: policy-loss control is chosen loss year amount (2008 or 2009), not raw 2009 loss.
+* Match R definition: policy-loss control is chosen loss year amount (2008 or 2009).
 gen pre_`yy'_tobinq       = L.tobinq       if in_`yy'
 gen pre_`yy'_roa          = L.roa          if in_`yy'
 gen pre_`yy'_cf_assets    = L.cf_assets    if in_`yy'
@@ -87,7 +88,7 @@ gen pre_`yy'_sales_assets = L.sales_assets if in_`yy'
 gen pre_`yy'_leverage     = L.leverage     if in_`yy'
 gen pre_`yy'_ln_assets    = L.ln_assets    if in_`yy'
 gen pre_`yy'_mtr          = L.mtr          if in_`yy'
-gen pre_`yy'_loss         = L.loss_applied_2010 if in_`yy'
+gen pre_`yy'_loss         = loss_2010_val if in_`yy'
 gen pre_`yy'_loss2        = pre_`yy'_loss^2
 
 reg refund_`yy'_reg ///

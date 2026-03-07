@@ -679,12 +679,12 @@ quietly _pctile v_fs_0203 if !missing(v_fs_0203), p(1 99)
 scalar v_p1_0203  = r(r1)
 scalar v_p99_0203 = r(r2)
 
-quietly _pctile refund_fs_0203 if !missing(refund_fs_0203), p(99.5)
-scalar refund_p995_0203 = r(r1)
+quietly _pctile refund_fs_0203 if !missing(refund_fs_0203), p(99.9)
+scalar refund_p999_0203 = r(r1)
 
 gen byte outlier_fs_0203 = inlist(fyear, 2002, 2003) & !missing(v_fs_0203, refund_fs_0203) & ///
     ((v_fs_0203 < v_p1_0203 | v_fs_0203 > v_p99_0203) | ///
-     (refund_fs_0203 > refund_p995_0203))
+     (refund_fs_0203 > refund_p999_0203))
 
 * 2010/2011 outcomes use 2009 policy-year assignment/refund carried by firm.
 bysort gvkey: egen v_2009_for_2010 = max(cond(fyear == 2009, assignment_v, .))
