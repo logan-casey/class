@@ -56,43 +56,42 @@ estimates store fs_0203
 
 * ---------------------------------------------------------------------
 * First stage: 2009 policy period
-* Run separate cross-sections for 2010 and 2011 outcomes.
+* Run 2010 outcome only.
 * ---------------------------------------------------------------------
 bysort gvkey: egen refund_2010_val = max(cond(fyear == 2009, potential_refund, .))
 bysort gvkey: egen v_2009_val      = max(cond(fyear == 2009, v_level, .))
 
-foreach yy in 2010 2011 {
-    gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
+local yy = 2010
+gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
 
-    gen refund_`yy'_reg = refund_2010_val if in_`yy'
-    gen v_`yy'      = v_2009_val      if in_`yy'
-    gen d_`yy'      = (v_`yy' < 0)    if in_`yy' & !missing(v_`yy')
-    gen v1_`yy'     = v_`yy'
-    gen v2_`yy'     = v_`yy'^2
-    gen zv1_`yy'    = d_`yy' * v1_`yy'
-    gen zv2_`yy'    = d_`yy' * v2_`yy'
+gen refund_`yy'_reg = refund_2010_val if in_`yy'
+gen v_`yy'      = v_2009_val      if in_`yy'
+gen d_`yy'      = (v_`yy' < 0)    if in_`yy' & !missing(v_`yy')
+gen v1_`yy'     = v_`yy'
+gen v2_`yy'     = v_`yy'^2
+gen zv1_`yy'    = d_`yy' * v1_`yy'
+gen zv2_`yy'    = d_`yy' * v2_`yy'
 
-    gen pre_`yy'_tobinq       = tobinq       if in_`yy'
-    gen pre_`yy'_roa          = roa          if in_`yy'
-    gen pre_`yy'_cf_assets    = cf_assets    if in_`yy'
-    gen pre_`yy'_sales_assets = sales_assets if in_`yy'
-    gen pre_`yy'_leverage     = leverage     if in_`yy'
-    gen pre_`yy'_ln_assets    = ln_assets    if in_`yy'
-    gen pre_`yy'_mtr         = mtr          if in_`yy'
-    gen pre_`yy'_loss         = loss         if in_`yy'
-    gen pre_`yy'_loss2        = pre_`yy'_loss^2
+gen pre_`yy'_tobinq       = tobinq       if in_`yy'
+gen pre_`yy'_roa          = roa          if in_`yy'
+gen pre_`yy'_cf_assets    = cf_assets    if in_`yy'
+gen pre_`yy'_sales_assets = sales_assets if in_`yy'
+gen pre_`yy'_leverage     = leverage     if in_`yy'
+gen pre_`yy'_ln_assets    = ln_assets    if in_`yy'
+gen pre_`yy'_mtr         = mtr          if in_`yy'
+gen pre_`yy'_loss         = loss         if in_`yy'
+gen pre_`yy'_loss2        = pre_`yy'_loss^2
 
-    reg refund_`yy'_reg ///
-        v1_`yy' v2_`yy' ///
-        zv1_`yy' zv2_`yy' ///
-        pre_`yy'_tobinq pre_`yy'_roa pre_`yy'_cf_assets pre_`yy'_sales_assets ///
-        pre_`yy'_leverage pre_`yy'_ln_assets pre_`yy'_mtr ///
-        pre_`yy'_loss pre_`yy'_loss2 ///
-        i.ffi48 ///
-        if in_`yy', vce(cluster ffi48)
+reg refund_`yy'_reg ///
+    v1_`yy' v2_`yy' ///
+    zv1_`yy' zv2_`yy' ///
+    pre_`yy'_tobinq pre_`yy'_roa pre_`yy'_cf_assets pre_`yy'_sales_assets ///
+    pre_`yy'_leverage pre_`yy'_ln_assets pre_`yy'_mtr ///
+    pre_`yy'_loss pre_`yy'_loss2 ///
+    i.ffi48 ///
+    if in_`yy', vce(cluster ffi48)
 
-    test zv1_`yy' zv2_`yy'
-    estimates store fs_`yy'
-}
+test zv1_`yy' zv2_`yy'
+estimates store fs_`yy'
 
-display as text "Stored estimates: fs_0203 fs_2010 fs_2011"
+display as text "Stored estimates: fs_0203 fs_2010"
