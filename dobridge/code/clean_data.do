@@ -24,39 +24,34 @@ by gvkey fyear: keep if _n == 1
 
 drop datafmt_l datafmt_pref consol_l consol_pref at_keep
 
-* Generate indicators for policy-specific year coverage
-* 2002 refund period coverage: 1996-2001
-* 2003 refund period coverage: 1997-2002
-* 2010 refund period coverage: 2003-2008
-gen pre2002 = (fyear >= 1996 & fyear <= 2001)
-gen pre2003 = (fyear >= 1997 & fyear <= 2002)
-gen pre2009 = (fyear >= 2003 & fyear <= 2008)
+* Generate indicators for policy-relevant five-year carryback windows
+* 2002-period assignment windows: 1996-2000 (for 2001 loss) or 1997-2001 (for 2002 loss)
+* 2010-period assignment windows: 2003-2007 (for 2008 loss) or 2004-2008 (for 2009 loss)
+gen win_2001_5 = inrange(fyear, 1996, 2000)
+gen win_2002_5 = inrange(fyear, 1997, 2001)
+gen win_2008_5 = inrange(fyear, 2003, 2007)
+gen win_2009_5 = inrange(fyear, 2004, 2008)
 
-* Count number of years each firm appears in each window
-bysort gvkey: egen years_pre2002 = total(pre2002)
-bysort gvkey: egen years_pre2003 = total(pre2003)
-bysort gvkey: egen years_pre2009 = total(pre2009)
+* Count years observed per five-year window
+bysort gvkey: egen n_win_2001_5 = total(win_2001_5)
+bysort gvkey: egen n_win_2002_5 = total(win_2002_5)
+bysort gvkey: egen n_win_2008_5 = total(win_2008_5)
+bysort gvkey: egen n_win_2009_5 = total(win_2009_5)
 
-* Keep firms present in at least one policy-relevant window
-keep if (years_pre2002 == 6) | (years_pre2003 == 6) | (years_pre2009 == 6)
+* Keep firms present in at least one required five-year window
+keep if (n_win_2001_5 == 5) | (n_win_2002_5 == 5) | ///
+        (n_win_2008_5 == 5) | (n_win_2009_5 == 5)
 
-* Regression eligibility flags based on complete preceding-year panels
-* For 2002/2003 refund regressions: require full 1996-2002 history
-gen pre_0203_full = inrange(fyear, 1996, 2002)
-bysort gvkey: egen n_pre_0203_full = total(pre_0203_full)
-gen firm_complete_0203 = (n_pre_0203_full == 7)
-
-* For 2010/2011 refund regressions: require full 2003-2009 history
-gen pre_2010_full = inrange(fyear, 2003, 2009)
-bysort gvkey: egen n_pre_2010_full = total(pre_2010_full)
-gen firm_complete_2010 = (n_pre_2010_full == 7)
+* Regression eligibility flags based on required five-year carryback presence
+gen firm_complete_0203 = (n_win_2001_5 == 5 | n_win_2002_5 == 5)
+gen firm_complete_2010 = (n_win_2008_5 == 5 | n_win_2009_5 == 5)
 
 * Row-level flags are finalized after all period-specific restrictions (Step 7)
 gen byte regflag_0203 = .
 gen byte regflag_2010 = .
 
-drop pre2002 pre2003 pre2009 years_pre2002 years_pre2003 years_pre2009
-drop pre_0203_full pre_2010_full n_pre_0203_full n_pre_2010_full
+drop win_2001_5 win_2002_5 win_2008_5 win_2009_5
+drop n_win_2001_5 n_win_2002_5 n_win_2008_5 n_win_2009_5
 
 
 ********************************************************************************
@@ -696,12 +691,12 @@ quietly _pctile v_fs_2010 if !missing(v_fs_2010), p(1 99)
 scalar v_p1_2010  = r(r1)
 scalar v_p99_2010 = r(r2)
 
-quietly _pctile refund_fs_2010 if !missing(refund_fs_2010), p(99.5)
-scalar refund_p995_2010 = r(r1)
+quietly _pctile refund_fs_2010 if !missing(refund_fs_2010), p(99.9)
+scalar refund_p999_2010 = r(r1)
 
 gen byte outlier_fs_2010 = inlist(fyear, 2010, 2011) & !missing(v_fs_2010, refund_fs_2010) & ///
     ((v_fs_2010 < v_p1_2010 | v_fs_2010 > v_p99_2010) | ///
-     (refund_fs_2010 > refund_p995_2010))
+     (refund_fs_2010 > refund_p999_2010))
 
 * Align with R: trim investment by 1st and 99th percentiles by period sample
 quietly _pctile investment if inlist(fyear, 2002, 2003), p(1 99)
@@ -735,9 +730,9 @@ drop v_fs_0203 refund_fs_0203 v_2009_for_2010 refund_2009_for_2010 v_fs_2010 ref
 drop outlier_fs_0203 outlier_fs_2010
 drop invest_trim_0203 invest_trim_2010
 scalar drop v_p1_0203 v_p99_0203
-scalar drop refund_p995_0203
+scalar drop refund_p999_0203
 scalar drop v_p1_2010 v_p99_2010
-scalar drop refund_p995_2010
+scalar drop refund_p999_2010
 scalar drop invest_p1_0203 invest_p99_0203
 scalar drop invest_p1_2010 invest_p99_2010
 
@@ -834,8 +829,13 @@ bysort gvkey: egen byte has_crsp_link_firm = max(has_crsp_link_obs)
 label var has_crsp_link_obs  "Obs has valid CCM gvkey-permno link at obsdate"
 label var has_crsp_link_firm "Firm has any valid CCM gvkey-permno link in sample"
 
-replace regflag_0203 = 0 if inlist(fyear, 2002, 2003) & has_crsp_link_obs == 0
-replace regflag_2010 = 0 if fyear == 2010 & has_crsp_link_obs == 0
+* Optional: enforce CRSP-link requirement inside regression flags.
+* Default off to align with paper-based sample that does not require CRSP coverage.
+local require_crsp_link_for_reg 0
+if `require_crsp_link_for_reg' {
+    replace regflag_0203 = 0 if inlist(fyear, 2002, 2003) & has_crsp_link_obs == 0
+    replace regflag_2010 = 0 if fyear == 2010 & has_crsp_link_obs == 0
+}
 
 drop obs_id obsdate
 
