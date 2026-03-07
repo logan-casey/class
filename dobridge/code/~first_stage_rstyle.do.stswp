@@ -2,7 +2,7 @@ clear all
 set more off
 
 use "../data/main_data.dta", clear
-
+drop if ffi48 >=44 & ffi48 <=/47
 capture confirm variable ffi48
 if _rc {
     di as err "Missing industry variable ffi48. Run clean_data.do first."
@@ -16,6 +16,11 @@ if _rc {
 capture confirm variable regflag_2010
 if _rc {
     di as err "Missing regflag_2010. Re-run clean_data.do."
+    exit 111
+}
+capture confirm variable loss_applied_2010
+if _rc {
+    di as err "Missing loss_applied_2010. Re-run clean_data.do."
     exit 111
 }
 
@@ -36,10 +41,11 @@ gen v2_0203     = v_0203^2
 gen zv1_0203    = d_0203 * v1_0203
 gen zv2_0203    = d_0203 * v2_0203
 
+* Match R timing: controls come from loss year (t-1) for outcome years 2002/2003.
 foreach c in tobinq roa cf_assets sales_assets leverage ln_assets mtr {
-    gen pre_0203_`c' = `c' if inlist(fyear, 2002, 2003)
+    gen pre_0203_`c' = L.`c' if inlist(fyear, 2002, 2003)
 }
-gen pre_0203_loss  = loss    if inlist(fyear, 2002, 2003)
+gen pre_0203_loss  = L.loss  if inlist(fyear, 2002, 2003)
 gen pre_0203_loss2 = pre_0203_loss^2
 
 reg refund_0203 ///
@@ -67,6 +73,7 @@ estimates store fs_0203
 * ---------------------------------------------------------------------
 bysort gvkey: egen refund_2010_val = max(cond(fyear == 2009, potential_refund, .))
 bysort gvkey: egen v_2009_val      = max(cond(fyear == 2009, v_level, .))
+bysort gvkey: egen loss_2010_val   = max(cond(inlist(fyear, 2008, 2009), loss_applied_2010, .))
 
 local yy = 2010
 gen in_`yy' = (fyear == `yy') & (regflag_2010 == 1)
@@ -79,14 +86,16 @@ gen v2_`yy'     = v_`yy'^2
 gen zv1_`yy'    = d_`yy' * v1_`yy'
 gen zv2_`yy'    = d_`yy' * v2_`yy'
 
-gen pre_`yy'_tobinq       = tobinq       if in_`yy'
-gen pre_`yy'_roa          = roa          if in_`yy'
-gen pre_`yy'_cf_assets    = cf_assets    if in_`yy'
-gen pre_`yy'_sales_assets = sales_assets if in_`yy'
-gen pre_`yy'_leverage     = leverage     if in_`yy'
-gen pre_`yy'_ln_assets    = ln_assets    if in_`yy'
-gen pre_`yy'_mtr         = mtr          if in_`yy'
-gen pre_`yy'_loss         = loss         if in_`yy'
+* Match R timing: 2010 outcome uses 2009 controls (t-1).
+* Match R definition: policy-loss control is chosen loss year amount (2008 or 2009).
+gen pre_`yy'_tobinq       = L.tobinq       if in_`yy'
+gen pre_`yy'_roa          = L.roa          if in_`yy'
+gen pre_`yy'_cf_assets    = L.cf_assets    if in_`yy'
+gen pre_`yy'_sales_assets = L.sales_assets if in_`yy'
+gen pre_`yy'_leverage     = L.leverage     if in_`yy'
+gen pre_`yy'_ln_assets    = L.ln_assets    if in_`yy'
+gen pre_`yy'_mtr          = L.mtr          if in_`yy'
+gen pre_`yy'_loss         = loss_2010_val if in_`yy'
 gen pre_`yy'_loss2        = pre_`yy'_loss^2
 
 reg refund_`yy'_reg ///
@@ -135,7 +144,7 @@ local pf2010  : display %4.2f scalar(pF_2010)
 local n2010   : display %12.0fc scalar(N_2010)
 local r22010  : display %5.3f scalar(r2_2010)
 
-file open fh using "../output/first_stage_table.tex", write replace
+file open fh using "../output/first_stage_table_rstyle.tex", write replace
 file write fh "\begin{table}[htbp]" _n
 file write fh "\centering" _n
 file write fh "\caption{First-stage regression: tax refund kink coefficients}" _n
@@ -158,4 +167,4 @@ file write fh "\end{table}" _n
 file close fh
 
 display as text "Stored estimates: fs_0203 fs_2010"
-display as text "LaTeX table written: ../output/first_stage_table.tex"
+display as text "LaTeX table written: ../output/first_stage_table_rstyle.tex"
