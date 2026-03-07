@@ -27,7 +27,7 @@ gen other = d_stinv + d_inv + acquisitions
 *   none   = no winsorization (default; relies on sample-construction trim)
 *   noninv = winsorize non-investment outcomes only
 *   all    = winsorize all outcomes including investment
-local winsor_mode "none"
+local winsor_mode "noninv"
 local winsor_list ""
 if "`winsor_mode'" == "all"    local winsor_list "investment d_cash d_totdebt payout other d_emp"
 if "`winsor_mode'" == "noninv" local winsor_list "d_cash d_totdebt payout other d_emp"
