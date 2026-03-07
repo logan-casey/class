@@ -78,8 +78,8 @@ replace xido = 0 if missing(xido)
 
 * Fallback PIDOM definition: PIDOM, else PI - PIFO
 gen pidom_imp = pidom
-replace pidom_imp = pi - coalesce(pifo, 0) if missing(pidom_imp) & !missing(pi)
-
+replace pidom_imp = pi - cond(missing(pifo), 0, pifo)
+ if missing(pidom_imp) & !missing(pi)
 * MTR-style txfed fallback for TI: use TXDFED if available, else TXDI
 gen txdfed_for_ti = txdfed
 replace txdfed_for_ti = txdi if missing(txdfed_for_ti)
@@ -121,7 +121,7 @@ replace tax_ratio_gm = txt / pi if missing(tax_ratio_gm) & !missing(txt) & !miss
 gen double mtr = 0.331 ///
     - 0.075 * (tax_ratio_gm < 0.1) ///
     - 0.012 * (tlcf > 0) ///
-    - 1.83 * (pi < 0) ///
+    - 0.106 * (pi < 0) ///
     + 0.037 * (abs(pifo / pi) > 0.05)
 
 replace mtr = . if missing(tax_ratio_gm) & missing(txt) & missing(txfed_use)
