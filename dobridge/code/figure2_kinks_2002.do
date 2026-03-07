@@ -13,26 +13,26 @@ xtset gvkey fyear
 cap mkdir "../output"
 
 * ---------------------------------------------------------------------
-* Build 2002-period regression sample variables (same timing as first_stage.do)
+* Build 2002-period regression sample variables (match first_stage.do timing)
 * ---------------------------------------------------------------------
-capture confirm variable v
-gen tax_refund = L.potential_refund if regflag_0203 == 1
-gen inv = investment if regflag_0203 == 1
+gen tax_refund = L.potential_refund if inlist(fyear, 2002, 2003)
+gen v_0203     = L.assignment_v     if inlist(fyear, 2002, 2003)
+gen inv        = investment         if inlist(fyear, 2002, 2003)
 
-foreach c in tobinq roa cf_assets sales_assets leverage ln_assets {
-    gen pre_`c' = L.`c' if regflag_0203 == 1
+foreach c in tobinq roa cf_assets sales_assets leverage ln_assets mtr {
+    gen pre_`c' = `c' if inlist(fyear, 2002, 2003)
 }
-gen pre_loss  = L.loss if regflag_0203 == 1
+gen pre_loss  = loss if inlist(fyear, 2002, 2003)
 gen pre_loss2 = pre_loss^2
 
 * Residualize outcomes on controls + industry FE (recentered residuals)
 reg tax_refund pre_tobinq pre_roa pre_cf_assets pre_sales_assets ///
-    pre_leverage pre_ln_assets pre_loss pre_loss2 i.ffi48 ///
+    pre_leverage pre_ln_assets pre_mtr pre_loss pre_loss2 i.ffi48 ///
     if regflag_0203 == 1
 predict tax_refund_resid if e(sample), resid
 
 reg inv pre_tobinq pre_roa pre_cf_assets pre_sales_assets ///
-    pre_leverage pre_ln_assets pre_loss pre_loss2 i.ffi48 ///
+    pre_leverage pre_ln_assets pre_mtr pre_loss pre_loss2 i.ffi48 ///
     if regflag_0203 == 1
 predict inv_resid if e(sample), resid
 
@@ -40,9 +40,9 @@ predict inv_resid if e(sample), resid
 * 1M bins of V with 99% CI for means
 * ---------------------------------------------------------------------
 preserve
-keep if regflag_0203 == 1 & !missing(v, tax_refund_resid, inv_resid)
+keep if regflag_0203 == 1 & !missing(v_0203, tax_refund_resid, inv_resid)
 
-gen bin = floor(v)
+gen bin = floor(v_0203)
 gen bin_mid = bin + 0.5
 
 collapse ///
@@ -63,7 +63,7 @@ save `binned'
 restore
 
 * Merge binned moments back to plotting sample (avoids twoway using-syntax conflicts)
-gen bin = floor(v)
+gen bin = floor(v_0203)
 gen bin_mid = bin + 0.5
 merge m:1 bin bin_mid using `binned', nogen keep(master match)
 bysort bin: gen byte bin_tag = (_n == 1) if !missing(bin)
@@ -72,8 +72,8 @@ bysort bin: gen byte bin_tag = (_n == 1) if !missing(bin)
 * Left panel: Tax refund kink
 * ---------------------------------------------------------------------
 twoway ///
-    (lfit tax_refund_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(tax_refund_resid, -10, 10) & v < 0, lcolor(blue) lwidth(medthick)) ///
-    (lfit tax_refund_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(tax_refund_resid, -10, 10) & v >= 0, lcolor(blue) lwidth(medthick)) ///
+    (lfit tax_refund_resid v_0203 if regflag_0203 == 1 & inrange(v_0203, -50, 50) & inrange(tax_refund_resid, -10, 10) & v_0203 < 0, lcolor(blue) lwidth(medthick)) ///
+    (lfit tax_refund_resid v_0203 if regflag_0203 == 1 & inrange(v_0203, -50, 50) & inrange(tax_refund_resid, -10, 10) & v_0203 >= 0, lcolor(blue) lwidth(medthick)) ///
     (rarea tax_lo99 tax_hi99 bin_mid if bin_tag == 1 & inrange(tax_lo99,-10,10) & inrange(tax_hi99,-10,10) & inrange(bin_mid, -50, 50), color(gs12%45) lcolor(none)) ///
     (scatter tax_mean bin_mid if bin_tag == 1 & inrange(tax_mean,-10,10) & inrange(bin_mid, -50, 50), mcolor(blue) msymbol(Oh) msize(small)), ///
     xline(0, lcolor(red) lpattern(dash)) ///
@@ -91,8 +91,8 @@ twoway ///
 * Right panel: Investment kink
 * ---------------------------------------------------------------------
 twoway ///
-    (lfit inv_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(inv_resid, -50, 50) & v < 0, lcolor(navy) lwidth(medthick)) ///
-    (lfit inv_resid v if regflag_0203 == 1 & inrange(v, -50, 50) & inrange(inv_resid, -50, 50) & v >= 0, lcolor(navy) lwidth(medthick)) ///
+    (lfit inv_resid v_0203 if regflag_0203 == 1 & inrange(v_0203, -50, 50) & inrange(inv_resid, -50, 50) & v_0203 < 0, lcolor(navy) lwidth(medthick)) ///
+    (lfit inv_resid v_0203 if regflag_0203 == 1 & inrange(v_0203, -50, 50) & inrange(inv_resid, -50, 50) & v_0203 >= 0, lcolor(navy) lwidth(medthick)) ///
     (rarea inv_lo99 inv_hi99 bin_mid if bin_tag == 1 & inrange(inv_lo99,-50,50) & inrange(inv_hi99,-50,50) & inrange(bin_mid, -50, 50), color(gs12%45) lcolor(none)) ///
     (scatter inv_mean bin_mid if bin_tag == 1 & inrange(inv_mean,-50,50) & inrange(bin_mid, -50, 50), mcolor(navy) msymbol(Oh) msize(small)), ///
     xline(0, lcolor(red) lpattern(dash)) ///

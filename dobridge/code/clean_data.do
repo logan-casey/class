@@ -73,8 +73,7 @@ replace xido = 0 if missing(xido)
 
 * Fallback PIDOM definition: PIDOM, else PI - PIFO
 gen pidom_imp = pidom
-replace pidom_imp = pi - cond(missing(pifo), 0, pifo)
- if missing(pidom_imp) & !missing(pi)
+replace pidom_imp = pi - cond(missing(pifo), 0, pifo) if missing(pidom_imp) & !missing(pi)
 * MTR-style txfed fallback for TI: use TXDFED if available, else TXDI
 gen txdfed_for_ti = txdfed
 replace txdfed_for_ti = txdi if missing(txdfed_for_ti)

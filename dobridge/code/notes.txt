@@ -1,3 +1,9 @@
+construct your version of Table 4 (first-stage), table 5 (second-
+stage) and table 6 (investment and tax refund by financial constraints), Figure 2 (kinks in tax refunds
+and investment) and figure 3 for 2002.
+
+
+
 TaxRefund_{i,t} = \delta_0 + \sum_{p=1}^P [ \delta_p (V_{i,t-1} - V^*)^p + \gamma_p D (V_{i,t-1} - V^*)^p] + \theta Controls_{i,t} + \omega_n + \epsilon_{i,t}
 
 FirmOutcome_{i,t} = \alpha_0 + \Beta_1 \hat{TaxRefund}_{i,t} + \sum_{p=1}^P [\alpha_p (V_{i,t-1}-V^*)^p] + \theta Controls_{i,t} + \omega_n + \epsilon_{i,t}
