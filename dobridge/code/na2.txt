@@ -1,0 +1,342 @@
+ #---- 1. LOAD & DEDUPLICATE------------------------------------
+20 comp_raw <- read_csv("compustat.csv", show_col_types = FALSE)
+21 names(comp_raw) <- tolower(names(comp_raw))
+22
+23 comp_raw <- comp_raw %>%
+24 mutate(gvkey = as.integer(gvkey),
+25 fyear = as.integer(fyear)) %>%
+26 mutate(
+27 sort_datafmt = case_when(
+28 tolower(coalesce(datafmt, "")) == "indl" ~ 0L,
+29 TRUE ~ 1L
+30 ),
+31 sort_consol = case_when(
+32 tolower(coalesce(consol, "")) == "c" ~ 0L,
+33 TRUE ~ 1L
+34 )
+35 ) %>%
+36 arrange(gvkey, fyear, sort_datafmt, sort_consol, desc(coalesce(at, 0))) %>%
+37 group_by(gvkey, fyear) %>%
+38 slice(1) %>%
+39 ungroup() %>%
+40 dplyr::select(-sort_datafmt,-sort_consol) %>%
+41 arrange(gvkey, fyear)
+42
+43 cat(sprintf("Rows after dedup: %d | Unique gvkey-fyear: %d\n",
+44 nrow(comp_raw),
+45 n_distinct(paste(comp_raw$gvkey, comp_raw$fyear))))
+139 #---- 3. TAXABLE INCOME----------------------------------------
+140 comp <- comp_raw %>%
+141 mutate(
+142 pidom_imp = coalesce(
+143 pidom,
+144 if_else(!is.na(pi), pi- coalesce(pifo, 0L), NA_real_)
+145 ),
+146 txdfed_use = coalesce(txdfed, txdi),
+147 xido_use = coalesce(xido, 0),
+148 ti = pidom_imp- coalesce(txdfed_use, 0) / TAU +
+149 xido_use / (1- TAU)
+150 )
+151
+152 #---- 4. TAX RATE----------------------------------------------
+153 comp <- comp %>%
+154 mutate(
+155 txfed_use = coalesce(
+156 txfed,
+157 coalesce(txt, 0)- coalesce(txfo, 0)
+158- coalesce(txs, 0)
+159- coalesce(txo, 0)
+160 ),
+161 tax_rate = case_when(
+162 !is.na(ti) & ti > 0 &
+163 !is.na(txfed_use) & txfed_use > 0 ~ txfed_use / ti,
+164 TRUE ~ NA_real_
+165 ),
+166 tax_rate = if_else(tax_rate < 0.01 | tax_rate > 0.52, NA_real_, tax_rate)
+167 )
+168
+169 #---- 5. MARGINAL TAX RATE (Graham & Mills 2008)---------------
+170 comp <- comp %>%
+171 mutate(
+172 tax_ratio_gm = case_when(
+173 !is.na(txfed_use) & !is.na(pidom_imp) & pidom_imp != 0
+174 ~ txfed_use / pidom_imp,
+175 !is.na(txt) & !is.na(pi) & pi != 0
+10
+176 ~ txt / pi,
+177 TRUE ~ NA_real_
+178 ),
+179 is_multinational = !is.na(pi) & pi != 0 &
+180 abs(coalesce(pifo, 0) / pi) > 0.05,
+181 mtr = 0.331
+182 0.075 * as.integer(!is.na(tax_ratio_gm) & tax_ratio_gm < 0.1)
+183 0.012 * as.integer(!is.na(tlcf) & tlcf > 0)
+184 0.106 * as.integer(!is.na(pi) & pi < 0) +
+185 0.037 * as.integer(is_multinational)
+186 )
+187
+188 #---- 6. OUTCOMES & CONTROLS-----------------------------------
+189 comp <- comp %>%
+190 group_by(gvkey) %>%
+191 mutate(
+192 che_lag = lag(che),
+193 dltt_lag = lag(coalesce(dltt, 0)),
+194 dlc_lag = lag(coalesce(dlc, 0)),
+195 ivst_lag = lag(coalesce(ivst, 0)),
+196 ppent_lag = lag(ppent),
+197 emp_lag = lag(emp)
+198 ) %>%
+199 ungroup() %>%
+200 mutate(
+201 capxv_use = coalesce(capxv, capx, 0),
+202 investment = capxv_use- coalesce(sppe, 0),
+203 delta_cash = coalesce(che, 0)- coalesce(che_lag, 0),
+204 dltt_use = coalesce(dltt, 0),
+205 dlc_use = coalesce(dlc, 0),
+206 delta_debt_total = (dltt_use + dlc_use)- (dltt_lag + dlc_lag),
+207 delta_debt_lt = dltt_use- dltt_lag,
+208 delta_debt_st = dlc_use- dlc_lag,
+209 payout = coalesce(dvc, 0) + coalesce(prstkc, 0),
+210 delta_st_invest = coalesce(ivst, 0)- ivst_lag,
+211 delta_lt_invest = coalesce(ivch, 0),
+212 acquisitions = coalesce(aqc, 0),
+213 other_uses = acquisitions +
+214 coalesce(delta_st_invest, 0) +
+215 coalesce(delta_lt_invest, 0),
+216 delta_emp = emp- emp_lag,
+217 at_use = coalesce(at, NA_real_),
+218 prccf_use = coalesce(prcc_f, prcc_c, NA_real_),
+219 seq_use = coalesce(seq, NA_real_),
+220 tobins_q = (at_use + prccf_use * coalesce(csho, NA_real_)
+221 (seq_use + coalesce(txditc, 0)- coalesce(pstk, 0))) / at_use,
+222 roa = coalesce(oibdp, 0) / at_use,
+223 cf_assets = (coalesce(ib, 0) + coalesce(dp, 0)) / at_use,
+224 sales_assets = coalesce(sale, 0) / at_use,
+225 leverage = (dlc_use + dltt_use) /
+226 (dlc_use + dltt_use + prccf_use * coalesce(csho, NA_real_)),
+227 ln_at = log(at_use),
+228 cash_assets = coalesce(che, 0) / at_use,
+229 ppe_assets = coalesce(ppent, 0) / at_use,
+230 kz_index = case_when(
+231 !is.na(ppent_lag) & ppent_lag > 0 ~ (
+232-1.002 * (coalesce(ib,0) + coalesce(dp,0)) / ppent_lag +
+233 0.283 * (at_use + prccf_use * coalesce(csho,NA_real_)
+234 coalesce(ceq,0)- coalesce(txdb,0)) / at_use +
+11
+235 3.139 * (dltt_use + dlc_use) /
+236 (dltt_use + coalesce(seq_use,0))
+237 39.368 * (coalesce(dvc,0) + coalesce(dvp,0)) / ppent_lag
+238 1.315 * coalesce(che,0) / ppent_lag
+239 ),
+240 TRUE ~ NA_real_
+241 ),
+242 sic_use = coalesce(as.integer(sich), as.integer(sic), NA_integer_),
+243 ff48 = ff48_from_sic(sic_use)
+244 )
+245
+246 #---- 7. REFUND CALCULATION FUNCTIONS--------------------------
+247 adjust_within_window_2yr <- function(ti_vec) {
+248 ti_vec <- replace(ti_vec, is.na(ti_vec), 0)
+249 avail <- pmax(ti_vec, 0)
+250 for (j in seq_along(ti_vec)) {
+251 if (ti_vec[j] >= 0) next
+252 loss_rem <--ti_vec[j]
+253 if (j >= 3 && avail[j-2] > 0) {
+254 use <- min(avail[j-2], loss_rem)
+255 avail[j-2] <- avail[j-2]- use
+256 loss_rem <- loss_rem- use
+257 }
+258 if (j >= 2 && loss_rem > 0 && avail[j-1] > 0) {
+259 use <- min(avail[j-1], loss_rem)
+260 avail[j-1] <- avail[j-1]- use
+261 }
+262 }
+263 avail
+264 }
+265
+266 calc_refund_and_V <- function(ti_vec, tr_vec, policy_loss, cap_first = 1) {
+267 if (is.na(policy_loss) || policy_loss <= 0)
+268 return(list(refund = 0, V = NA_real_))
+269 ti_vec <- replace(ti_vec, is.na(ti_vec), 0)
+270 tr_vec <- replace(tr_vec, is.na(tr_vec), TAU)
+271 tr_vec <- pmin(pmax(tr_vec, 0), 0.52)
+272 avail <- adjust_within_window_2yr(ti_vec)
+273 avail[1] <- avail[1] * cap_first
+274 V <- sum(avail)- policy_loss
+275 refund <- 0
+276 remaining <- policy_loss
+277 for (i in seq_along(avail)) {
+278 if (remaining < 1e-9) break
+279 use <- min(avail[i], remaining)
+280 refund <- refund + use * tr_vec[i]
+281 remaining <- remaining- use
+282 }
+283 list(refund = refund, V = V)
+284 }
+285
+286 compute_usage <- function(ti_vec, policy_loss) {
+287 policy_loss <- if (is.na(policy_loss) || policy_loss < 0) 0 else policy_loss
+288 ti_vec <- replace(ti_vec, is.na(ti_vec), 0)
+289 avail <- pmax(adjust_within_window_2yr(ti_vec), 0)
+290 remaining <- policy_loss
+291 usage <- numeric(length(ti_vec))
+292 for (i in seq_along(avail)) {
+293 if (remaining < 1e-9) break
+12
+294 use <- min(avail[i], remaining)
+295 usage[i] <- use
+296 remaining <- remaining- use
+297 }
+298 usage
+299 }
+300
+301 #---- 8. DATASET CONSTRUCTION HELPERS--------------------------
+302 comp_thin <- comp %>%
+303 dplyr::select(
+304 gvkey, fyear, ti, tax_rate, mtr, at,
+305 tobins_q, roa, cf_assets, sales_assets, leverage, ln_at,
+306 cash_assets, ppe_assets, kz_index, is_multinational, ff48, sic_use,
+307 investment, delta_cash, delta_debt_total, delta_debt_lt, delta_debt_st,
+308 payout, other_uses, delta_emp, dvc, prstkc, oibdp
+309 )
+310
+311 stopifnot(
+312 "comp_thin still has duplicate gvkey/fyear check dedup step" =
+313 !anyDuplicated(paste(comp_thin$gvkey, comp_thin$fyear)))
+314
+315 get_window_wide <- function(df, window_yrs) {
+316 df %>%
+317 filter(fyear %in% window_yrs) %>%
+318 dplyr::select(gvkey, fyear, ti, mtr) %>%
+319 group_by(gvkey, fyear) %>%
+320 slice(1) %>%
+321 ungroup() %>%
+322 pivot_wider(
+323 names_from = fyear,
+324 values_from = c(ti, mtr),
+325 names_glue = "{.value}_{fyear}"
+326 )
+327 }
+328
+329 apply_refund_calc <- function(wide_df, window_yrs, cap_first = 1) {
+330 ti_cols <- paste0("ti_", window_yrs)
+331 mtr_cols <- paste0("mtr_", window_yrs)
+332 n <- length(window_yrs)
+333 for (col in c(ti_cols, mtr_cols))
+334 if (!col %in% names(wide_df)) wide_df[[col]] <- NA_real_
+335 input_mat <- wide_df %>%
+336 dplyr::select(all_of(c(ti_cols, mtr_cols, "policy_loss"))) %>%
+337 as.data.frame()
+338 results <- pmap(input_mat, function(...) {
+339 vals <- list(...)
+340 ti_vec <- as.numeric(unlist(vals[seq_len(n)], use.names = FALSE))
+341 mtr_vec <- as.numeric(unlist(vals[seq_len(n) + n], use.names = FALSE))
+342 policy_loss <- as.numeric(vals[[2 * n + 1]])
+343 calc_refund_and_V(ti_vec, mtr_vec, policy_loss, cap_first)
+344 })
+345 wide_df %>%
+346 mutate(
+347 TaxRefund = map_dbl(results, "refund"),
+348 V = map_dbl(results, "V")
+349 )
+350 }
+351
+352 merge_outcomes <- function(calc_df, loss_yr, outcome_yr) {
+13
+353 outcomes <- comp_thin %>%
+354 filter(fyear == outcome_yr) %>%
+355 dplyr::select(gvkey, investment, delta_cash, delta_debt_total,
+356 delta_debt_lt, delta_debt_st, payout, other_uses,
+357 delta_emp, at)
+358 controls <- comp_thin %>%
+359 filter(fyear == loss_yr) %>%
+360 dplyr::select(gvkey,
+361 tobins_q_pre = tobins_q,
+362 roa_pre = roa,
+363 cf_assets_pre = cf_assets,
+364 sales_assets_pre = sales_assets,
+365 leverage_pre = leverage,
+366 mtr_pre = mtr,
+367 ln_at_pre = ln_at,
+368 cash_assets_pre = cash_assets,
+369 ppe_assets_pre = ppe_assets,
+370 kz_pre = kz_index,
+371 dvc_pre = dvc,
+372 prstkc_pre = prstkc,
+373 oibdp_pre = oibdp,
+374 is_multi = is_multinational,
+375 ff48, sic_use)
+376 calc_df %>%
+377 dplyr::select(gvkey, TaxRefund, V, policy_loss) %>%
+378 mutate(losses_sq = policy_loss^2,
+379 loss_year = as.integer(loss_yr),
+380 outcome_year = as.integer(outcome_yr)) %>%
+381 inner_join(outcomes, by = "gvkey") %>%
+382 inner_join(controls, by = "gvkey") %>%
+383 filter(!is.na(at), at > 1)
+384 }
+385
+386 #---- 8A. 2002 POLICY PERIOD-----------------------------------
+387 loss_2001 <- comp_thin %>%
+388 filter(fyear == 2001, !is.na(ti), ti < 0) %>%
+389 transmute(gvkey, policy_loss =-ti)
+390
+391 df_2001_calc <- loss_2001 %>%
+392 inner_join(get_window_wide(comp_thin, 1996:2000), by = "gvkey") %>%
+393 filter(if_all(paste0("ti_", 1996:2000), ~ !is.na(.))) %>%
+394 apply_refund_calc(1996:2000, cap_first = 1)
+395
+396 # Define loss_2002 before 3C adjustment
+397 loss_2002 <- comp_thin %>%
+398 filter(fyear == 2002, !is.na(ti), ti < 0) %>%
+399 transmute(gvkey, policy_loss =-ti)
+400
+401 # 3C cross-year adjustment: dual-loss firms only
+402 dual_loss_gvkeys <- intersect(loss_2001$gvkey, loss_2002$gvkey)
+403 cat(sprintf("Firms with losses in both 2001 and 2002: %d\n",
+404 length(dual_loss_gvkeys)))
+405
+406 consumed_by_2001 <- df_2001_calc %>%
+407 filter(gvkey %in% dual_loss_gvkeys) %>%
+408 dplyr::select(gvkey, policy_loss,
+409 ti_1996, ti_1997, ti_1998, ti_1999, ti_2000) %>%
+410 as.data.frame() %>%
+411 pmap_dfr(function(gvkey, policy_loss,
+14
+412 ti_1996, ti_1997, ti_1998, ti_1999, ti_2000) {
+413 ti_vec <- c(ti_1996, ti_1997, ti_1998, ti_1999, ti_2000)
+414 usage <- compute_usage(ti_vec, policy_loss)
+415 tibble(gvkey = gvkey,
+416 consumed_1997 = usage[2],
+417 consumed_1998 = usage[3],
+418 consumed_1999 = usage[4],
+419 consumed_2000 = usage[5])
+420 })
+421
+422 cat(sprintf("Consumed_by_2001 rows: %d\n", nrow(consumed_by_2001)))
+423
+424 win_2002_adj <- get_window_wide(comp_thin, 1997:2001) %>%
+425 left_join(consumed_by_2001, by = "gvkey") %>%
+426 mutate(
+427 ti_1997 = pmax(coalesce(ti_1997, 0)- coalesce(consumed_1997, 0), 0),
+428 ti_1998 = pmax(coalesce(ti_1998, 0)- coalesce(consumed_1998, 0), 0),
+429 ti_1999 = pmax(coalesce(ti_1999, 0)- coalesce(consumed_1999, 0), 0),
+430 ti_2000 = pmax(coalesce(ti_2000, 0)- coalesce(consumed_2000, 0), 0),
+431 ti_2001 = pmax(coalesce(ti_2001, 0), 0)
+432 ) %>%
+433 dplyr::select(-starts_with("consumed_"))
+434
+435 df_2002_calc <- loss_2002 %>%
+436 inner_join(win_2002_adj, by = "gvkey") %>%
+437 filter(if_all(paste0("ti_", 1997:2001), ~ !is.na(.))) %>%
+438 apply_refund_calc(1997:2001, cap_first = 1)
+439
+440 df_2002_full <- bind_rows(
+441 merge_outcomes(df_2001_calc, 2001L, 2002L),
+442 merge_outcomes(df_2002_calc, 2002L, 2003L)
+443 )
+444
+445 df_2002_full %>%
+446 group_by(loss_year, outcome_year) %>%
+447 summarise(n = n(), mean_V = mean(V), .groups = "drop") %>%
+448 print()
