@@ -1,5 +1,5 @@
 
-use "../data/compustat_output1.dta", clear
+use "../data/compustat_output2.dta", clear
 
 ********************************************************************************
 * Sample Restrictions
@@ -10,6 +10,9 @@ destring(gvkey), replace
 * Keep firms with total assets greater than $1 million
 keep if at > 1 & !missing(at)
 
+* Keep firms incorporated in the U.S.
+keep if fic == "USA"
+
 * Exclude financials/utilities/international/non-operating establishments by SIC
 * Financials: 6000-6999, Utilities: 4900-4999, Intl/non-operating: 9000-9999
 gen double sic_num = real(trim(sic))
@@ -17,19 +20,26 @@ drop if !missing(sic_num) & ///
     (inrange(sic_num, 4900, 4999) | inrange(sic_num, 6000, 6999) | inrange(sic_num, 9000, 9999))
 drop sic_num
 
-* Sort for panel operations
+* Priority ranking for duplicate gvkey-fyear rows
+gen strL indfmt_l  = lower(trim(indfmt))
 gen strL datafmt_l = lower(trim(datafmt))
-gen byte datafmt_pref = (datafmt_l != "indl")
-gen strL consol_l = lower(trim(consol))
-gen byte consol_pref = (consol_l != "c")
-gen double at_keep = at
-replace at_keep = 0 if missing(at_keep)
+gen strL consol_l  = lower(trim(consol))
 
-* Prioritize consolidated industrial data, then by largest assets.
-sort gvkey fyear datafmt_pref consol_pref -at_keep
-by gvkey fyear: keep if _n == 1
+gen byte indfmt_rank = cond(indfmt_l=="indl",1,2)
+gen byte consol_rank = cond(consol_l=="c",1,2)
 
-drop datafmt_l datafmt_pref consol_l consol_pref at_keep
+gen byte datafmt_rank = 9
+replace datafmt_rank = 1 if datafmt_l=="std"
+replace datafmt_rank = 2 if datafmt_l=="summ_std"
+replace datafmt_rank = 3 if datafmt_l=="pre_amends"
+replace datafmt_rank = 4 if datafmt_l=="pre_amendss"
+
+gen double at_keep = cond(missing(at),0,at)
+
+sort gvkey fyear indfmt_rank consol_rank datafmt_rank -at_keep
+by gvkey fyear: keep if _n==1
+
+drop indfmt_l datafmt_l consol_l indfmt_rank consol_rank datafmt_rank at_keep
 
 * Generate indicators for policy-relevant five-year carryback windows
 * 2002-period assignment windows: 1996-2000 (for 2001 loss) or 1997-2001 (for 2002 loss)
@@ -685,9 +695,17 @@ scalar v_p99_0203 = r(r2)
 quietly _pctile refund_fs_0203 if !missing(refund_fs_0203), p(99.9)
 scalar refund_p999_0203 = r(r1)
 
+preserve
+keep if inlist(fyear, 2002, 2003) & !missing(refund_fs_0203)
+gsort -refund_fs_0203
+scalar refund_top_0203 = refund_fs_0203[1]
+scalar refund_second_0203 = refund_fs_0203[2]
+restore
+
 gen byte outlier_fs_0203 = inlist(fyear, 2002, 2003) & !missing(v_fs_0203, refund_fs_0203) & ///
     ((v_fs_0203 < v_p1_0203 | v_fs_0203 > v_p99_0203) | ///
-     (refund_fs_0203 > refund_p999_0203))
+     (refund_fs_0203 > refund_p999_0203) | ///
+     (!missing(refund_second_0203) & refund_fs_0203 > 2 * refund_second_0203))
 
 * 2010/2011 outcomes use 2009 policy-year assignment/refund carried by firm.
 bysort gvkey: egen v_2009_for_2010 = max(cond(fyear == 2009, assignment_v, .))
@@ -702,9 +720,17 @@ scalar v_p99_2010 = r(r2)
 quietly _pctile refund_fs_2010 if !missing(refund_fs_2010), p(99.9)
 scalar refund_p999_2010 = r(r1)
 
+preserve
+keep if inlist(fyear, 2010, 2011) & !missing(refund_fs_2010)
+gsort -refund_fs_2010
+scalar refund_top_2010 = refund_fs_2010[1]
+scalar refund_second_2010 = refund_fs_2010[2]
+restore
+
 gen byte outlier_fs_2010 = inlist(fyear, 2010, 2011) & !missing(v_fs_2010, refund_fs_2010) & ///
     ((v_fs_2010 < v_p1_2010 | v_fs_2010 > v_p99_2010) | ///
-     (refund_fs_2010 > refund_p999_2010))
+     (refund_fs_2010 > refund_p999_2010) | ///
+     (!missing(refund_second_2010) & refund_fs_2010 > 2 * refund_second_2010))
 
 * Align with R: trim investment by 1st and 99th percentiles by period sample
 quietly _pctile investment if inlist(fyear, 2002, 2003), p(1 99)
@@ -739,8 +765,10 @@ drop outlier_fs_0203 outlier_fs_2010
 drop invest_trim_0203 invest_trim_2010
 scalar drop v_p1_0203 v_p99_0203
 scalar drop refund_p999_0203
+scalar drop refund_top_0203 refund_second_0203
 scalar drop v_p1_2010 v_p99_2010
 scalar drop refund_p999_2010
+scalar drop refund_top_2010 refund_second_2010
 scalar drop invest_p1_0203 invest_p99_0203
 scalar drop invest_p1_2010 invest_p99_2010
 
