@@ -10,6 +10,13 @@ destring(gvkey), replace
 * Keep firms with total assets greater than $1 million
 keep if at > 1 & !missing(at)
 
+* Exclude financials/utilities/international/non-operating establishments by SIC
+* Financials: 6000-6999, Utilities: 4900-4999, Intl/non-operating: 9000-9999
+gen double sic_num = real(trim(sic))
+drop if !missing(sic_num) & ///
+    (inrange(sic_num, 4900, 4999) | inrange(sic_num, 6000, 6999) | inrange(sic_num, 9000, 9999))
+drop sic_num
+
 * Sort for panel operations
 gen strL datafmt_l = lower(trim(datafmt))
 gen byte datafmt_pref = (datafmt_l != "indl")
