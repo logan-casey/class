@@ -1,0 +1,52 @@
+
+clear all
+set maxvar 6000
+*---------------------------------------------------------------*
+* 1. Load raw SCF
+*---------------------------------------------------------------*
+cd C:\Users\logan\Documents\GitHub\class\scf
+use p22i6.dta, clear
+
+foreach v of varlist _all {
+    rename `v' `=upper("`v'")'
+}
+
+*---------------------------------------------------------------*
+* 2. Construct variables
+*---------------------------------------------------------------*
+
+* Total revolving credit card debt
+gen ccbal = X42001 + X42002 + X42003
+
+* High-interest indicator
+gen highint = (X422 > 5)
+
+* Card ownership
+gen has_card = (X401==1 | X402==1)
+
+* Banked indicator
+gen banked = (X3506==1 | X3507==1 | X3508==1)
+
+*---------------------------------------------------------------*
+* 3. Sample restrictions
+*---------------------------------------------------------------*
+
+* Drop top 5% net worth
+xtile nw_pct = NETWORTH [pw=WGT], nq(100)
+drop if nw_pct > 95
+
+* Drop retirees
+drop if AGE >= 68
+drop if AGE <= 22
+
+* Drop unbanked / underbanked
+drop if banked==0
+drop if has_card==0
+
+*---------------------------------------------------------------*
+* 4. Revolving high-interest debt
+*---------------------------------------------------------------*
+gen revolve = (ccbal > 0 & highint==1)
+
+svyset [pw=WGT]
+svy: mean revolve
