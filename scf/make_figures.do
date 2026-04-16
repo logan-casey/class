@@ -53,14 +53,14 @@ restore
 ** FIGURE 2: Participation rates by asset class (x-axis = p_asset)
 preserve
 * Treat missing/negative components as zero (asset-only construction)
-foreach v in checking saving mma call cds savbnd vehic homeq nnresre oresre deq bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
+foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
     gen `v'_pos = cond(missing(`v'), 0, cond(`v' < 0, 0, `v'))
 }
 
 gen safe_assets = checking_pos + saving_pos + mma_pos + call_pos + cds_pos + savbnd_pos
 gen vehicles = vehic_pos
-gen real_estate = homeq_pos + nnresre_pos + oresre_pos
-gen public_equity = deq_pos
+gen real_estate = homeeq_pos + nnresre_pos + oresre_pos
+gen public_equity = equity_pos
 gen private_business = bus_pos
 gen bonds = govtbnd_pos + obnd_pos + mortbnd_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
 
@@ -102,14 +102,14 @@ restore
 ** FIGURE 3: Asset class shares in portfolios (x-axis = p_asset)
 preserve
 * Treat missing/negative components as zero (asset-only construction)
-foreach v in checking saving mma call cds savbnd vehic homeq nnresre oresre deq bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
+foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
     gen `v'_pos = cond(missing(`v'), 0, cond(`v' < 0, 0, `v'))
 }
 
 gen safe_assets = checking_pos + saving_pos + mma_pos + call_pos + cds_pos + savbnd_pos
 gen vehicles = vehic_pos
-gen real_estate = homeq_pos + nnresre_pos + oresre_pos
-gen public_equity = deq_pos
+gen real_estate = homeeq_pos + nnresre_pos + oresre_pos
+gen public_equity = equity_pos
 gen private_business = bus_pos
 gen bonds = govtbnd_pos + obnd_pos + mortbnd_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
 
@@ -121,6 +121,7 @@ gen ratio_real_estate = real_estate / asset if asset > 0
 gen ratio_public_equity = public_equity / asset if asset > 0
 gen ratio_private_business = private_business / asset if asset > 0
 gen ratio_bonds = bonds / asset if asset > 0
+gen total_ratio = ratio_safe_assets + ratio_vehicles + ratio_real_estate + ratio_public_equity + ratio_private_business + ratio_bonds
 
 collapse ///
     (mean) sh_safe_assets=ratio_safe_assets ///
@@ -129,6 +130,7 @@ collapse ///
     (mean) sh_public_equity=ratio_public_equity ///
     (mean) sh_private_business=ratio_private_business ///
     (mean) sh_bonds=ratio_bonds ///
+    (mean) sh_total=total_ratio ///
     [pw=wgt], by(p_asset)
 
 replace sh_safe_assets = 100 * sh_safe_assets
@@ -137,6 +139,7 @@ replace sh_real_estate = 100 * sh_real_estate
 replace sh_public_equity = 100 * sh_public_equity
 replace sh_private_business = 100 * sh_private_business
 replace sh_bonds = 100 * sh_bonds
+replace sh_total = 100 * sh_total
 
 twoway ///
     (lpoly sh_safe_assets p_asset, bwidth(5) lcolor(navy) lwidth(medthick)) ///
@@ -144,12 +147,13 @@ twoway ///
     (lpoly sh_real_estate p_asset, bwidth(5) lcolor(green) lwidth(medthick)) ///
     (lpoly sh_public_equity p_asset, bwidth(5) lcolor(orange) lwidth(medthick)) ///
     (lpoly sh_private_business p_asset, bwidth(5) lcolor(brown) lwidth(medthick)) ///
-    (lpoly sh_bonds p_asset, bwidth(5) lcolor(gs6) lwidth(medthick)), ///
+    (lpoly sh_bonds p_asset, bwidth(5) lcolor(gs6) lwidth(medthick)) ///
+    (lpoly sh_total p_asset, bwidth(5) lcolor(black) lwidth(medthick)), ///
     xlabel(0(10)100, labsize(small)) ///
     ylabel(0(20)100, angle(horizontal) labsize(small)) ///
     xtitle("Percentile of distribution of total assets (weighted)") ///
     ytitle("Share of total assets (%)") ///
-    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds")) ///
+    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds" 7 "Total")) ///
     title("Asset Class Shares in Household Portfolios (Kernel Smoothed)")
 graph export "portfolio_shares_by_asset_percentile.png", replace width(2400)
 
