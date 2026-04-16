@@ -1,0 +1,78 @@
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,scrextend,mathtools}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{tikz}
+\usepackage[mathscr]{euscript}
+\let\euscr\mathscr \let\mathscr\relax% just so we can load this and rsfs
+\usepackage[scr]{rsfso}
+\usepackage{multicol}
+\usepackage{csquotes}
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue,
+citecolor=blue, urlcolor=blue]{hyperref}
+\let\ds\displaystyle
+\newcommand{\cont}{\subseteq}
+\newcommand{\un}{\cup}
+\newcommand{\inter}{\cap}
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{placeins}
+
+% Tighter, more stable float placement (reduces large whitespace gaps)
+\setlength{\textfloatsep}{6pt plus 1pt minus 1pt}
+\setlength{\floatsep}{6pt plus 1pt minus 1pt}
+\setlength{\intextsep}{4pt plus 1pt minus 1pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+
+\begin{document}
+ 
+
+\lhead{PhD CorpFin -- Maxted}
+\chead{Logan Casey}
+\rhead{\today}
+ 
+\section*{Campbell Presidential Lecture}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{wealth_dist.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{campbell1.jpg}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{participation_by_asset_percentile.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{campbell2.jpg}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{portfolio_shares_by_asset_percentile.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{campbell3.jpg}
+\end{figure}
+
+\end{document}

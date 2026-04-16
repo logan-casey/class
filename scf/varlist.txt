@@ -1,0 +1,79 @@
+https://sda.berkeley.edu/sdaweb/docs/scfcomb2022/DOC/hcbkx01.htm#3.HEADING
+
+
+ASSET	Total value of assets held by household, 2022 dollars
+ASSETCAT	Asset percentile groups
+FIN	Total value of financial assets held by household, 2022 dollars
+HLIQ	Household has any checking, savings, money market or call accounts
+LIQ	Total value of all types of transactions accounts, 2022 dollars
+MMA	Total value of money market deposit and money market mutual fund accounts, 2022 dollars
+CHECKING	Total value of checking accounts held by household, 2022 dollars
+SAVING	Total value of savings accounts held by household, 2022 dollars
+CALL	Total value of call accounts held by household, 2022 dollars
+CDS	Total value of certificates of deposit held by household, 2022 dollars
+PREPAID	Amount in prepaid card accounts, 2022 dollars
+NMMF	Total value of directly held pooled investment funds held by household, 2022 dollars
+SAVBND	Total value of savings bonds held by household, 2022 dollars
+STOCKS	Total value of directly held stocks held by household, 2022 dollars
+BOND	Total value of directly held bonds held by household, 2022 dollars
+CASHLI	Total cash value of whole life insurance held by household, 2022 dollars
+OTHMA	Total value of other managed assets held by household, 2022 dollars
+RETQLIQ	Total value of quasi-liquid held by household, 2022 dollars
+RETEQ	Total value of equity in quasi-liquid retirement assets, 2022 dollars
+ANYPEN	Pension exists for either reference person or spouse
+OTHFIN	Total value of other financial assets, 2022 dollars
+NFIN	Total value of nonfinancial assets held by household, 2022 dollars
+VEHIC	Total value of all vehicles held by household, 2022 dollars
+HOUSES	Total value of primary residence of household, 2022 dollars
+ORESRE	Total value of other residential real estate held by household, 2022 dollars
+NNRESRE	Total value of net equity in nonresidential real estate held by household, 2022 dollars
+HBUS	Have active or nonactively managed business(es)
+BUS	Total value of business(es) in which the household has either an active or nonactive interest, 2022 dollars
+ACTBUS	Total value of actively managed business(es), 2022 dollars
+NONACTBUS	Value of non-actively managed business(es), 2022 dollars
+OTHNFIN	Total value of other nonfinancial assets held by household, 2022 dollars
+DEQ	Total value of equity in directly held stocks, stock mutual funds, and combination mutual funds held by household, 2022 dollars
+EQUITY	Total value of financial assets held by household that are invested in stock, 2022 dollars
+HOMEEQ	Total value of equity in primary residence of household, 2022 dollars
+BUSVEH	Household has vehicle(s) owned by business
+NBUSVEH	Total number of business vehicles held by household
+VLEASE	Total value of leased vehicles held by household, 2022 dollars
+PENACCTWD	Withdrawals from IRAs and tax-deferred pension accounts, 2022 dollars
+MMDA	money maket deposit accounts, 2022 dollars
+MMMF	money market mutual funds, 2022 dollars
+STMUTF	amount in stock mutual funds, 2022 dollars
+TFBMUTF	amount in tax-free bond mutual funds, 2022 dollars
+GBMUTF	amount in government bond mutual funds, 2022 dollars
+OBMUTF	amount in other bond mutual funds, 2022 dollars
+COMUTF	amount in combination and other mutual funds, 2022 dollars
+OMUTF	amount in other mutual funds, 2022 dollars
+HSTOCKS	have stocks?
+NSTOCKS	number different companies in which hold stock
+WILSH	Wilshire index of stock prices
+NOTXBND	tax-exempt bonds (state and local bonds), 2022 dollars
+MORTBND	mortgage-backed bonds, 2022 dollars
+GOVTBND	US government and government agency bonds and bills, 2022 dollars
+OBND	corporate and foreign bonds, 2022 dollars
+FUTPEN	future pensions (accumulated in an account for the R/S), 2022 dollars
+CURRPEN	current value in pension, 2022 dollars
+THRIFT	Total value of account-type pension plans from R and spouse's current job, 2022 dollars
+IRAKH	Total value of IRA/Keogh accounts, 2022 dollars
+DBPLANCJ	Either reference person or spouse/partner has a defined benefit pension on a current job
+DBPLANT	Either reference person or spouse/partner has DB plan on current job or some type of pension from a past job to be received in the future
+DCPLANCJ	Either reference person or spouse/partner has any type of account-based plan on a current job
+BPLANCJ	Either reference person or spouse/partner has both types of pension plan on a current job
+ANNUIT	Amount R would receive if they cashed in annuities, 2022 dollars
+TRUSTS	Amount R would receive if they cashed in trusts, 2022 dollars
+EQUITINC	ratio of equity to normal income
+HBROK	have a brokerage account
+HTRAD	traded in the past year
+NTRAD	number of trades per year
+OWN	have an owned vehicle
+NOWN	number of owned vehicles
+LEASE	have leased vehicle
+NLEASE	number of leased vehicles
+NVEHIC	total number of vehicles (owned and leased)
+NEWCAR1	number of car/truck/SUV with model year no older than two years before the survey
+NEWCAR2	number of car/truck/SUV with model year no older than one year before the survey
+FARMBUS	compute value of business part of farm net of outstanding mortgages, 2022 dollars
+NHNFIN	total nonfinancial assets excluding principal residences, 2022 dollars

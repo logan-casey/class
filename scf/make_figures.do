@@ -31,29 +31,26 @@ use `curve_asset', clear
 merge 1:1 pct using `curve_fin', nogen
 merge 1:1 pct using `curve_networth', nogen
 
-label var mean_fin "Financial assets"
-label var mean_asset "Total assets"
-label var mean_networth "Net worth"
-
 	
 * 5) Plot
 twoway ///
     (line mean_asset    pct, lcolor(navy)   lwidth(medthick)) ///
     (line mean_fin      pct, lcolor(maroon) lwidth(medthick)) ///
     (line mean_networth pct, lcolor(forest_green) lwidth(medthick)), ///
-	yscale(log) ylabel(1000 "1k" 10000 "10k" 100000 "100k" 1000000 "1m" 10000000 "10m", angle(horizontal) labsize(small)) ///
-    xtitle("Percentile (weighted; variable-specific ranking)") ///
-    ytitle("Weighted mean") ///
-    legend(order(1 "Asset" 2 "Fin" 3 "Net worth")) ///
-    title("Means across percentiles")
+	yscale(log) ylabel(100 "100"1000 "1k" 10000 "10k" 100000 "100k" 1000000 "1m" 10000000 "10m", angle(horizontal) labsize(small)) ///
+    xtitle("Percentile") ///
+    ytitle("Mean") ///
+    legend(order(1 "Total assets" 2 "Financial assets" 3 "Net worth") position(6) ring(1) rows(1))
 graph export "wealth_dist.png", replace width(2400)
 
 restore
 
 ** FIGURE 2: Participation rates by asset class (x-axis = p_asset)
 preserve
+drop if missing(asset) | asset <= 0
+
 * Treat missing/negative components as zero (asset-only construction)
-foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
+foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus bond cashli gbmutf obmutf trusts othma {
     gen `v'_pos = cond(missing(`v'), 0, cond(`v' < 0, 0, `v'))
 }
 
@@ -62,7 +59,7 @@ gen vehicles = vehic_pos
 gen real_estate = homeeq_pos + nnresre_pos + oresre_pos
 gen public_equity = equity_pos
 gen private_business = bus_pos
-gen bonds = govtbnd_pos + obnd_pos + mortbnd_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
+gen bonds = bond_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
 
 xtile p_asset = asset [pw=wgt], nq(100)
 
@@ -70,7 +67,7 @@ gen hold_safe_assets = safe_assets > 0 if !missing(safe_assets)
 gen hold_vehicles = vehicles > 0 if !missing(vehicles)
 gen hold_real_estate = real_estate > 0 if !missing(real_estate)
 gen hold_public_equity = public_equity > 0 if !missing(public_equity)
-gen hold_private_business = private_business > 0 if !missing(private_business)
+gen hold_private_business = hbus > 0 if !missing(hbus)
 gen hold_bonds = bonds > 0 if !missing(bonds)
 
 collapse ///
@@ -91,9 +88,9 @@ twoway ///
     (lpoly sh_hold_bonds p_asset, bwidth(5) lcolor(gs6) lwidth(medthick)), ///
     xlabel(0(10)100, labsize(small)) ///
     ylabel(0(.2)1, format(%3.1f) angle(horizontal) labsize(small)) ///
-    xtitle("Percentile of distribution of total assets (weighted)") ///
-    ytitle("Sample-weighted share with holdings") ///
-    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds")) ///
+    xtitle("Percentile of distribution of total assets") ///
+    ytitle("Share with holdings") ///
+    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds") position(6) ring(1) rows(1)) ///
     title("Participation Rates by Asset Class (Kernel Smoothed)")
 graph export "participation_by_asset_percentile.png", replace width(2400)
 
@@ -102,7 +99,7 @@ restore
 ** FIGURE 3: Asset class shares in portfolios (x-axis = p_asset)
 preserve
 * Treat missing/negative components as zero (asset-only construction)
-foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus govtbnd obnd mortbnd cashli gbmutf obmutf trusts othma {
+foreach v in checking saving mma call cds savbnd vehic homeeq nnresre oresre equity bus bond cashli gbmutf obmutf trusts othma {
     gen `v'_pos = cond(missing(`v'), 0, cond(`v' < 0, 0, `v'))
 }
 
@@ -111,17 +108,18 @@ gen vehicles = vehic_pos
 gen real_estate = homeeq_pos + nnresre_pos + oresre_pos
 gen public_equity = equity_pos
 gen private_business = bus_pos
-gen bonds = govtbnd_pos + obnd_pos + mortbnd_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
+gen bonds = bond_pos + cashli_pos + gbmutf_pos + obmutf_pos + trusts_pos + othma_pos
 
 xtile p_asset = asset [pw=wgt], nq(100)
 
-gen ratio_safe_assets = safe_assets / asset if asset > 0
-gen ratio_vehicles = vehicles / asset if asset > 0
-gen ratio_real_estate = real_estate / asset if asset > 0
-gen ratio_public_equity = public_equity / asset if asset > 0
-gen ratio_private_business = private_business / asset if asset > 0
-gen ratio_bonds = bonds / asset if asset > 0
-gen total_ratio = ratio_safe_assets + ratio_vehicles + ratio_real_estate + ratio_public_equity + ratio_private_business + ratio_bonds
+gen totalassets = safe_assets + vehicles + real_estate + public_equity + private_business + bonds
+gen ratio_safe_assets = safe_assets / totalassets if totalassets > 0
+gen ratio_vehicles = vehicles / totalassets if totalassets > 0
+gen ratio_real_estate = real_estate / totalassets if totalassets > 0
+gen ratio_public_equity = public_equity / totalassets if totalassets > 0
+gen ratio_private_business = private_business / totalassets if totalassets > 0
+gen ratio_bonds = bonds / totalassets if totalassets > 0
+// gen total_ratio = ratio_safe_assets + ratio_vehicles + ratio_real_estate + ratio_public_equity + ratio_private_business + ratio_bonds
 
 collapse ///
     (mean) sh_safe_assets=ratio_safe_assets ///
@@ -130,7 +128,6 @@ collapse ///
     (mean) sh_public_equity=ratio_public_equity ///
     (mean) sh_private_business=ratio_private_business ///
     (mean) sh_bonds=ratio_bonds ///
-    (mean) sh_total=total_ratio ///
     [pw=wgt], by(p_asset)
 
 replace sh_safe_assets = 100 * sh_safe_assets
@@ -139,7 +136,7 @@ replace sh_real_estate = 100 * sh_real_estate
 replace sh_public_equity = 100 * sh_public_equity
 replace sh_private_business = 100 * sh_private_business
 replace sh_bonds = 100 * sh_bonds
-replace sh_total = 100 * sh_total
+// replace sh_total = 100 * sh_total
 
 twoway ///
     (lpoly sh_safe_assets p_asset, bwidth(5) lcolor(navy) lwidth(medthick)) ///
@@ -147,13 +144,12 @@ twoway ///
     (lpoly sh_real_estate p_asset, bwidth(5) lcolor(green) lwidth(medthick)) ///
     (lpoly sh_public_equity p_asset, bwidth(5) lcolor(orange) lwidth(medthick)) ///
     (lpoly sh_private_business p_asset, bwidth(5) lcolor(brown) lwidth(medthick)) ///
-    (lpoly sh_bonds p_asset, bwidth(5) lcolor(gs6) lwidth(medthick)) ///
-    (lpoly sh_total p_asset, bwidth(5) lcolor(black) lwidth(medthick)), ///
+    (lpoly sh_bonds p_asset, bwidth(5) lcolor(gs6) lwidth(medthick)), ///
     xlabel(0(10)100, labsize(small)) ///
     ylabel(0(20)100, angle(horizontal) labsize(small)) ///
-    xtitle("Percentile of distribution of total assets (weighted)") ///
+    xtitle("Percentile of distribution of total assets") ///
     ytitle("Share of total assets (%)") ///
-    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds" 7 "Total")) ///
+    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds") position(6) ring(1) rows(1)) ///
     title("Asset Class Shares in Household Portfolios (Kernel Smoothed)")
 graph export "portfolio_shares_by_asset_percentile.png", replace width(2400)
 
