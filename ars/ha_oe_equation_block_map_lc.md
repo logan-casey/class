@@ -130,7 +130,10 @@ quantitative modifications:
 
 
 is delayed substitution alright? is HH block hetinputs alright
-how did we get grids and SS anchors
+how did we get grids and SS anchors?
+why do we have so many targets?
+why do we not use so many equations involving cF, cH, pH, etc (eg the consumption aggregator)?
+in general, how does the model as currently written differ from the DAG plan you made?
 
 
 
