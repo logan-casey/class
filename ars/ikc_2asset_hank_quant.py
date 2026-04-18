@@ -17,6 +17,7 @@ from __future__ import annotations
 import numpy as np
 import sequence_jacobian as sj
 from sequence_jacobian import grids
+from pathlib import Path
 
 
 # -----------------------------------------------------------------------------
@@ -340,7 +341,7 @@ def _linear_nfa_from_nx(dnx, r_ss):
     return dnfa
 
 
-def solve_exchange_rate_irf(T=80):
+def solve_exchange_rate_irf(T=40):
     """Run the section-5.3-style foreign-rate shock IRF, normalized to dQ0 = 1%."""
     model, hh_oe = build_quant_model()
     calib = quantitative_calibration()
@@ -365,11 +366,14 @@ def solve_exchange_rate_irf(T=80):
     outputs = [
         "Y",
         "C",
+        "W",
         "Q",
+        "E",
         "r",
         "i",
         "PH",
         "P",
+        "PH_star",
         "CH",
         "CH_star",
         "NX",
@@ -414,11 +418,71 @@ def solve_exchange_rate_irf(T=80):
     return {"model": model, "calibration": calib, "ss": ss, "irf": irf, "derived": pct, "shock_scale": scale}
 
 
+def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_quant_irf.png"):
+    """Save a paper-style 8-panel IRF figure."""
+    import matplotlib.pyplot as plt
+
+    ss = result["ss"]
+    irf = result["irf"]
+    d = result["derived"]
+
+    T_plot = min(T_plot, len(d["Y_pct"]))
+    t = np.arange(T_plot)
+
+    # Recover levels from linear responses where needed.
+    W = ss["W"] + irf["W"]
+    P = ss["P"] + irf["P"]
+    Y = ss["Y"] + irf["Y"]  # N=Y from Eq. (13)
+    E = ss["E"] + irf["E"]
+    PH = ss["PH"] + irf["PH"]
+    PH_star = ss["PH_star"] + irf["PH_star"]
+    CH_star = (ss["CH_star"] + irf["CH_star"])
+
+    # Real wage income and dividends (Eq. 15 object).
+    wage_income = W / P * Y
+    wage_income_ss = ss["W"] / ss["P"] * ss["Y"]
+    wage_income_pctY = 100.0 * (wage_income - wage_income_ss) / ss["Y"]
+
+    dividends = (PH * Y - W * Y) / P + (E * PH_star - PH) / P * CH_star
+    dividends_ss = (ss["PH"] * ss["Y"] - ss["W"] * ss["Y"]) / ss["P"] + (ss["E"] * ss["PH_star"] - ss["PH"]) / ss["P"] * ss["CH_star"]
+    dividends_pctY = 100.0 * (dividends - dividends_ss) / ss["Y"]
+
+    series = [
+        (d["Y_pct"][:T_plot], "Output", "Percent of Yss"),
+        (d["C_pct"][:T_plot], "Consumption", "Percent of Css"),
+        (d["NX_pctY"][:T_plot], "Net exports", "Percent of Yss"),
+        (d["NFA_pctY"][:T_plot], "NFA", "Percent of Yss"),
+        (wage_income_pctY[:T_plot], "Real wage income", "Percent of Yss"),
+        (dividends_pctY[:T_plot], "Dividends", "Percent of Yss"),
+        (d["Q_pct"][:T_plot], "Real exchange rate", "Percent"),
+        (d["r_pp"][:T_plot], "Real interest rate", "Percentage points"),
+    ]
+
+    fig, axes = plt.subplots(2, 4, figsize=(14, 7), constrained_layout=True)
+    axes = axes.ravel()
+
+    for ax, (y, title, ylabel) in zip(axes, series):
+        ax.plot(t, y, color="#2F6B4F", lw=2.2)
+        ax.axhline(0.0, color="#666666", lw=0.8, alpha=0.6)
+        ax.set_title(title, fontsize=11)
+        ax.set_xlabel("Quarters")
+        ax.set_ylabel(ylabel)
+        ax.grid(alpha=0.25, lw=0.6)
+
+    savepath = Path(savepath)
+    savepath.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(savepath, dpi=220, bbox_inches="tight")
+    plt.close(fig)
+    return savepath
+
+
 if __name__ == "__main__":
     out = solve_exchange_rate_irf(T=40)
     d = out["derived"]
+    fig_path = plot_exchange_rate_irf_figure(out, T_plot=32, savepath="figures/ha_oe_quant_irf.png")
     print("Shock scale:", out["shock_scale"])
     print("Q impact (%):", d["Q_pct"][0])
     print("Y first 8 qtrs (%):", np.round(d["Y_pct"][:8], 4))
     print("C first 8 qtrs (%):", np.round(d["C_pct"][:8], 4))
     print("NFA first 8 qtrs (% of Y):", np.round(d["NFA_pctY"][:8], 4))
+    print("Saved figure:", fig_path)
