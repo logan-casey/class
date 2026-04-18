@@ -1,29 +1,34 @@
-"""Quantitative HA open-economy IRFs with paper calibration.
+"""Quantitative open-economy HANK model from
+Exchange Rates and Monetary Policy with Heterogeneous Agents:
+Sizing up the Real Income Channel,
+by Auclert, Rognlie, Souchier, and Straub
 
-This file implements a runnable sequence_jacobian pipeline calibrated to Table 2
-of `ha_oe.pdf` (quarterly values), and computes impulse responses to the foreign
-interest-rate shock described in section 5.3 (AR(1), persistence 0.85, normalized
-to a 1% impact depreciation in Q).
+strategy: start with SSJ notebooks/IKC rep kit, translate equations into simple blocks
 
-Scope:
-- Uses equations (13), (18), (20), (21), (47)-(53) directly.
-- Uses UIP and Fisher relations from the core model.
-- Uses Eq. (48) for heterogeneous labor-income incidence in the HH block.
-- Uses Eq. (23) ex post to construct an NFA path from net exports.
+paper calibration, IRFs (to foreign interest-rate shock in sec 5.3 (AR(1), persistence 0.85,
+normalized to a 1% impact depreciation in Q)).
+
+equations used:
+- (13), (18), (20), (21), (47)-(53)
+- UIP and Fisher relations from core model
+- (48) for het labor-income incidence in HH block
+- (23) to construct an NFA path from net exports
 """
 
-from __future__ import annotations
+from __future__ import annotations # recommended for performance
 
 import numpy as np
 import sequence_jacobian as sj
 from sequence_jacobian import grids
 from pathlib import Path
 
+# -----------------------------------------------------------------------------
+# DEFINE MODEL BLOCKS
+# -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
-# Household block (one-asset HA) with equation-(48)-style income incidence
+# Household block
 # -----------------------------------------------------------------------------
-
 
 def make_grids_oe(rho_e, sd_e, n_e, min_a, max_a, n_a):
     """Rouwenhorst idiosyncratic income process + asset grid."""
@@ -62,7 +67,7 @@ def production(Y):
 
 @sj.simple
 def exchange_rate_identity(E, Q, P):
-    """Identity: E = Q * P (with P* = 1)."""
+    """Eq. (6): E = Q * P (with P* = 1)"""
     exrate_res = E - Q * P
     return exrate_res
 
@@ -76,7 +81,7 @@ def import_price_pass_through(E):
 
 @sj.simple
 def price_index(PF, PH, alpha, eta):
-    """Eq. (4): CPI index."""
+    """Eq. (4): price index"""
     P = (alpha * PF ** (1.0 - eta) + (1.0 - alpha) * PH ** (1.0 - eta)) ** (1.0 / (1.0 - eta))
     return P
 
@@ -100,7 +105,7 @@ def foreign_rate_block(i_star):
 
 @sj.simple
 def monetary_rule_taylor(i, pi, r_ss, eps_m, rho_m, phi_pi):
-    """Eq. (20): inertial Taylor rule."""
+    """Eq. (20): MP rule."""
     mp_taylor_res = i - (rho_m * i(-1) + (1.0 - rho_m) * (r_ss + phi_pi * pi(+1)) + eps_m)
     return mp_taylor_res
 
@@ -114,7 +119,7 @@ def fisher_equation(i, r, pi):
 
 @sj.simple
 def uip_real(r, r_star, Q):
-    """Eq. (7), real UIP condition."""
+    """Eq. (7): real UIP."""
     uip_res = (1.0 + r) - (1.0 + r_star) * Q(+1) / Q
     return uip_res
 
@@ -185,6 +190,61 @@ def external_accounts(PH, P, Y, C):
 # Calibration and model builder
 # -----------------------------------------------------------------------------
 
+def base_calibration():
+    """Quarterly calibration from Table 2 + section 5.3 shock settings."""
+    beta_star = 0.990
+    r_ss = 1.0 / beta_star - 1.0
+
+    theta_w = 0.938
+    theta_H = 0
+    theta_H_star = 0
+    alpha = 0.4
+
+    calib = {
+        # Preferences / demand
+        "sigma": 1.0,
+        "eis": 1.0,
+        "phi_labor": 2.0,
+        "beta": 0.965,
+        "beta_star": beta_star,
+        "alpha": alpha,
+        "eta": 1/(2-alpha), # varies ...
+        "gamma": 1/(2-alpha),
+        "cbar": 0,  # (not directly needed)
+        # Pricing / markups
+        "mu": 1.043,
+        # Phillips curve coefficients
+        "theta_w": theta_w,
+        "theta_H": theta_H,
+        "theta_H_star": theta_H_star,
+        "kappa_w": (1.0 - 0.962 * theta_w) * (1.0 - theta_w) / theta_w,
+        "kappa_H": (1.0 - theta_H) * (1.0 - theta_H / (1.0 + r_ss)) / theta_H,
+        "kappa_H_star": (1.0 - theta_H_star) * (1.0 - theta_H_star / (1.0 + r_ss)) / theta_H_star,
+        # Monetary policy
+        "eps_m": 0.0,
+        "r_ss": r_ss,
+        # Productivity
+        "Z": 1.0,
+        # Foreign block normalization
+        "C_star": 1.0,
+        # Idiosyncratic earnings process
+        "rho_e": 0.912,
+        "sd_e": 0.883,
+        "n_e": 7,
+        # Asset grid
+        "min_a": 0.0,
+        "max_a": 1000.0,
+        "n_a": 250,
+        # Steady-state anchors
+        "W_ss": 1.0 / 1.041,
+        "P_ss": 1.0,
+        "N_ss": 1.0,
+        # Shock process (section 5.3)
+        "rho_i_star": 0.85,
+        "q0_target": 0.01,
+    }
+    return calib
+
 
 def quantitative_calibration():
     """Quarterly calibration from Table 2 + section 5.3 shock settings."""
@@ -206,7 +266,7 @@ def quantitative_calibration():
         "eta": 4.0,
         "gamma": 4.0,
         "theta_sub": 0.976,
-        "cbar": 0.085,  # kept for reference (not directly needed in this reduced implementation)
+        "cbar": 0.085,  # (not directly needed)
         "zeta": -0.196,
         # Pricing / markups
         "mu": 1.041,
