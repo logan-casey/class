@@ -184,7 +184,7 @@ def base_calibration():
     beta_star = 0.990
     r_ss = 1.0 / beta_star - 1.0
     alpha = 0.4
-    eta = 2.0 - alpha
+    eta = 0.1 / (2-alpha)
 
     theta_w = 0.938
     beta = 0.965

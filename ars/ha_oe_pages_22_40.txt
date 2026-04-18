@@ -1,0 +1,1017 @@
+
+===== PAGE 22 =====
+
+leading to more expenditure switching and therefore a greater expansion dYt.
+The trade elasticity χ, defined in (36), captures the combined effect of reduced imports
+and increased exports following a depreciation. Holding aggregate Ct and C∗
+t fixed,
+the elasticity of imports with respect to the relative price of foreign goods PFt/PHt is
+−η (1 − α), and the elasticity of exports is γ.27 The trade elasticity is the export minus
+the import elasticity, and gives the response of net exports in quantity terms. Because a
+1% real depreciation raises the relative price of foreign goods by 1
+1−α%, it therefore raises
+the volume of net exports by χ
+1−α% of initial imports, so it has a α
+1−α χ% effect on real GDP .
+This explains equation (34). The middle panel of figure 2 plots the response of output in
+the RA-CM model to the exchange rate shock in the left panel, forχ = 1 (black, solid) and
+χ = 0.1 (red, dot-dashed). The scaling of this response in χ is evident in the figure.
+While the volume of net exports increases by α
+1−α χdQt, the value of net exports also
+reflects the rising cost of imports, so it only rises by dNX t = α
+1−α (χ − 1) dQt. At χ = 1,
+the volume and the price effect offset each other: this is the threshold in the well-known
+Marshall-Lerner condition. This will turn out to play a key role in the analysis that follows.
+From now on, it will be convenient to express impulse responses as infinite vectors,
+e.g. dY = (dY0, dY1, . . .). With this notation, (34)-(35) become dC = 0 and dY = α
+1−α χdQ.
+3.2 General case
+Away from the RA-CM benchmark, domestic consumption Ct does respond to depreci-
+ation, via the effect of depreciation on real income. Indeed, applying proposition 1 with
+the real interest rate rule rt = rss, we see that Ct only depends on the time path of real in-
+come PHt
+Pt Yt. Moreover, we have the first-order relation dC = M d
+
+PH
+P Y
+
+, with the matrix
+of intertemporal MPCs M mapping real income changes into consumption. In turn, con-
+sumption affects income through (33). Hence, for general M, the equilibrium response
+dYt to an exchange rate shock dQt is the solution to the following fixed-point problem.
+Proposition 3. In response to a shock to the real exchange rate d Q, the impulse response of
+consumption is given by
+dC = − α
+1 − αMdQ
+| {z }
+Real income channel
++ MdY|{z}
+Multiplier
+(37)
+27Aggregating the home demand equation for foreign goods (10) across consumers, we find that aggre-
+gate imports are CFt = α
+
+PFt
+Pt
+−η
+Ct, and then ∂ log CFt
+∂ log PFt/PHt
+= η ∂ log Pt/PFt
+∂ log PFt/PHt
+= −η (1 − α). Given (12), the
+elasticity of aggregate exports is ∂ log C∗
+Ht
+∂ log P∗
+Ft/P∗
+Ht
+= γ ∂ log P∗
+t /P∗
+Ht
+∂ log P∗
+Ft/P∗
+Ht
+= γ, where the last equality follows from the
+fact that the home country is too small to affect the foreign CPI.
+22
+
+===== PAGE 23 =====
+
+Figure 2: Effect of exchange rate shocks on output for various χ’s
+0 5 10 15 20 25 30
+Quarters
+−0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+Percent of s.s.
+Real exchange rate Q
+0 5 10 15 20 25 30
+Quarters
+−0.2
+−0.1
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+Output Y, complete markets
+χ = 1
+χ = 0.1, RA
+χ = 0.1, TA
+χ = 0.1, HA
+0 5 10 15 20 25 30
+Quarters
+−0.2
+−0.1
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+Output Y, incomplete markets
+Note: AR(1) shock to ι∗
+t with persistence 0.85, and corresponding impulse response of the real exchange rate Qt in the left panel. The
+shock is normalized so that the real exchange rate depreciates by 1% on impact. χ is the trade elasticity (the sum of the import and
+export elasticity to the exchange rate). The HA model generates a contraction on impact for χ < χ∗ = 0.26.
+and the impulse response of output dY is determined by an “international Keynesian cross”
+dY = α
+1 − α χdQ
+| {z }
+Exp. switching channel
+− αMdQ| {z }
+Real income channel
++ (1 − α) MdY| {z }
+Multiplier
+(38)
+Proposition 3 shows that the impulse responses of consumption and output only de-
+pend on the openness parameter α, the trade elasticity χ, and the matrix of intertemporal
+MPCs M. Equation (37) finds that there are two ways in which real income PHt
+Pt Yt, and
+hence consumption dC, are affected by an exchange rate depreciation dQ. First, a depre-
+ciation lowers PHt
+Pt by α
+1−αdQt, that is, it lowers the price of the goods that the country
+produces relative to the price of those that it buys. This reduces real income, leading
+agents to cut consumption by M × α
+1−αdQ. We refer to this as the real income channel .
+Second, a depreciation affects the path of output dY, which also enters real income, and
+changes consumption by M × dY. This is a standard (Keynesian) multiplier effect.
+Linearizing goods market clearing (33) and substituting in (37), we obtain equation
+(38), whose form is like that of a standard Keynesian cross, where the relevant multiplier
+is the product of M by home bias (1 − α). Including expenditure switching, there are
+altogether three distinct channels that jointly determine the output response to any given
+shock. The next proposition, proved in appendix B.3, derives the general solution to (38).
+23
+
+===== PAGE 24 =====
+
+Proposition 4. The equilibrium consumption and output responses are unique and given by
+dC = α
+1 − α (χ − 1) ∑
+k≥0
+(1 − α)k Mk+1dQ (39)
+dY = α
+1 − α dQ + α
+1 − α (χ − 1) ∑
+k≥0
+(1 − α)k MkdQ (40)
+Just like the ordinary Keynesian cross, the solution to our international Keynesian
+cross (38) involves infinitely many rounds, captured here by the powers(1 − α)kMk. One
+way to understand (39)–(40) is that, holding consumption constant, the effect of the de-
+preciation on the value of net exports is dNX = α
+1−α (χ − 1) dQ (see section 3.1), where
+χ − 1 is the distance to the Marshall-Lerner condition. 28 Through the national account-
+ing identity PHt
+Pt Yt = Ct + NXt, this change in net exports feeds into real income, which
+in turn affects consumption via M, spilling back into real income, and so on, with the
+infinite series in (39) giving the outcome of this multiplier process.
+This also explains why, when χ = 1, M drops out of the solutions: the consumption
+and output responses to the depreciation are independent of household behavior.
+Proposition 5. If χ = 1, dY = α
+1−αdQ, dC = 0, and dNX = 0, all independent of M.
+When we substitute dY = α
+1−αdQ into (37), we get dC = 0: for χ = 1, the rise in output
+from expenditure switching is just large enough to offset the loss of real income from
+higher prices, leaving total real income and therefore consumption unchanged in every
+period. Since consumption is unchanged, the only effect on output is from expenditure
+switching, just as in the RA-CM model.
+Figure 3 shows the responses to the exchange rate shock in the χ = 1 case for both the
+RA-CM model (M = 0) and the HA-IM model ( M > 0), displaying separately the three
+components of output in equation (38). The expenditure-switching channel is the same
+in both cases, but the HA-IM model has a negative real income effect that is exactly offset
+by a positive multiplier effect, while in the RA-CM model these two effects are zero.
+This result suggests that the real income channel will play an economically more
+meaningful role when χ ̸= 1, a case we turn to next.
+28Observe that χ = 1 does not correspond to the well-known Cole and Obstfeld (1991) parametrization,
+which, using (36), is given by χ = 2 − α. The Cole and Obstfeld (1991) parametrization turns out to be more
+relevant for the analysis of monetary policy (see section 4).
+24
+
+===== PAGE 25 =====
+
+Figure 3: Exchange rate shock when χ = 1 and its transmission channels
+0 5 10 15 20 25 30
+Quarters
+−0.2
+0.0
+0.2
+0.4
+0.6
+dY (percent of ss)
+RA model with complete markets
+Total
+Real income channel
+Exp. switching channel
+Multiplier
+0 5 10 15 20 25 30
+Quarters
+−0.2
+0.0
+0.2
+0.4
+0.6
+HA model with incomplete markets
+Note: impulse response in RA-CM and HA-IM to the shock to ι∗
+t from figure 2, with decomposition from proposition 3.
+3.3 Complementarity between iMPCs and the trade elasticity
+When χ ̸= 1, proposition 4 suggests that the aggregate response to depreciation is affected
+by M. Specifically, there is a complementarity between having trade elasticitiesχ ̸= 1 and
+larger intertemporal MPCs M. We formalize this result in the following proposition.
+Proposition 6. Consider two models with M,fM such that M >fM, and a shock dQ ≫ 0. Then,
+χ < 1 ⇔ dY < deY and d C < deC
+Higher intertemporal MPCs M reduce the output response dY if and only if χ < 1,
+since they amplify the negative effect of the real income channel on consumption (sym-
+metrically, when χ > 1, higher iMPCs increase the output response.) Since both high
+M and—as we argue in section 5—low short-run trade elasticity χ < 1 are realistic as-
+sumptions for exchange rate shocks, this suggests that the RA-CM model is overstating
+the output and consumption response to a depreciation.
+Figure 4 visualizes the complementarity described in proposition 6. It shows, for the
+RA-CM model (M = 0) and the HA-IM model ( M > 0), the impact responses of output
+dY0 and consumption dC0 to the shock considered in figure 2 at various values of χ. A
+larger M pivots the lines in these figures counter-clockwise around χ = 1. As a result, in
+a model with M > 0, we get an impact decline in consumption whenχ < 1, and a decline
+in output when χ is sufficiently below 1.
+Which models have an M large enough to meaningfully affect the output and con-
+sumption response to depreciation? Among the models that we consider, HA-IM stands
+out. Indeed, figure 2 shows that, at χ = 0.1, it is the only model that generates a sizable
+decline in output on impact. Table 1 shows that this stems from its unique ability to gen-
+25
+
+===== PAGE 26 =====
+
+Figure 4: Complementarity between expenditure switching elasticity χ and high MPCs
+0.00 0.25 0.50 0.75 1.00 1.25 1.50
+χ
+−0.4
+−0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+Percent of ss.
+Output at date 0 dY0
+HA-IM
+RA-CM
+0.00 0.25 0.50 0.75 1.00 1.25 1.50
+χ
+−0.8
+−0.6
+−0.4
+−0.2
+0.0
+0.2
+0.4
+Consumption at date 0 dC0
+Note: changes on impact in output and consumption following the shock toι∗
+t from figure 2. The HA-IM model generates a contraction
+for output on impact forχ < χ∗ = 0.26 and a contraction for consumption forχ < 1. The RA-CM model never generates a contraction.
+dC0 RA TA HA
+Complete markets 0.00 0.00 - 0.02
+Incomplete markets -0.09 - 0.15 - 0.34
+Note: changes on impact of consumption to the shock to ι∗
+t displayed in Figure 2 with χ = 0.1.
+Table 1: Complementarity between market incompleteness and heterogeneity
+erate a large decline in consumption on impact. In CM models, the effect of depreciation
+on aggregate consumption are insured.29 In RA-IM, the impact MPC is small. In TA-IM,
+the impact MPC is large, but the iMPCs are small—there is very limited persistence in
+spending after an income shock (figure 1). We conclude that it is the combination of ag-
+gregate market incompleteness and heterogeneity that "sizes up" the real income channel,
+generating a meaningful contractionary effect of depreciation at low trade elasticities.
+Extensions: dollar currency pricing, nontradable goods, imported intermediates. Ap-
+pendix E.1 describes how our results change if we assume dollar currency pricing instead
+of producer currency pricing. Appendices E.2 and E.3 show that our results also apply in
+a model with nontradable goods or with imported intermediate goods. These models are
+isomorphic to our baseline model, under a reinterpretation of parameters.
+29In particular, a CM model always has a smaller consumption decline than an IM model at χ < 1. This
+is because MCM ≤ MIM , as we prove in appendix B.6.
+26
+
+===== PAGE 27 =====
+
+3.4 Contractionary depreciations
+We now summarize our results on contractionary depreciations due to the real income
+channel and contrast them to existing literature. First, when χ is below 1, depreciations
+lower real income and consumption.
+Proposition 7. If χ < 1, the consumption and real income response to a depreciation shock
+dQ ≥ 0 is negative: dC ≤ 0 and d PHY
+P ≤ 0
+This result shows that low trade elasticities and high intertemporal MPCs can help
+explain the empirical Backus-Smith correlation, complementing the recent findings of It-
+skhoki and Mukhin (2021).
+Second, while expenditure switching always boosts output relative to consumption,
+there is a threshold elasticity χ∗ such that output also contracts.
+Proposition 8. Given a depreciation shock dQ ≥ 0, there is a threshold χ∗ between (1 − α)M0,0
+and 1 such that for any χ < χ∗, the output response is negative on impact, dY0 ≤ 0. Moreover, if
+χ < 1 − α, in any incomplete market model, the present value of the output response is negative,
+∑∞
+t=0(1 + r)−tdYt ≤ 0.
+For low enough χ, the real income channel overwhelms the expenditure switching
+channel in (38) on impact of the shock. Consider, for instance, a one-time shock to dQ0:
+here, the real income effect at t = 0 is −αM0,0dQ0, compared to expenditure switching
+of α
+1−α χdQ0. When χ < (1 − α)M0,0, the former dominates. This dominant real income
+channel is only reinforced by the multiplier in (38), since with high iMPCs the real income
+effect on consumption persists after the shock has passed, and this persistence feeds back
+to date 0 via the multiplier. Overall, for any depreciation, there is a thresholdχ∗ at which
+it becomes contractionary on impact: χ∗ is at least (1 − α)M0,0, and usually greater due
+to multiplier effects.30 Further, in an incomplete markets model, χ < 1 − α is enough to
+generate an output response with negative present value.
+Since this result is driven by the real income channel, it is different from, and comple-
+mentary to, the commonly studied balance sheet channel with currency mismatch (e.g.
+Aghion, Bacchetta and Banerjee 2004, Céspedes, Chang and Velasco 2004). It can poten-
+tially explain the continued relevance of fear of floating (Ilzetzki, Reinhart and Rogoff
+2019) and reserve hoarding (Bianchi and Lorenzoni 2022) among countries for which cur-
+rency mismatch is no longer an issue (see appendix D.6).
+30For instance, in our calibration of HA-IM and for the shock we consider, we have χ∗ = 0.26.
+27
+
+===== PAGE 28 =====
+
+Relation to the old Keynesian literature. So far, we have stressed the contrast between
+a model with realistic iMPCs and the RA-CM model, in which depreciations never lower
+output. However, our result also contrasts with the old Keynesian analysis of open-
+economy IS-LM (Polak 1947, Harberger 1950, Laursen and Metzler 1950), as summarized,
+for instance, in Dornbusch (1980). According to this theory, depreciations always lower
+output when χ < 1, irrespective of MPCs.
+The reason for the discrepancy is as follows. Dornbusch (1980) wrote the equation
+determining the equilibrium level of output as Y = E (Y) + T (p, Y), where E is domestic
+spending, T is the trade surplus, and p is the relative price of imports in terms of domestic
+goods. This equation implies that dY = Tp
+1−EY−TY
+dp, and therefore, the condition under
+which output falls with depreciation ( dY/dp < 0) is the same as that under which the
+trade balance deteriorates (Tp < 0), which corresponds to being on the wrong side of the
+Marshall-Lerner condition ( χ < 1). In this theory, MPCs only play a role in amplifying
+any given response of the trade balance on output.
+The difference with our framework can be best understood by recognizing that the
+national accounting identity is given by PHt
+Pt Yt = Ct + NXt, where Ct and NXt depend
+on real income PHt
+Pt Yt rather than output directly. Hence, the result derived by Dornbusch
+(1980) should be interpreted as the effect of depreciation on real income, not output, con-
+sistent with our proposition 7. In fact, in the special case of the TA-CM model, we show
+in appendix A.7 that, in periods t ≥ 1, real income is given by the analogue of the Dorn-
+busch (1980) condition
+d
+ PHt
+Pt
+Yt
+
+= α
+1 − α
+χ − 1
+1 − (1 − α) λdQt (41)
+where λ is the effective MPC. However, because the relative price PHt/Pt falls with de-
+preciation, the equation determining the volume of output for t ≥ 1 is in fact
+dYt = α
+1 − α
+χ − (1 − α) λ
+1 − (1 − α) λ dQt (42)
+Hence, the threshold determining whether output contracts is χ∗ = (1 − α) λ < 1, which
+increases with the effective MPCλ. Relative to the open-economy IS-LM logic, our micro-
+founded model therefore requires lower trade elasticities to generate contractionary out-
+put depreciations.
+28
+
+===== PAGE 29 =====
+
+4 Monetary policy
+We next ask how monetary transmission is affected by the real income channel under het-
+erogeneity and incomplete markets. For this section, we assume log preferences, σ = 1,
+and a real interest rate rule, which allow for a clean analytical characterization.31 We also
+focus on the contrast between the RA-CM and HA-IM models, which we saw provided
+two polar cases for the importance of the real income channel. Appendix C.4 covers the
+intermediate RA-IM case.
+4.1 Transmission of real interest rates
+Given our monetary policy rule (19), monetary policy affects aggregate activity by directly
+changing the path of domestic real interest rates {rt}. This has two distinct effects on
+household behavior. First, it affects the path of the real exchange rate {Qt} through the
+real UIP condition. Given no preference shock Bt = 1, (30) now implies
+Qt = ∏
+s≥t
+1 + rss
+1 + rs
+
+(43)
+These changes in the real exchange rate operate through the expenditure switching and
+real income channels analyzed in section 3.
+Second, changes in domestic interest rates also affect the economy directly, since rt
+moves asset prices and returns at all dates, including, under incomplete markets, by
+revaluing wealth at date 0. The resulting income and substitution effects are well-studied
+in the closed economy literature (e.g. Auclert 2019). We refer to this set of effects as
+the interest rate channel . The interest rate response matrix Mr, defined in section 2.3 as
+Mr
+t,s ≡ (1 + r) · ∂Ct/∂rs, captures these closed-economy effects.
+To characterize the effect of monetary policy on output, we proceed again by lin-
+earizing the goods market clearing condition. Consider a change {drt} to real inter-
+est rates, and let dr ≡
+
+dr0
+1+r, dr1
+1+r, . . .
+′
+. Given (43), the real exchange rate responds by
+dQt = − ∑s≥t
+drs
+1+r, or in matrix notation, dQ = −Udr, where U is the matrix with 1’s
+on and above the diagonal. Linearizing (21), we now obtain a generalized version of the
+international Keynesian cross (38):
+31These assumptions can be relaxed slightly; for instance, appendix C.5 extends our main equivalence
+result to Taylor rules and productivity shocks.
+29
+
+===== PAGE 30 =====
+
+dY = (1 − α) Mrdr| {z }
+Interest rate channel
++ α
+1 − α χdQ
+| {z }
+Exp. switching channel
+− αMdQ| {z }
+Real income channel
++ (1 − α) MdY| {z }
+Multiplier
+(44)
+The representative-agent model with complete markets is still covered as a special case of
+equation (44), for which M = 0 and Mr = −U.32 In that case, equation (44) delivers the
+simple expression dYRA-CM = −
+ 
+(1 − α) + α
+1−α χ
+
+Udr.
+Contrast this with the HA-IM model. In that model, it is well-understood from the
+closed-economy literature that the interest rate channel is less powerful, since agents have
+less ability to substitute intertemporally. In a closed economy, Werning (2015) has shown
+that this weaker interest rate channel tends to be offset by a stronger multiplier. In the
+open economy, however, the multiplier is weaker, since only a share 1 − α of domestic
+demand is spent on home goods. Hence, with χ = 1, the HA model has a weaker output
+response to monetary policy. However, as we prove next, equivalence is restored at a
+greater value of χ, namely χ = 2 − α.
+Proposition 9. Assume σ = 1, and consider an arbitrary first-order monetary policy shock dr. If
+χ = 2 − α, all aggregate quantities and prices are identical in the RA-CM and HA-IM models.
+Moreover, provided that M > 0, for an accommodative shock d r < 0, the output response in the
+HA-IM model satisfies
+χ < 2 − α ⇔ dYHA-IM < dYRA-CM
+Proposition 9 is the analogue of Proposition 5 for monetary policy. The neutral case,
+χ = 2 − α, includes the commonly-studied Cole and Obstfeld (1991) parameterization
+with η = γ = σ = 1.33 This result generalizes the representative-agent result in Itskhoki
+(2021) to heterogeneous-agent models, and the closed economy result of Werning (2015)
+to the open economy. Appendix C.4 shows that this proposition applies equally to the
+comparison between RA-CM and RA-IM.34
+To understand this result, it is helpful to consider the effects of monetary policy on the
+trade balance. Suppose that consumption changes as in the RA-CM model: the Backus-
+32Recall that σ = 1 in this section. In a RA-CM model with general σ, we have Mr = − 1
+σ U.
+33In fact, in this Cole-Obstfeld case, it is even possible to prove that proposition 9 holds for unanticipated
+non-linear shocks. We can generalize our results further when χ = 2 − α, e.g. by allowing for arbitrary
+monetary policy rules. See appendix C.5.
+34Bianchi and Coulibaly (2023) independently arrived at a decomposition similar to (44) for the consump-
+tion response after a monetary policy shock in a tradable-nontradable RA-IM model. See appendix E.4 for
+an analogous model.
+30
+
+===== PAGE 31 =====
+
+Figure 5: The effects of monetary policy
+0 5 10 15 20 25 30
+Quarters
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+dY (percent of s.s.)
+RA-CM with χ = 2 − α
+Total
+Real income channel
+Exp. switching channel
+Interest rate channel
+0 5 10 15 20 25 30
+Quarters
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+HA-IM with χ = 2 − α
+0 5 10 15 20 25 30
+Quarters
+−0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+HA-IM with χ = 0.5
+Note: impulse response to a rt shock that is identical to the ι∗
+t shock from figure 2, but with opposite sign. This leads to the same Qt
+path as in the left panel of that figure. The decomposition follows equation (44) but the multiplier effect is omitted from the figure.
+Smith condition then implies that dCt = dQt. Then, applying the relationship between
+the trade balance, the real exchange rate and consumption (see appendix B.1), we have
+dNX t = α
+1 − α (χ − 1) dQt − αdCt = α
+1 − α (χ − (2 − α)) dQt (45)
+Hence, at χ = 2 − α, expenditure switching offsets both the increase in import prices and
+the higher import demand, and the economy behaves as if it were a closed economy.
+Given this, we can apply Werning (2015)’s result for closed economies to validate our
+guess that consumption behaves as if there was a representative agent. By contrast, when
+χ < 2 − α, the net export decline causes a real income decline, which in general equilib-
+rium results in weaker consumption and output responses than the RA-CM model.
+Figure 5 illustrates proposition 9 by showing the output response as well as its de-
+composition using equation (44). For simplicity, we consider an accommodative interest
+rate shock that generates the same path for the real exchange rate as that considered in
+section 3. The left and middle panels illustrate the case with χ = 2 − α. Relative to the
+RA-CM model (left panel), there is a clearly negative real income effect and a weaker in-
+terest rate effect in the HA-IM model (middle panel). However, both are exactly offset by
+a positive multiplier effect from the increased production (not shown), so that the output
+response is identical. The right panel shows what happens in the HA-IM model when
+χ = 0.5 < 2 − α instead. The interest rate and real income channels are unchanged rela-
+tive to χ = 2 − α but the expenditure switching channel is muted. As a result, the positive
+multiplier effect no longer offsets the negative influence of the interest rate and real in-
+come channels in HA-IM relative to RA-CM. This is the reason why the output response
+in HA-IM is below that of the RA model everywhere, consistent with proposition 9.
+31
+
+===== PAGE 32 =====
+
+4.2 Stealing demand from the future through current account deficits
+An intriguing aspect of the bottom right panel of figure 5 is that the output response in
+the HA model turns negative after 9 quarters, until it returns to steady state much later. In
+other words, monetary stimulus successfully raises aggregate demand for a few quarters,
+but at the cost of lowering it afterward. It “steals” demand from the future.
+What explains this pattern? As discussed above, when χ < 2 − α, monetary stimulus
+generates a current account deficit: agents borrow from abroad, both to finance higher
+spending today, spurred by the low rates, and to smooth the real income losses from
+higher import prices. These current account deficits accumulate into a negative net for-
+eign asset position over time, which remains even after the interest rate and exchange rate
+have converged most of the way back to steady state. To rebalance the current account,
+agents cut back on spending, causing a downturn in aggregate demand, and the economy
+eventually converges back to its initial steady state.
+The following proposition derives a simple expression for the present value of the
+consumption adjustment needed to close a given net foreign asset position dnfat.
+Proposition 10. If the real exchange rate is at steady state from date t + 1 onward (dQ t+s = 0
+for s ≥ 1), the date-t present value of consumption and output is given by
+∞
+∑
+s=1
+(1 + rss)−sdCt+s = 1
+α dnfat
+∞
+∑
+s=1
+(1 + rss)−sdYt+s = 1 − α
+α dnfat (46)
+Intuitively, in present value terms, any negative net foreign asset position will even-
+tually be repaid. If there is no depreciation, this must involve a recession. Proposition
+10 shows that the more closed the economy (the smaller α), the larger the reduction of
+spending and output required for repayment, since most of the reduced spending falls on
+home goods, which does not contribute to the international adjustment.35
+Our “stealing demand from the future” effect is a close cousin to the “limited ammu-
+nition” effect in closed-economy models that has been recently described by McKay and
+Wieland (2021), Caballero and Simsek (2021) and Mian, Straub and Sufi (2021). There is
+one crucial difference, however. In our open economy setting, the effect of monetary pol-
+icy can be so weak that the present value of the output response to monetary stimulus,
+PV(dY), is negative. Appendix C.3 shows that this happens in our model when χ < 1 − α.
+To conclude, with high MPCs and low trade elasticities, the real income channel substan-
+tially alters the transmission of monetary policy in open economies.
+35See Krugman (1987) for an earlier articulation of this point. Of course, a less open economy is less likely
+to accumulate a large negative NFA in the first place.
+32
+
+===== PAGE 33 =====
+
+5 Quantitative model
+We have shown that the importance of heterogeneity for the effects of exchange rates or
+monetary policy depends on the level of the trade elasticity χ. We derived these results
+under the standard assumption of static CES demand, for which χ is a constant struc-
+tural parameter. Yet, a host of empirical evidence suggests that the response of the trade
+balance to exchange rate shocks takes time to play out and depends on the nature of the
+shock, notably on agents’ expectations of its persistence (e.g. Ruhl 2008, Fitzgerald and
+Haller 2018). For transitory shocks to exchange rates, the elasticity can be close to 0 in the
+short run (e.g. Hooper, Johnson and Marquez 2000); for more permanent shocks, such as
+tariff changes, it can be 4 or more in the long run (e.g. Caliendo and Parro 2015). Any
+plausible quantification exercise needs to confront this evidence.
+In this section, we develop a quantitative version of the benchmark model studied so
+far. To this benchmark, we add a stylized model of "delayed substitution," which exhibits
+shock-dependent and time-varying elasticities of imports and exports to movements in
+relative prices. The model’s aggregate dynamics are similar to those of the richer mod-
+els in Ruhl (2008), Drozd and Nosal (2012) and Alessandria and Choi (2021), but it ab-
+stracts away from the behavior of firms and focuses directly on that of of households.
+In doing so, it captures the essence of these theories in reduced form, and is straight-
+forward to integrate into broader general equilibrium environments, such as that of our
+heterogeneous-agent model.36
+In addition to delayed substitution, our quantitative model allows for price rigidities
+on top of wage rigidity (and hence intermediate degrees of exchange rate pass-through),
+non-homotheticities in consumption, heterogeneous incidence of aggregate shocks on
+households’ labor income, and a standard Taylor rule for monetary policy.
+5.1 Additional model elements
+We next introduce our new model elements.
+Non-homothetic preferences. Cravino and Levchenko (2017) document that, in Mexico,
+households at the bottom of the income distribution consume a larger share of imported
+goods than households at the top, implying that they experience larger declines in real
+income during a depreciation.37 Since poor households typically have higher MPCs, ac-
+36See Arkolakis, Eaton and Kortum (2012) and Drozd, Kolbin and Nosal (2021) for alternative reduced-
+form models that share the same objective.
+37The importance of this phenomenon in other countries is subject to an empirical debate. Borusyak and
+Jaravel (2021) argue that the share of imports in consumption baskets is flat across the income distribution
+in the United States. Bems and di Giovanni (2016) argue that the fall in aggregate income during the 2008
+33
+
+===== PAGE 34 =====
+
+counting for this fact could magnify the importance of the real income channel. To allow
+for this possibility, we follow Carroll and Hur (2020) and Fanelli and Straub (2021) and
+assume agents consume a Stone-Geary CES bundle, with a positive subsistence needc for
+imported goods,38
+c =
+h
+α1/η (cF − c)(η−1)/η + (1 − α)1/η c(η−1)/η
+H
+iη/(η−1)
+(47)
+Unequal incidence of aggregate shocks on workers.Blanco et al. (2024) show that the deval-
+uation of 2002 in Argentina had heterogeneous incidence on the real income of workers
+across the income distribution. To allow for this, we follow Auclert and Rognlie (2018)
+and assume that the total labor income of a worker with productivity e is39
+labor income for e, t = Wt
+Pt
+Nt
+e1+ζ log
+ Wt
+Pt Nt
+
+Wss
+Pss Nss
+
+R
+˜e1+ζ log
+ Wt
+Pt Nt
+
+Wss
+Pss Nss
+
+d ˜e
+(48)
+In the data, the elasticity of individual household income to aggregate income Wt
+Pt Nt is
+decreasing in the productivity e of workers, so ζ is negative. This implies that the labor
+income of low-productivity workers falls more in recessions and rises more in booms rela-
+tive to high-productivity workers. Given that low-productivity workers also have higher
+marginal propensities to consume, this additional source of heterogeneity will amplify
+the real income and the multiplier channels.
+Monetary policy. Clarida et al. (2000) show that US monetary policy is well approx-
+imated by a policy rule targeting expected CPI-inflation with inertia. In this spirit, we
+replace the constant–r monetary rule in the previous sections by the Taylor rule (20).
+Sticky prices and imperfect exchange rate pass-through. We allow for price stickiness in
+domestic prices, modeled a la Calvo with a price stickiness coefficient ofθH. This leads to
+a Phillips curve for inflation in domestic prices PHt of
+πHt = κH
+
+µ Wt
+ZtPHt
+− 1
+
++ 1
+1 + r Et [πH,t+1] (49)
+with κH = (1 − θH)
+
+1 − 1
+1+r θH
+
+/θH.
+We also allow for imperfect pass-through of the exchange rate into import prices as
+crisis in Latvia caused consumers to shift towards lower-quality, domestically produced goods.
+38Appendix D.1 describes how to modify our solution method to incorporate non-homothetic demand.
+39Cyclical movements in aggregate labor income could affect workers differently because of differences
+in fundamental productivity, or differences in hours worked.
+34
+
+===== PAGE 35 =====
+
+in Monacelli (2005). To model imperfect pass-through to import prices, we assume that
+foreign exporters produce differentiated goods at a flat cost of Et per unit and sell them
+domestically at a sticky price PFt. The elasticity of substitution between these varieties is
+µ F/ (µ F − 1). This formulation leads to a Phillips curve for imported goods PFt of
+πFt = κF
+
+µ F
+Et
+PFt
+− 1
+
++ 1
+1 + r Et [πF,t+1] (50)
+with κF = (1 − θF)
+
+1 − 1
+1+r θF
+
+/θF.
+We make the same assumption for home exporters to model imperfect pass-through
+into export prices. Then, inflation in the price P∗
+H,t of home goods that foreigners see,
+expressed in their currency, is
+π∗
+Ht = κH∗
+
+µ H∗
+PHt
+EtP∗
+Ht
+− 1
+
++ 1
+1 + r Et
+
+π∗
+H,t+1
+
+(51)
+with κH∗ = (1 − θH∗)
+
+1 − 1
+1+r θH∗
+
+/θH∗. Domestic equity earns the dividends of both
+home producers and home exporters.
+Delayed substitution. We introduce delayed substitution by modifying the household
+problem. Instead of being able to flexibly adjust their relative consumption of different
+countries’ goods in each period, we now assume that households can only do so with
+a certain probability 1 − θ. With probability θ, they are forced to keep the ratio of each
+country’s good to total consumption constant, although they can still adjust overall ex-
+penditure.
+We obtain general results for this delayed substitution model in appendix D.3. In our
+problem, this model generates first-order dynamics for the target ratios ˆxHt and ˆx∗
+Ht, for
+households who can adjust, of domestic and foreign home good consumption to overall
+consumption:40
+d log ˆxHt = −(1 − βθ)ηd log PHt
+Pt
++ βθd log ˆxHt+1 (52)
+d log ˆx∗
+Ht = −(1 − β∗θ)γd log P∗
+Ht + β∗θd log ˆx∗
+Ht+1 (53)
+This is similar to a Calvo model of price-setting, but here, consumers reset their consump-
+tion bundles based on their perceptions of current and future relative prices. The aggregate
+ratios CHt/Ct and C∗
+Ht/C∗, in turn, evolve sluggishly as only a fraction 1 − θ adjusts each
+40For the heterogeneous domestic households, the simple form of (52) and (54) requires our assumption
+that σ = 1. Otherwise, as shown in appendix D.3, there is a more complex expression for the target ratio,
+which can vary between heterogeneous households.
+35
+
+===== PAGE 36 =====
+
+Parameter Benchmark model Quantitative model Parameter Benchmark model Quantitative model
+σ 1 1 µ 1.043 1.041
+φ 2 2 σe 0.883 0.883
+η = γ {0.1,0.5,1,2−α}
+2−α 4 ρe 0.912 0.912
+θ n.a. 0.976 θw 0.938 0.938
+β∗ 0.990 0.990 θH 0 0.66
+β 0.965 0.962 θH∗ 0 0.66
+ζ n.a. - 0.196 θF 0 0
+α 0.4 0.344 ρm n.a. 0.8
+c 0 0.085 ϕ n.a. 1.5
+Moment Data Benchmark model Quantitative Model
+Average quarterly MPC 0.20 0.20 0.20
+Std of log annual post-tax income 0.84 0.84 0.84
+Autocorrelation of order 1 of log annual post-tax income 0.78 0.78 0.78
+Average import share 0.40 0.40 0.40
+Std of import share 0.042 n.a. 0.042
+Std of elasticity to aggregate income 0.15 n.a. 0.15
+Notes: all parameters are for the quarterly calibration. Average and standard deviations are computed across deciles of income. The
+income process is discretized with 7 points.
+Table 2: Calibration
+period, with dynamics described by
+d log CHt
+Ct
+= ( 1 − θ)d log ˆxHt + θd log CHt−1
+Ct−1
+(54)
+d log C∗
+Ht = ( 1 − θ)d log ˆx∗
+Ht + θd log C∗
+Ht−1 (55)
+This delivers a model in which the trade elasticity is both shock- and time-dependent.
+For instance, for foreign consumption C∗
+Ht of the home good, the long-run elasticity to a
+permanent shock is simply γ. By contrast, the short-run elasticity to the same permanent
+shock is lower, at γ (1 − θ), since it takes time for consumers to adjust. Finally, the short-
+run elasticity to a one-time shock is even lower, atγ (1 − θ) (1 − βθ), since even those who
+change their bundles choose to adjust little, as they anticipate wanting to adjust back in
+the other direction after the shock has passed.
+5.2 Calibration
+Aggregate calibration. We calibrate the model at a quarterly frequency. Our aggregate
+calibration is standard. Our goal is to capture the essential features of a typical Latin
+36
+
+===== PAGE 37 =====
+
+American economy such as Mexico, since emerging economies have been the focal point
+of policy discussions on the consequences of exchange rate depreciations. Furthermore,
+as we will show in section 5.5, many of the features that make contractionary deprecia-
+tions more likely (e.g. incomplete financial markets, openness to trade) tend to prevail in
+emerging economies.
+Table 2 summarizes this calibration. We set β∗ to achieve an annualized real interest
+rate of r = 4% in steady state and β to clear the asset market at home. We set the initial
+steady state net foreign asset position to 0, with all assets invested in domestic stocks, to
+avoid interactions between exchange rates and pre-existing trade deficits. We consider
+standard values of σ = 1 for the elasticity of intertemporal substitution, and φ−1 = 0.5
+for the Frisch elasticity of labor supply. For the elasticity of substitution across goods,
+we proceed as follows. Since there is limited evidence that this elasticity is different for
+imported vs domestic goods relative to between imported goods, we set γ = η. This
+implies that χ = (2 − α) γ. In our benchmark model, we considered a range of values for
+χ. By contrast, our quantitative model relies on delayed substitution, which we calibrate
+below.
+MPCs. To calibrate the aggregate consumption behavior of the model, and in the ab-
+sence of MPC evidence from Mexico, we target a quarterly MPC of 0.20 measured by
+Hong (2023) for Peru41. We assume an AR(1) process for log income, with a persistenceρe
+and a cross-sectional standard deviation of logs σe set to match the persistence and stan-
+dard deviation of residual log annual income for Mexico from the GRID project (Guve-
+nen, Pistaferri and Violante 2022), which we adjust for progressive income taxation using
+estimates from De Magalhaes, Martorell-Toledano and Santaeulalia-Llopis (2022). 42 We
+adjust the markup µ , which mostly affects the level of steady-state liquidity in the model,
+so as to target the average quarterly MPC, and set the borrowing constraint to a = 0.43
+This delivers µ = 1.041, so an average liquid wealth to GDP ratio of 98%. 44 We set the
+markups of importers and exporters to µ F = µ H∗ = 1 to keep the steady states of the
+baseline and quantitative models similar.
+Non-homothetic preferences. To calibrate the spending behavior of households across
+41A quarterly MPC of 0.20 is similar to estimates from other countries (e.g. see Sokolova 2023).
+42Since our quantitative model has subsistence needs, we make sure that our discretization procedure
+respects the constraint that the agent at the lowest level of income can always afford the subsistence level
+of consumption.
+43Setting a different borrowing constraint a would leave our quantitative results almost unaffected, be-
+cause we would recalibrate markups to match the same average quarterly MPC.
+44This compares to a Mexican wealth-GDP ratio of 350% in 2018. Our estimate is smaller and best under-
+stood as capturing liquid wealth. We decided not to target aggregate wealth to GDP in order to hit realistic
+MPCs, whose importance is emphasized by our theoretical results.
+37
+
+===== PAGE 38 =====
+
+Figure 6: Calibration targets across the income distribution
+2 4 6 8 10
+Income decile
+0.30
+0.35
+0.40
+0.45
+0.50
+0.55Import share
+Non-homothetic preferences
+Benchmark model
+Quantitative model
+Data
+2 4 6 8 10
+Income decile
+0.7
+0.8
+0.9
+1.0
+1.1
+1.2
+1.3
+1.4
+1.5Elasticity of labor earnings to aggregate income
+Unequal incidence
+Note: the quantitative model targets the average and standard deviation across income deciles of consumption share of foreign goods
+and the standard deviation across income deciles of the elasticity of labor income to aggregate income.
+goods, we target moments of the Mexican spending survey reported in Cravino and
+Levchenko (2017). From their data, we obtain the average tradable share at each income
+decile, as well as that decile’s share of aggregate consumption. We then assume that the
+share of imports within tradables is the same across the income distribution, and compute
+income-specific import shares so that the economy-wide share lines up with the Mexican
+import/GDP ratio of 40%, as reported in appendix table A.1.45 In the benchmark model,
+we set α = 0.4, while in the quantitative model we adjust α, the asymptotic import share,
+and c, the subsistence level on the imported good, to target an average import share of 0.4
+together with the standard deviation of import shares across income deciles.
+Unequal incidence of aggregate shocks. We use information from Blanco et al. (2024) to
+calibrate ζ, which governs in the model the elasticity of labor income with respect to
+aggregate income for workers with different productivity e. The authors generously pro-
+vided us with estimates for the elasticity of real labor income with respect to aggregate
+income for different income deciles following the depreciation of 2002 in Argentina. They
+find that the elasticity is larger for low-income workers than high-income workers, which
+implies that ζ < 0. Our strategy is to find ζ < 0 such that the standard deviation of
+the elasticity across income deciles is identical in the model and in the data. This yields
+ζ = −0.196. Appendix D.2 provides details.
+Figure 6 shows the import share and elasticity of labor earnings to aggregate income
+across deciles of the income distribution. Overall our model does a good job at capturing
+the joint variation in the import share and the elasticity of labor earnings. In particu-
+lar, both are declining in income, as emphasized by Cravino and Levchenko (2017) and
+45Appendix E.2 spells out a formal model with nontradables, domestically produced tradables and im-
+ported tradables, and shows that it is equivalent to our model if α is calibrated to the import/GDP ratio.
+38
+
+===== PAGE 39 =====
+
+Blanco et al. (2024).
+Phillips curve parameters. Appendix D.5 provides details on our calibration of Phillips
+curve parameters. Among the price rigidity parameters, the Calvo coefficient for import
+prices θF is the most important as it directly affects the magnitude of the real income
+effect. We calibrate θF using evidence from the 1994 Mexican devaluation as reported
+by Burstein and Gopinath (2015). For this particular devaluation, we find perfect pass-
+through to import prices, so θF = 0.46 By contrast, given the widespread evidence in
+Boz et al. (2022) for dollar pricing of exports in Latin American countries, we set θH∗ >
+0. We assume that the degree of price rigidity in dollar prices, like the price rigidity of
+domestic goods prices, corresponds to an average price reset frequency of 9 months, as
+is standard in the literature. This leads us to set θH = θH∗ = 0.66. We then find the
+wage stickiness parameter that is able to replicate the path of home good prices after the
+Mexican devaluation (see figure A.3).
+Monetary policy. We set the Taylor rule coefficient on expected inflation to a standard
+value of ϕ = 1.5. We calibrate the persistence in the monetary policy rule to ρm = 0.8,
+following estimates from Clarida et al. (2000).
+Delayed substitution model. We assume that our delayed substitution model applies
+equally to domestic and foreign households, with the same parameter θ. We calibrate
+the model to the evidence in Boehm, Levchenko and Pandalai-Nayar (2023) (henceforth,
+BLP). BLP identify plausibly exogenous changes in tariffs and trace out the entire dynamic
+response of trade flows. To be precise, BLP observe how a country A’s exports within an
+industry to a specific importing country B respond to a persistent increase in tariffs levied
+by B on imports from A. This elasticity captures γ, the elasticity of export demand by the
+rest of the world. Figure 7 plots the evidence from their estimates. The left panel shows
+the changes in tariffs. The right panel shows the response of trade flows.
+We replicate this experiment in our model as follows. We begin by setting γ to 4,
+delivering a long-run trade elasticity of 6, well within the consensus range for the long-
+term trade elasticity (e.g. Caliendo and Parro 2015). We then interpret the tariff change in
+the BLP data as a change in the relative price of home goods abroad d log P∗
+Ht, which we
+assume follows an AR(1) with persistenceρ. We choose ρ to minimize the sum of squared
+distances to the tariff response in the left panel in figure 7, findingρ = 0.989 quarterly. We
+then feed this process into (53) and (55) and calibrate θ to minimize the sum of squared
+distances to the estimates displayed in the right panel in figure 7. This delivers θ = 0.976
+quarterly, which implies a trade elasticity of 0.15 on impact, 0.3 after one quarter, and 0.7
+after one year.
+46We recalibrate to evidence from other countries in appendix D.5.
+39
+
+===== PAGE 40 =====
+
+Figure 7: Calibrating delayed substitution in the quantitative model
+0 10 20 30 40
+Quarters
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6Percent of s.s.
+Price of home goods abroad
+Data
+AR(1)
+0 10 20 30 40
+Quarters
+−1.5
+−1.0
+−0.5
+0.0
+0.5
+Export of home goods
+Data
+Fitted model
+Note: calibration of delayed substitution in the quantitative model. We fit an AR(1) to the change in tariffs from Boehm, Levchenko and
+Pandalai-Nayar (2023) and estimate θ to minimize the sum of squared residuals between the model response and the data response of
+the foreign demand for home goods.
+5.3 Revisiting contractionary depreciations
+We use our quantitative model to revisit the effect of exogenous depreciation shocks.
+Proposition 8 showed that, in the benchmark model, these shocks generate output con-
+tractions when the trade elasticity χ is small enough. Figure 8 shows that in our quanti-
+tative model with a Taylor rule (green line) depreciations are contractionary for one year,
+and then expansionary. This is because, in the short run, the quantitative model behaves
+similarly to a model with a low static trade elasticity. Over time, households respond
+to the depreciation by substituting away from foreign goods, and towards home goods.
+This stimulates net exports, and eventually output after 4 quarters. Thus in the medium
+to long run, the quantitative model behaves similarly to a model with a high static trade
+elasticity.47
+5.4 Managing contractionary depreciations
+Our analysis shows that depreciations can be contractionary in the short run. We now dis-
+cuss how monetary policy should respond if its goal is to stabilize output. The question
+is non-trivial, due to the following dilemma: should monetary policy hike interest rates
+to fight the depreciation, which is the root cause of the recession? Or should it stimulate
+by cutting interest rates, as is traditional to fight a recession? To illustrate this trade-off,
+we consider two simple policies.
+The red line in figure 9 shows what happens when the central bank stabilizes the ex-
+47Appendix D.8 shows that depreciations generate a boom in the quantitative model with a representa-
+tive agent.
+40

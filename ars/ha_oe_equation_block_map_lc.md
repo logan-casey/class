@@ -30,6 +30,9 @@ kappaw = phillips slope, depends on beta, :
     thetaw = Calvo prob
 muw = wage markdown
 
+**not calibrated directly
+chi = eta*(1-alpha) + gamma
+
 phi_pi = Taylor rule coefficient
 rhom = MP shock persistence
 
@@ -134,7 +137,8 @@ how did we get grids and SS anchors?
 why do we have so many targets?
 why do we not use so many equations involving cF, cH, pH, etc (eg the consumption aggregator)?
 in general, how does the model as currently written differ from the DAG plan you made?
-
+delayed substitution**
+does eq 50 matter?
 
 
 1. In implementation, equation (9) is the key HH dynamic block; (1) and most of portfolio detail become accounting identities unless you explicitly model endogenous portfolio composition.
