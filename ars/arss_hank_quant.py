@@ -430,25 +430,15 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
     # normalized IRF
     irf = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * scale * base}, outputs=outputs)
 
-    # get NX and NFA
-    Y = ss["Y"] + irf["Y"]
-    C = ss["C"] + irf["C"]
-    PH = ss["PH"] + irf["PH"]
-    P = ss["P"] + irf["P"]
-    nx = PH / P * Y - C
-    nx_ss = ss["PH"] / ss["P"] * ss["Y"] - ss["C"]
-    dnx = nx - nx_ss
-    dnfa = _linear_nfa_from_nx(dnx, calib["r_ss"])
-
-    # match axes
+    aux = _irf_aux_series({"ss": ss, "irf": irf, "calibration": calib})
     pct = {
-        "Y_pct": 100.0 * irf["Y"] / ss["Y"],
-        "C_pct": 100.0 * irf["C"] / ss["C"],
-        "Q_pct": 100.0 * irf["Q"] / ss["Q"],
-        "NX_pctY": 100.0 * dnx / ss["Y"],
-        "NFA_pctY": 100.0 * dnfa / ss["Y"],
-        "r_pp": 100.0 * irf["r"],
-        "i_pp": 100.0 * irf["i"],
+        "Y_pct": aux["Y_pct"],
+        "C_pct": aux["C_pct"],
+        "Q_pct": aux["Q_pct"],
+        "NX_pctY": aux["NX_pctY"],
+        "NFA_pctY": aux["NFA_pctY"],
+        "r_pp": aux["r_pp"],
+        "i_pp": aux["i_pp"],
     }
 
     return {
@@ -463,9 +453,10 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
 
 
 def _irf_aux_series(result):
-    """add IRF series not solved for directly"""
+    """Add IRF series not solved for directly"""
     ss = result["ss"]
     irf = result["irf"]
+    calib = result["calibration"]
 
     W = ss["W"] + irf["W"]
     P = ss["P"] + irf["P"]
@@ -483,7 +474,29 @@ def _irf_aux_series(result):
     dividends_ss = (ss["PH"] * ss["Y"] - ss["W"] * ss["Y"]) / ss["P"] + (ss["E"] * ss["PH_star"] - ss["PH"]) / ss["P"] * ss["CH_star"]
     dividends_pctY = 100.0 * (dividends - dividends_ss) / ss["Y"]
 
+    nx = PH / P * Y - (ss["C"] + irf["C"])
+    nx_ss = ss["PH"] / ss["P"] * ss["Y"] - ss["C"]
+    dnx = nx - nx_ss
+    dnfa = _linear_nfa_from_nx(dnx, calib["r_ss"])
+
+    Y_pct = 100.0 * irf["Y"] / ss["Y"]
+    C_pct = 100.0 * irf["C"] / ss["C"]
+    Q_pct = 100.0 * irf["Q"] / ss["Q"]
+    NX_pctY = 100.0 * dnx / ss["Y"]
+    NFA_pctY = 100.0 * dnfa / ss["Y"]
+    r_pp = 100.0 * irf["r"]
+    i_pp = 100.0 * irf["i"]
+
     return {
+        "dnx": dnx,
+        "dnfa": dnfa,
+        "Y_pct": Y_pct,
+        "C_pct": C_pct,
+        "Q_pct": Q_pct,
+        "NX_pctY": NX_pctY,
+        "NFA_pctY": NFA_pctY,
+        "r_pp": r_pp,
+        "i_pp": i_pp,
         "wage_income_pctY": wage_income_pctY,
         "dividends_pctY": dividends_pctY,
     }
