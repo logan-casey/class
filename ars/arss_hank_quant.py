@@ -148,6 +148,7 @@ def delayed_substitution(
     beta_star,
     theta_sub,
     C,
+    cbar,
     C_star,
     shareH_ss,
     shareH_star_ss,
@@ -162,7 +163,8 @@ def delayed_substitution(
     xH_star_target_res = (xH_star_hat / xH_star_ss).apply(np.log) + (1.0 - beta_star * theta_sub) * gamma * (PH_star / PH_star_ss).apply(np.log) - beta_star * theta_sub * (xH_star_hat(+1) / xH_star_ss).apply(np.log)
     shareH_res = (shareH / shareH_ss).apply(np.log) - (theta_sub * (shareH(-1) / shareH_ss).apply(np.log) + (1.0 - theta_sub) * (xH_hat / xH_ss).apply(np.log))
     shareH_star_res = (shareH_star / shareH_star_ss).apply(np.log) - (theta_sub * (shareH_star(-1) / shareH_star_ss).apply(np.log) + (1.0 - theta_sub) * (xH_star_hat / xH_star_ss).apply(np.log))
-    CH = shareH * C
+    # Stone-Geary (Eq. 47): home-good demand is proportional to discretionary consumption.
+    CH = shareH * (C - cbar)
     CH_star = shareH_star * C_star
     return xH_target_res, xH_star_target_res, shareH_res, shareH_star_res, CH, CH_star
 
@@ -208,7 +210,7 @@ def quantitative_calibration():
         "eta": 4.0,
         "gamma": 4.0,
         "theta_sub": 0.976,
-        "cbar": 0.085,  # (not directly needed)
+        "cbar": 0.085,
         "zeta": -0.196,
         # Pricing / markups
         "mu": 1.041,
@@ -307,8 +309,15 @@ def build_steady_state(model, hh_oe, calib):
     psi_labor = (calib["W_ss"] / (calib["mu_w"] * calib["P_ss"])) * (C_ss ** (-calib["sigma"])) / (calib["N_ss"] ** calib["phi_labor"])
 
     # Match average import share of 40% and goods-market clearing at Y_ss = 1.
-    shareH_ss = 0.60
-    CH_ss = shareH_ss * C_ss
+    C_tilde_ss = C_ss - calib["cbar"]
+    if C_tilde_ss <= 0:
+        raise ValueError(f"Need C_ss > cbar for Stone-Geary mapping, got C_ss={C_ss:.6f}, cbar={calib['cbar']:.6f}.")
+
+    CH_ss = 0.60 * C_ss
+    shareH_ss = CH_ss / C_tilde_ss
+    if shareH_ss <= 0 or shareH_ss >= 1:
+        raise ValueError(f"Implied shareH_ss must be in (0,1), got {shareH_ss:.6f}.")
+
     CH_star_ss = 1.0 - CH_ss
     shareH_star_ss = CH_star_ss / calib["C_star"]
     xH_ss = shareH_ss

@@ -107,7 +107,7 @@ extra:
 
 ### Quantitative equations (47)-(53)
 (47) Stone-Geary non-homothetic CES aggregator -- replaces (3)
-    not needed if we only solve for H/F aggregate
+    only needed in delayed_substitution to find CH
 (48) crazy labor shock formulation
     used as hetinputs to HH block
 (49) home goods Phillips curve piH_t
