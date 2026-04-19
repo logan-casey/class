@@ -99,6 +99,13 @@ def monetary_rule_taylor(i, pi, r_ss, eps_m, rho_m, phi_pi):
 
 
 @sj.simple
+def monetary_rule_q(r, i_star):
+    """rule (perfectly) stabilizing real exchange rate instead of inflation."""
+    mp_q_res = r - i_star
+    return mp_q_res
+
+
+@sj.simple
 def monetary_rule_const_r(i, r_ss, pi, eps_m):
     """Base-model policy rule with a constant real-rate anchor."""
     mp_res = i - (r_ss + pi(+1) + eps_m)
@@ -186,6 +193,13 @@ def union_wage_nkpc(piw, N, W, P, C, psi_labor, phi_labor, sigma, mu_w, kappa_w,
     return wnkpc
 
 
+@sj.simple
+def output_stabilization_target(Y, Y_ss):
+    """Policy target: keep output at steady state by adjusting r path."""
+    y_stab_res = Y - Y_ss
+    return y_stab_res
+
+
 # -----------------------------------------------------------------------------
 # Calibration and model builder
 # -----------------------------------------------------------------------------
@@ -226,6 +240,7 @@ def quantitative_calibration():
         # Monetary policy
         "rho_m": 0.8,
         "phi_pi": 1.5,
+        "phi_q": 1.5,
         "eps_m": 0.0,
         "r_ss": r_ss,
         # Productivity
@@ -244,6 +259,8 @@ def quantitative_calibration():
         "W_ss": 1.0 / 1.041,
         "P_ss": 1.0,
         "N_ss": 1.0,
+        "Q_ss": 1.0,
+        "Y_ss": 1.0,
         # Shock process (section 5.3)
         "rho_i_star": 0.85,
         "q0_target": 0.01,
@@ -254,13 +271,21 @@ def quantitative_calibration():
 def build_quant_model(policy_rule="taylor"):
     """Build the quantitative open-economy model.
 
-    policy_rule: "taylor" or "const_r"
+    policy_rule: "taylor", "taylor_q", "const_r", or "y_stab"
     """
-    if policy_rule not in {"taylor", "const_r"}:
-        raise ValueError(f"Unknown policy_rule='{policy_rule}'. Use 'taylor' or 'const_r'.")
+    if policy_rule not in {"taylor", "taylor_q", "const_r", "y_stab"}:
+        raise ValueError("Unknown policy_rule. Use 'taylor', 'taylor_q', 'const_r', or 'y_stab'.")
 
     hh_oe = build_household_block()
-    mp_block = monetary_rule_taylor if policy_rule == "taylor" else monetary_rule_const_r
+    if policy_rule == "taylor":
+        policy_block = monetary_rule_taylor
+    elif policy_rule == "taylor_q":
+        policy_block = monetary_rule_q
+    elif policy_rule == "const_r":
+        policy_block = monetary_rule_const_r
+    else:
+        policy_block = output_stabilization_target
+
     blocks = [
         hh_oe,
         production,
@@ -269,7 +294,7 @@ def build_quant_model(policy_rule="taylor"):
         price_index,
         inflation_defs,
         foreign_rate_block,
-        mp_block,
+        policy_block,
         fisher_equation,
         uip_real,
         piH_nkpc,
@@ -366,23 +391,32 @@ def _linear_nfa_from_nx(dnx, r_ss):
     return dnfa
 
 
-def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
+def solve_exchange_rate_irf(T=40, policy_rule="taylor", shock_scale=None):
     """Run section-5.3-style foreign-rate shock IRF, normalized to dQ0 = 1%.
 
-    policy_rule: "taylor" or "const_r"
+    policy_rule: "taylor", "taylor_q", "const_r", or "y_stab"
+    If shock_scale is provided, uses that common shock scale directly.
     """
     model, hh_oe = build_quant_model(policy_rule=policy_rule)
     calib = quantitative_calibration()
     ss = build_steady_state(model, hh_oe, calib)
 
     unknowns = ["Y", "W", "PH", "PH_star", "Q", "E", "i", "r", "xH_hat", "xH_star_hat", "shareH", "shareH_star"]
-    mp_target = "mp_taylor_res" if policy_rule == "taylor" else "mp_res"
+    if policy_rule == "taylor":
+        policy_target = "mp_taylor_res"
+    elif policy_rule == "taylor_q":
+        policy_target = "mp_q_res"
+    elif policy_rule == "const_r":
+        policy_target = "mp_res"
+    else:
+        policy_target = "y_stab_res"
+
     targets = [
         "goods_mkt",
         "wnkpc",
         "piH_res",
         "piH_star_res",
-        mp_target,
+        policy_target,
         "fisher_res",
         "uip_res",
         "xH_target_res",
@@ -420,12 +454,15 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
     rho = calib["rho_i_star"]
     base = rho ** np.arange(T)
 
-    # First pass for normalization.
-    irf_raw = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * base}, outputs=outputs)
-    q0 = float(irf_raw["Q"][0])
-    if np.isclose(q0, 0.0):
-        raise RuntimeError("Q impact is numerically zero; cannot normalize shock to target dQ0.")
-    scale = calib["q0_target"] / q0
+    if shock_scale is None:
+        # First pass for normalization.
+        irf_raw = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * base}, outputs=outputs)
+        q0 = float(irf_raw["Q"][0])
+        if np.isclose(q0, 0.0):
+            raise RuntimeError("Q impact is numerically zero; cannot normalize shock to target dQ0.")
+        scale = calib["q0_target"] / q0
+    else:
+        scale = float(shock_scale)
 
     # Final, normalized IRF.
     irf = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * scale * base}, outputs=outputs)
@@ -459,6 +496,19 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
         "derived": pct,
         "shock_scale": scale,
     }
+
+
+def solve_three_policy_irfs(T=200, normalize_on="taylor"):
+    """Solve IRFs under three policy scenarios using one common foreign shock."""
+    baseline = solve_exchange_rate_irf(T=T, policy_rule=normalize_on, shock_scale=None)
+    common_scale = baseline["shock_scale"]
+
+    scenarios = {
+        "taylor": solve_exchange_rate_irf(T=T, policy_rule="taylor", shock_scale=common_scale),
+        "q_rule": solve_exchange_rate_irf(T=T, policy_rule="taylor_q", shock_scale=common_scale),
+        "y_stab": solve_exchange_rate_irf(T=T, policy_rule="y_stab", shock_scale=common_scale),
+    }
+    return {"normalize_on": normalize_on, "shock_scale": common_scale, "results": scenarios}
 
 
 def _irf_aux_series(result):
@@ -575,24 +625,58 @@ def plot_policy_rule_comparison_figure(result_taylor, result_const_r, T_plot=32,
     return savepath
 
 
+def plot_three_policy_rqy_figure(experiment, T_plot=32, savepath="figures/ha_oe_quant_policy_rqy.png"):
+    """Plot r, Q, Y IRFs under Taylor, Q-rule, and output-stabilizing policy."""
+    import matplotlib.pyplot as plt
+
+    res_t = experiment["results"]["taylor"]["derived"]
+    res_q = experiment["results"]["q_rule"]["derived"]
+    res_y = experiment["results"]["y_stab"]["derived"]
+
+    T_plot = min(T_plot, len(res_t["Y_pct"]), len(res_q["Y_pct"]), len(res_y["Y_pct"]))
+    t = np.arange(T_plot)
+
+    series = [
+        ("r_pp", "Real interest rate", "Percentage points"),
+        ("Q_pct", "Real exchange rate", "Percent"),
+        ("Y_pct", "Output", "Percent of Yss"),
+    ]
+
+    colors = {
+        "Taylor": "#2F6B4F",
+        "Q-rule": "#C46A2E",
+        "Y-stabilizing": "#2E4F8C",
+    }
+
+    fig, axes = plt.subplots(1, 3, figsize=(12, 3.8), constrained_layout=True)
+
+    for ax, (key, title, ylabel) in zip(axes, series):
+        ax.plot(t, res_t[key][:T_plot], color=colors["Taylor"], lw=2.2, label="Taylor")
+        ax.plot(t, res_q[key][:T_plot], color=colors["Q-rule"], lw=2.0, ls="--", label="Q-rule")
+        ax.plot(t, res_y[key][:T_plot], color=colors["Y-stabilizing"], lw=2.0, ls="-.", label="Y-stabilizing")
+        ax.axhline(0.0, color="#666666", lw=0.8, alpha=0.6)
+        ax.set_title(title, fontsize=11)
+        ax.set_xlabel("Quarters")
+        ax.set_ylabel(ylabel)
+        ax.grid(alpha=0.25, lw=0.6)
+
+    axes[0].legend(frameon=False, fontsize=9)
+
+    savepath = Path(savepath)
+    savepath.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(savepath, dpi=220, bbox_inches="tight")
+    plt.close(fig)
+    return savepath
+
+
 if __name__ == "__main__":
-    out_taylor = solve_exchange_rate_irf(T=200, policy_rule="taylor")
-    out_const = solve_exchange_rate_irf(T=200, policy_rule="const_r")
+    exp = solve_three_policy_irfs(T=200, normalize_on="taylor")
+    fig_path = plot_three_policy_rqy_figure(exp, T_plot=32, savepath="figures/ha_oe_quant_policy_rqy.png")
 
-    d = out_taylor["derived"]
-    fig_single = plot_exchange_rate_irf_figure(out_taylor, T_plot=32, savepath="figures/ha_oe_quant_irf.png")
-    fig_compare = plot_policy_rule_comparison_figure(
-        out_taylor,
-        out_const,
-        T_plot=32,
-        savepath="figures/ha_oe_quant_irf_policy_compare.png",
-    )
-
-    print("Taylor shock scale:", out_taylor["shock_scale"])
-    print("Const-r shock scale:", out_const["shock_scale"])
-    print("Taylor Q impact (%):", d["Q_pct"][0])
-    print("Taylor Y first 8 qtrs (%):", np.round(d["Y_pct"][:8], 4))
-    print("Taylor C first 8 qtrs (%):", np.round(d["C_pct"][:8], 4))
-    print("Taylor NFA first 8 qtrs (% of Y):", np.round(d["NFA_pctY"][:8], 4))
-    print("Saved single-policy figure:", fig_single)
-    print("Saved comparison figure:", fig_compare)
+    d_t = exp["results"]["taylor"]["derived"]
+    d_q = exp["results"]["q_rule"]["derived"]
+    d_y = exp["results"]["y_stab"]["derived"]
+    print("Common shock scale:", exp["shock_scale"])
+    print("Impact Q (%): Taylor / Q-rule / Y-stab =", d_t["Q_pct"][0], d_q["Q_pct"][0], d_y["Q_pct"][0])
+    print("Impact Y (%): Taylor / Q-rule / Y-stab =", d_t["Y_pct"][0], d_q["Y_pct"][0], d_y["Y_pct"][0])
+    print("Saved policy comparison figure:", fig_path)
