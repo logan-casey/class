@@ -73,17 +73,11 @@ def import_price_pass_through(E):
 
 
 @sj.simple
-def law_of_one_price(PH, E):
-    """Eq. (17): P*_H = PH / E."""
+def foreign_demand_home_goods(PH, E, C_star, alpha, gamma):
+    """Eqs. (17)+(12): P*_H from LOP and foreign demand for home goods."""
     PH_star = PH / E
-    return PH_star
-
-
-@sj.simple
-def foreign_demand_home_goods(PH_star, C_star, alpha, gamma):
-    """Eq. (12) with P* normalized to 1."""
     CH_star = alpha * PH_star ** (-gamma) * C_star
-    return CH_star
+    return PH_star, CH_star
 
 
 @sj.simple
@@ -224,7 +218,6 @@ def build_base_model():
         production,
         home_price_flex,
         import_price_pass_through,
-        law_of_one_price,
         foreign_demand_home_goods,
         price_index,
         inflation_defs,
@@ -411,7 +404,7 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_bas
 
 
 if __name__ == "__main__":
-    out = solve_exchange_rate_irf(T=40)
+    out = solve_exchange_rate_irf(T=200)
     d = out["derived"]
     fig_path = plot_exchange_rate_irf_figure(out, T_plot=32, savepath="figures/ha_oe_base_irf.png")
 

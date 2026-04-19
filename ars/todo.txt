@@ -9,6 +9,9 @@ make slides.
 dot -Tpng figures\ha_oe_base_dag.dot -o figures\ha_oe_base_dag.png
 start figures\ha_oe_base_dag.png
 
+dot -Tpng figures\ha_oe_quant_dag.dot -o figures\ha_oe_quant_dag.png
+start figures\ha_oe_quant_dag.png
+
 
 
 

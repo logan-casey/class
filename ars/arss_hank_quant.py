@@ -511,7 +511,7 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_qua
 
 
 if __name__ == "__main__":
-    out = solve_exchange_rate_irf(T=120)
+    out = solve_exchange_rate_irf(T=200)
     d = out["derived"]
     fig_path = plot_exchange_rate_irf_figure(out, T_plot=32, savepath="figures/ha_oe_quant_irf.png")
     print("Shock scale:", out["shock_scale"])

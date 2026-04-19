@@ -117,7 +117,7 @@ extra:
 (51) home goods foreign Phillips curve
     simple: piHstar_nkpc (written as target)
 (52)-(53)-(54)-(55) delayed substitution (sticky consumption)
-    simple: xH_target_law, xHstar_target_law, delayed_substitution
+    simple: delayed_substitution (4 targets)
     see appendix D3
 
 ## 4) notes
