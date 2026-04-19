@@ -1,0 +1,279 @@
+\documentclass[notes,11pt, aspectratio=169]{beamer}
+
+\usepackage{pgfpages}
+% These slides also contain speaker notes. You can print just the slides,
+% just the notes, or both, depending on the setting below. Comment out the one
+% you want.
+\setbeameroption{hide notes} % Only slide
+%\setbeameroption{show only notes} % Only notes
+%\setbeameroption{show notes on second screen=right} % Both
+
+\usepackage{helvet}
+\usepackage[default]{lato}
+\usepackage{array}
+
+
+\usepackage{tikz}
+\usepackage{verbatim}
+\setbeamertemplate{note page}{\pagecolor{lightblue!5}\insertnote}
+\usetikzlibrary{positioning}
+\usetikzlibrary{snakes}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{matrix,shapes,arrows,fit,tikzmark}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{mathpazo}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{multimedia}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bbm}
+
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\E}{\mathbb{E}}
+% \newcommand{\I}{\mathbbm{1}}
+\newcommand{\I}{\mathbb{I}_i}
+
+\newcolumntype{d}[0]{D{.}{.}{5}}
+\newcolumntype{H}{>{\setbox0=\hbox\bgroup}c<{\egroup}@{}}
+
+\usepackage{changepage}
+\usepackage{appendixnumberbeamer}
+\newcommand{\beginbackup}{
+   \newcounter{framenumbervorappendix}
+   \setcounter{framenumbervorappendix}{\value{framenumber}}
+   \setbeamertemplate{footline}
+   {
+     \leavevmode%
+     \hbox{%
+       \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,right]{footlinecolor}%
+%         \insertframenumber  \hspace*{2ex} 
+       \end{beamercolorbox}}%
+     \vskip0pt%
+   }
+ }
+\newcommand{\backupend}{
+   \addtocounter{framenumbervorappendix}{-\value{framenumber}}
+   \addtocounter{framenumber}{\value{framenumbervorappendix}} 
+}
+
+
+\usepackage{graphicx}
+\usepackage[space]{grffile}
+\usepackage{booktabs}
+
+% These are my colors -- there are many like them, but these ones are mine.
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{red}{RGB}{213,94,0}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{green}{RGB}{15,158,115}
+
+\hypersetup{
+  colorlinks=false,
+  linkbordercolor = {white},
+  linkcolor = {blue}
+}
+
+
+%% I use a beige off white for my background
+\definecolor{MyBackground}{RGB}{255,253,218}
+
+%% Uncomment this if you want to change the background color to something else
+%\setbeamercolor{background canvas}{bg=MyBackground}
+
+%% Change the bg color to adjust your transition slide background color!
+\newenvironment{transitionframe}{
+  \setbeamercolor{background canvas}{bg=skyblue}
+  \begin{frame}}{
+    \end{frame}
+}
+
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{title}{fg=black}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{itemize items}{\textbullet}
+\setbeamercolor{itemize item}{fg=blue}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{enumerate item}{fg=blue}
+\setbeamercolor{enumerate subitem}{fg=blue}
+\setbeamercolor{button}{bg=MyBackground,fg=blue,}
+
+
+
+% If you like road maps, rather than having clutter at the top, have a roadmap show up at the end of each section 
+% (and after your introduction)
+% Uncomment this is if you want the roadmap!
+% \AtBeginSection[]
+% {
+%    \begin{frame}
+%        \frametitle{Roadmap of Talk}
+%        \tableofcontents[currentsection]
+%    \end{frame}
+% }
+\setbeamercolor{section in toc}{fg=blue}
+\setbeamercolor{subsection in toc}{fg=red}
+\setbeamersize{text margin left=1em,text margin right=1em} 
+
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+
+% \usepackage{environ}
+% \NewEnviron{videoframe}[1]{
+%   \begin{frame}
+%     \vspace{-8pt}
+%     \begin{columns}[onlytextwidth, T] % align columns
+%       \begin{column}{.58\textwidth}
+%         \begin{minipage}[t][\textheight][t]
+%           {\dimexpr\textwidth}
+%           \vspace{8pt}
+%           \hspace{4pt} {\Large \sc \textcolor{blue}{#1}}
+%           \vspace{8pt}
+          
+%           \BODY
+%         \end{minipage}
+%       \end{column}%
+%       \hfill%
+%       \begin{column}{.42\textwidth}
+%         \colorbox{green!20}{\begin{minipage}[t][1.2\textheight][t]
+%             {\dimexpr\textwidth}
+%             Face goes here
+%           \end{minipage}}
+%       \end{column}%
+%     \end{columns}
+%   \end{frame}
+% }
+
+
+
+\title[]{\textcolor{blue}{Exchange Rates and Monetary Policy with Heterogenous Agents:\\Sizing up the Real Income Channel\\(Auclert, Rognlie, Souchier, \& Straub, 2024 WP)}}
+%\author{Logan Casey}
+
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{What does this paper do?}
+\begin{wideitemize}
+\item Auclert, Rognlie, Straub-style HA model in open-economy setting
+\item Contractionary depreciations: two HA channels: real-income channel (import prices $\uparrow$ Y $\downarrow$) \textit{can} dominate Keynesian multiplier channel (foreign demand $\uparrow$ Y $\uparrow$)
+\begin{itemize}
+  \item These can together dominate RA-CM expenditure-switching channel (domestic home-goods demand $\uparrow$)
+\end{itemize}
+\item Quantitative model + calibration
+\end{wideitemize}
+\end{frame}
+
+
+\begin{frame}{Base model}
+\begin{wideitemize}
+\item Domestic households face idiosyncratic income shocks and borrowing constraint
+\item Households may hold domestic bond, foreign bond, domestic equity
+\item Wages are sticky
+\item IRFs to MIT shocks (perfect foresight, no aggregate uncertainty, etc.)
+\end{wideitemize}
+\end{frame}
+
+
+\begin{frame}{Base model: simplifications}
+\begin{wideitemize}
+\item No illiquid asset/adjustment friction
+\begin{itemize}
+  \item UIP holds, portfolio choice indeterminate
+\end{itemize}
+\item No need to model consumption bundles
+\item Rest-of-world is RA-CM-flexible price/wage (with patience/MP shock)
+\item<2-> No capital; no taxes, debt, or spending
+\item<2-> Producer-currency pricing (relaxed in appendix)
+\end{wideitemize}
+\end{frame}
+
+\begin{frame}{Solution method: SSJ}
+\begin{wideitemize}
+\item Solve for steady state (all residuals = 0)
+\item Compute sequence Jacobians (in background)
+\begin{itemize}
+  \item Must account for policy change, distribution change in HH block (as in PS2)
+\end{itemize}
+\item Solve for unknowns
+\item Here:
+\begin{itemize}
+  \item Unknowns: $\{Y_t, W_t, Q_t, E_t, i_t, r_t\}$
+  \item Targets: goods market clearing, NKPC, UIP, exchange rate, Fisher, MP equations
+\end{itemize}
+\end{wideitemize}
+\end{frame}
+
+
+\begin{frame}{Base Model DAG}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/ha_oe_base_dag.png}
+\end{frame}
+
+
+\begin{frame}{Quantitative extension}
+\begin{wideitemize}
+\item Delayed substitution -- consumers change consumption basket with Calvo probability
+\begin{itemize}
+  \item Low trade elasticity in short run, high in long run
+\end{itemize}
+\item Heterogenous labor shock incidence (like \enquote{Inequality and Aggregate Demand})
+\begin{itemize}
+  \item Poor more affected
+\end{itemize}
+\item Non-homothetic consumption (Stone-Geary)
+\begin{itemize}
+  \item Poor consume more imports
+\end{itemize}
+\item Sticky prices
+\end{wideitemize}
+\end{frame}
+
+
+\begin{frame}{Paper Figure 8: devaluation shock IRFs}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/figure8_original.png}
+\end{frame}
+
+\begin{frame}{Replication Figure 8: devaluation shock IRFs}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/ha_oe_quant_irf_policy_compare.png}
+\end{frame}
+
+\begin{frame}{Paper Figure 9: MP tradeoffs}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/figure9_original.png}
+\end{frame}
+
+\begin{frame}{Replication Figure 9: MP tradeoffs}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/ha_oe_quant_policy_rqy.png}
+\end{frame}
+
+\appendix
+\beginbackup
+
+\begin{frame}{Appendix: Quantitative Model DAG}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/ha_oe_quant_dag.png}
+\end{frame}
+
+\begin{frame}{Appendix: Base Model IRFs}
+  \centering
+  \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{../figures/ha_oe_base_irf.png}
+\end{frame}
+
+\backupend
+
+\end{document}

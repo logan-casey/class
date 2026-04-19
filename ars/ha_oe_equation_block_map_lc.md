@@ -132,19 +132,3 @@ quantitative modifications:
     heterogeneous labor income incidence
     price stickiness -- how do we deal with both
     delayed substitution (sticky consumption shares)
-
-
-is delayed substitution alright? is HH block hetinputs alright
-how did we get grids and SS anchors?
-why do we have so many targets?
-why do we not use so many equations involving cF, cH, pH, etc (eg the consumption aggregator)?
-in general, how does the model as currently written differ from the DAG plan you made?
-delayed substitution**
-does eq 50 matter?
-
-
-1. In implementation, equation (9) is the key HH dynamic block; (1) and most of portfolio detail become accounting identities unless you explicitly model endogenous portfolio composition.
-2. Treat forward-looking equations as residual blocks and solve with model-level unknowns/targets (as in `main_sec67`).
-3. Use equation switches:
-   - baseline demand: (3), baseline pricing: (14), policy: (19)
-   - quantitative extensions: replace with (47), (49)-(53), and optionally (20)

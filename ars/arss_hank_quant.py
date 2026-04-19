@@ -3,7 +3,7 @@ Exchange Rates and Monetary Policy with Heterogeneous Agents:
 Sizing up the Real Income Channel,
 by Auclert, Rognlie, Souchier, and Straub
 
-strategy: start with SSJ notebooks/IKC rep kit, translate equations into simple blocks
+strategy: start with SSJ notebooks + IKC rep kit, use built-in HH block, translate equations into simple blocks
 
 paper calibration, IRFs (to foreign interest-rate shock in sec 5.3 (AR(1), persistence 0.85, normalized to a 1% impact depreciation in Q)).
 """
@@ -19,17 +19,17 @@ from pathlib import Path
 # DEFINE MODEL BLOCKS
 # -----------------------------------------------------------------------------
 
-# Household block
+# Household problem
 
 def make_grids_oe(rho_e, sd_e, n_e, min_a, max_a, n_a):
-    """Rouwenhorst idiosyncratic income process + asset grid."""
+    """Rouwenhorst idiosyncratic income process + asset grid"""
     e_grid, pi_e, Pi = grids.markov_rouwenhorst(rho=rho_e, sigma=sd_e, N=n_e)
     a_grid = grids.asset_grid(min_a, max_a, n_a)
     return e_grid, pi_e, Pi, a_grid
 
 
 def income_incidence(W, P, N, e_grid, pi_e, zeta, W_ss, P_ss, N_ss):
-    """Eq. (48): heterogeneous labor-income incidence to aggregate labor income."""
+    """Eq. (48): heterogeneous labor-income incidence"""
     agg_ratio = (W / P * N) / (W_ss / P_ss * N_ss)
     expo = 1.0 + zeta * np.log(agg_ratio)
     num = e_grid ** expo
@@ -39,6 +39,9 @@ def income_incidence(W, P, N, e_grid, pi_e, zeta, W_ss, P_ss, N_ss):
 
 
 def build_household_block():
+    """Eq. (9): standard one-asset HH problem
+    Inputs: ['a_grid', 'y', 'r', 'beta', 'eis', 'Pi']
+    Macro outputs: ['A', 'C'] """
     hh = sj.hetblocks.hh_sim.hh
     hh_oe = hh.add_hetinputs([make_grids_oe, income_incidence])
     return hh_oe.rename("hh_oe")
@@ -48,7 +51,7 @@ def build_household_block():
 
 @sj.simple
 def production(Y):
-    """Eq. (13): Y = N."""
+    """Eq. (13): Y = N"""
     N = Y
     return N
 
@@ -62,7 +65,7 @@ def exchange_rate_identity(E, Q, P):
 
 @sj.simple
 def import_price_pass_through(E):
-    """Full pass-through for imports (theta_F = 0): PF = E."""
+    """(unnumbered bet 16-17): import passthrough (thetaF = 0), PF = E"""
     PF = E
     return PF
 
@@ -76,7 +79,7 @@ def price_index(PF, PH, alpha, eta):
 
 @sj.simple
 def inflation_defs(P, PH, PH_star, W):
-    """Inflation definitions for CPI, home prices, export prices, and wages."""
+    """Inflation definitions for extra PC blocks"""
     pi = P / P(-1) - 1.0
     piH = PH / PH(-1) - 1.0
     piH_star = PH_star / PH_star(-1) - 1.0
@@ -86,49 +89,49 @@ def inflation_defs(P, PH, PH_star, W):
 
 @sj.simple
 def foreign_rate_block(i_star):
-    """With P*=1 and no foreign inflation: r* = i*."""
+    """~Eq. (16): P*=1, no foreign inflation, r* = i*"""
     r_star = i_star
     return r_star
 
 
 @sj.simple
 def monetary_rule_taylor(i, pi, r_ss, eps_m, rho_m, phi_pi):
-    """Eq. (20): MP rule."""
+    """Eq. (20): MP Taylor rule"""
     mp_taylor_res = i - (rho_m * i(-1) + (1.0 - rho_m) * (r_ss + phi_pi * pi(+1)) + eps_m)
     return mp_taylor_res
 
 
 @sj.simple
 def monetary_rule_const_r(i, r_ss, pi, eps_m):
-    """Base-model policy rule with a constant real-rate anchor."""
+    """Eq. (19): Constant-r MP rule"""
     mp_res = i - (r_ss + pi(+1) + eps_m)
     return mp_res
 
 
 @sj.simple
 def fisher_equation(i, r, pi):
-    """(unnumbered, linearized) i = r - pi_{t+1}."""
+    """(unnumbered, linearized**) i = r - pi_{t+1}"""
     fisher_res = i - r - pi(+1)
     return fisher_res
 
 
 @sj.simple
 def uip_real(r, r_star, Q):
-    """Eq. (7): real UIP."""
+    """Eq. (7): real UIP"""
     uip_res = (1.0 + r) - (1.0 + r_star) * Q(+1) / Q
     return uip_res
 
 
 @sj.simple
 def piH_nkpc(piH, W, PH, Z, mu, kappa_H, r):
-    """Eq. (49): domestic-price Phillips curve."""
+    """Eq. (49): domestic-price Phillips"""
     piH_res = piH - (kappa_H * (mu * W / (Z * PH) - 1.0) + piH(+1) / (1.0 + r))
     return piH_res
 
 
 @sj.simple
 def piHstar_nkpc(piH_star, PH, E, PH_star, mu_H_star, kappa_H_star, r):
-    """Eq. (51): export-price Phillips curve."""
+    """Eq. (51): export-price Phillips"""
     piH_star_res = piH_star - (kappa_H_star * (mu_H_star * PH / (E * PH_star) - 1.0) + piH_star(+1) / (1.0 + r))
     return piH_star_res
 
@@ -158,7 +161,7 @@ def delayed_substitution(
     P_ss,
     PH_star_ss,
 ):
-    """Eqs. (52)-(55): targets and sluggish adjustment."""
+    """Eqs. (52)-(55): targets and sluggish adjustment"""
     xH_target_res = (xH_hat / xH_ss).apply(np.log) + (1.0 - beta * theta_sub) * eta * ((PH / P) / (PH_ss / P_ss)).apply(np.log) - beta * theta_sub * (xH_hat(+1) / xH_ss).apply(np.log)
     xH_star_target_res = (xH_star_hat / xH_star_ss).apply(np.log) + (1.0 - beta_star * theta_sub) * gamma * (PH_star / PH_star_ss).apply(np.log) - beta_star * theta_sub * (xH_star_hat(+1) / xH_star_ss).apply(np.log)
     shareH_res = (shareH / shareH_ss).apply(np.log) - (theta_sub * (shareH(-1) / shareH_ss).apply(np.log) + (1.0 - theta_sub) * (xH_hat / xH_ss).apply(np.log))
@@ -171,14 +174,14 @@ def delayed_substitution(
 
 @sj.simple
 def goods_market(CH, CH_star, Y):
-    """Eq. (21): goods market clearing."""
+    """Eq. (21): goods market clearing"""
     goods_mkt = CH + CH_star - Y
     return goods_mkt
 
 
 @sj.simple
 def union_wage_nkpc(piw, N, W, P, C, psi_labor, phi_labor, sigma, mu_w, kappa_w, beta):
-    """Eq. (18): wage Phillips curve."""
+    """Eq. (18): wage Phillips curve"""
     uprime = C ** (-sigma)
     vprime = psi_labor * N ** phi_labor
     rhs = kappa_w * (vprime / ((W / (mu_w * P)) * uprime) - 1.0) + beta * piw(+1)
@@ -191,7 +194,7 @@ def union_wage_nkpc(piw, N, W, P, C, psi_labor, phi_labor, sigma, mu_w, kappa_w,
 # -----------------------------------------------------------------------------
 
 def quantitative_calibration():
-    """Quarterly calibration from Table 2 + section 5.3 shock settings."""
+    """Calibration from Table 2 + section 5.3 shock settings"""
     beta_star = 0.990
     r_ss = 1.0 / beta_star - 1.0
 
@@ -252,8 +255,7 @@ def quantitative_calibration():
 
 
 def build_quant_model(policy_rule="taylor"):
-    """Build the quantitative open-economy model.
-
+    """Build the model
     policy_rule: "taylor" or "const_r"
     """
     if policy_rule not in {"taylor", "const_r"}:
@@ -283,7 +285,6 @@ def build_quant_model(policy_rule="taylor"):
 
 
 def build_steady_state(model, hh_oe, calib):
-    """Assemble a consistent steady state under the paper calibration."""
     hh_calib = {
         "rho_e": calib["rho_e"],
         "sd_e": calib["sd_e"],
@@ -357,7 +358,7 @@ def build_steady_state(model, hh_oe, calib):
 
 
 def _linear_nfa_from_nx(dnx, r_ss):
-    """Linearized Eq. (23) around nfa_ss = 0."""
+    """Linearized Eq. (23) around nfa_ss = 0"""
     T = len(dnx)
     dnfa = np.zeros(T)
     for t in range(T):
@@ -367,8 +368,7 @@ def _linear_nfa_from_nx(dnx, r_ss):
 
 
 def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
-    """Run section-5.3-style foreign-rate shock IRF, normalized to dQ0 = 1%.
-
+    """Run foreign-rate shock IRF, normalized to dQ0 = 1%.
     policy_rule: "taylor" or "const_r"
     """
     model, hh_oe = build_quant_model(policy_rule=policy_rule)
@@ -420,17 +420,17 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
     rho = calib["rho_i_star"]
     base = rho ** np.arange(T)
 
-    # First pass for normalization.
+    # pre-normalization
     irf_raw = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * base}, outputs=outputs)
     q0 = float(irf_raw["Q"][0])
     if np.isclose(q0, 0.0):
         raise RuntimeError("Q impact is numerically zero; cannot normalize shock to target dQ0.")
     scale = calib["q0_target"] / q0
 
-    # Final, normalized IRF.
+    # normalized IRF
     irf = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * scale * base}, outputs=outputs)
 
-    # Ex-post external accounts from levels.
+    # get NX and NFA
     Y = ss["Y"] + irf["Y"]
     C = ss["C"] + irf["C"]
     PH = ss["PH"] + irf["PH"]
@@ -440,6 +440,7 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
     dnx = nx - nx_ss
     dnfa = _linear_nfa_from_nx(dnx, calib["r_ss"])
 
+    # match axes
     pct = {
         "Y_pct": 100.0 * irf["Y"] / ss["Y"],
         "C_pct": 100.0 * irf["C"] / ss["C"],
@@ -462,7 +463,7 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
 
 
 def _irf_aux_series(result):
-    """Build auxiliary plotted series not stored in result['derived']."""
+    """add IRF series not solved for directly"""
     ss = result["ss"]
     irf = result["irf"]
 
@@ -489,7 +490,6 @@ def _irf_aux_series(result):
 
 
 def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_quant_irf.png"):
-    """Save a paper-style 8-panel IRF figure."""
     import matplotlib.pyplot as plt
 
     d = result["derived"]
@@ -528,7 +528,6 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_qua
 
 
 def plot_policy_rule_comparison_figure(result_taylor, result_const_r, T_plot=32, savepath="figures/ha_oe_quant_irf_policy_compare.png"):
-    """Save 8-panel IRFs overlaying Taylor vs constant-r rules."""
     import matplotlib.pyplot as plt
 
     d_t = result_taylor["derived"]
