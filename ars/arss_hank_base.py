@@ -160,20 +160,6 @@ def union_wage_nkpc(piw, N, W, P, C, psi_labor, phi_labor, sigma, mu_w, kappa_w,
     return wnkpc
 
 
-@sj.simple
-def external_accounts(PH, P, Y, C):
-    """Net exports in consumption units used in Eq. (23)."""
-    NX = PH / P * Y - C
-    return NX
-
-
-@sj.simple
-def dividends(PH, Y, W, N, P, E, PH_star, CH_star):
-    """Eq. (15): real dividends."""
-    Div = (PH * Y - W * N) / P + (E * PH_star - PH) / P * CH_star
-    return Div
-
-
 # -----------------------------------------------------------------------------
 # Calibration and assembly
 # -----------------------------------------------------------------------------
@@ -250,8 +236,6 @@ def build_base_model():
         hh_goods_split,
         goods_market,
         union_wage_nkpc,
-        external_accounts,
-        dividends,
     ]
     model = sj.create_model(blocks, name="HA_OE_Base")
     return model, hh_oe
@@ -334,10 +318,8 @@ def solve_exchange_rate_irf(T=40):
         "PH_star",
         "CH",
         "CH_star",
-        "NX",
         "pi",
         "piw",
-        "Div",
         "goods_mkt",
         "wnkpc",
     ]
@@ -352,13 +334,19 @@ def solve_exchange_rate_irf(T=40):
     scale = calib["q0_target"] / q0
 
     irf = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * scale * base}, outputs=outputs)
-    dnfa = _linear_nfa_from_nx(irf["NX"], calib["r_ss"])
+    # Ex-post external accounts from levels.
+    Y = ss["Y"] + irf["Y"]
+    C = ss["C"] + irf["C"]
+    PH = ss["PH"] + irf["PH"]
+    P = ss["P"] + irf["P"]
+    dnx = (PH / P * Y - C) - (ss["PH"] / ss["P"] * ss["Y"] - ss["C"])
+    dnfa = _linear_nfa_from_nx(dnx, calib["r_ss"])
 
     pct = {
         "Y_pct": 100.0 * irf["Y"] / ss["Y"],
         "C_pct": 100.0 * irf["C"] / ss["C"],
         "Q_pct": 100.0 * irf["Q"] / ss["Q"],
-        "NX_pctY": 100.0 * irf["NX"] / ss["Y"],
+        "NX_pctY": 100.0 * dnx / ss["Y"],
         "NFA_pctY": 100.0 * dnfa / ss["Y"],
         "r_pp": 100.0 * irf["r"],
         "i_pp": 100.0 * irf["i"],
@@ -386,7 +374,13 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_bas
     wage_income_ss = ss["W"] / ss["P"] * ss["Y"]
     wage_income_pctY = 100.0 * (wage_income - wage_income_ss) / ss["Y"]
 
-    dividends_pctY = 100.0 * irf["Div"] / ss["Y"]
+    E = ss["E"] + irf["E"]
+    PH = ss["PH"] + irf["PH"]
+    PH_star = ss["PH_star"] + irf["PH_star"]
+    CH_star = ss["CH_star"] + irf["CH_star"]
+    dividends = (PH * Y - W * Y) / P + (E * PH_star - PH) / P * CH_star
+    dividends_ss = (ss["PH"] * ss["Y"] - ss["W"] * ss["Y"]) / ss["P"] + (ss["E"] * ss["PH_star"] - ss["PH"]) / ss["P"] * ss["CH_star"]
+    dividends_pctY = 100.0 * (dividends - dividends_ss) / ss["Y"]
 
     series = [
         (d["Y_pct"][:T_plot], "Output", "Percent of Yss"),

@@ -100,7 +100,7 @@ eps = domestic MP shock
 (22) net foreing asset position def A_t, p_t -> nfa_t
     only used in IRFs
 (23) currrent account (nfa law of motion) -- note (PH/P)Y-C is net exports
-    only used in IRFs; NX in simple: external accounts
+    only used in IRFs
 extra:
     simple: inflation_defs
 

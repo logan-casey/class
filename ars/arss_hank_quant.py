@@ -5,14 +5,7 @@ by Auclert, Rognlie, Souchier, and Straub
 
 strategy: start with SSJ notebooks/IKC rep kit, translate equations into simple blocks
 
-paper calibration, IRFs (to foreign interest-rate shock in sec 5.3 (AR(1), persistence 0.85,
-normalized to a 1% impact depreciation in Q)).
-
-equations used:
-- (13), (18), (20), (21), (47)-(53)
-- UIP and Fisher relations from core model
-- (48) for het labor-income incidence in HH block
-- (23) to construct an NFA path from net exports
+paper calibration, IRFs (to foreign interest-rate shock in sec 5.3 (AR(1), persistence 0.85, normalized to a 1% impact depreciation in Q)).
 """
 
 from __future__ import annotations # recommended for performance
@@ -26,9 +19,7 @@ from pathlib import Path
 # DEFINE MODEL BLOCKS
 # -----------------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------
 # Household block
-# -----------------------------------------------------------------------------
 
 def make_grids_oe(rho_e, sd_e, n_e, min_a, max_a, n_a):
     """Rouwenhorst idiosyncratic income process + asset grid."""
@@ -53,10 +44,7 @@ def build_household_block():
     return hh_oe.rename("hh_oe")
 
 
-# -----------------------------------------------------------------------------
 # Simple blocks
-# -----------------------------------------------------------------------------
-
 
 @sj.simple
 def production(Y):
@@ -146,27 +134,37 @@ def piHstar_nkpc(piH_star, PH, E, PH_star, mu_H_star, kappa_H_star, r):
 
 
 @sj.simple
-def xH_target_law(xH_hat, PH, P, eta, beta, theta_sub, xH_ss, PH_ss, P_ss):
-    """Eq. (52): target domestic share in log-deviations from steady state."""
+def delayed_substitution(
+    shareH,
+    shareH_star,
+    xH_hat,
+    xH_star_hat,
+    PH,
+    P,
+    PH_star,
+    eta,
+    gamma,
+    beta,
+    beta_star,
+    theta_sub,
+    C,
+    C_star,
+    shareH_ss,
+    shareH_star_ss,
+    xH_ss,
+    xH_star_ss,
+    PH_ss,
+    P_ss,
+    PH_star_ss,
+):
+    """Eqs. (52)-(55): targets and sluggish adjustment in one block."""
     xH_target_res = (xH_hat / xH_ss).apply(np.log) + (1.0 - beta * theta_sub) * eta * ((PH / P) / (PH_ss / P_ss)).apply(np.log) - beta * theta_sub * (xH_hat(+1) / xH_ss).apply(np.log)
-    return xH_target_res
-
-
-@sj.simple
-def xHstar_target_law(xH_star_hat, PH_star, gamma, beta_star, theta_sub, xH_star_ss, PH_star_ss):
-    """Eq. (53): target foreign home-good share in log-deviations from steady state."""
     xH_star_target_res = (xH_star_hat / xH_star_ss).apply(np.log) + (1.0 - beta_star * theta_sub) * gamma * (PH_star / PH_star_ss).apply(np.log) - beta_star * theta_sub * (xH_star_hat(+1) / xH_star_ss).apply(np.log)
-    return xH_star_target_res
-
-
-@sj.simple
-def delayed_substitution(shareH, shareH_star, xH_hat, xH_star_hat, theta_sub, C, C_star, shareH_ss, shareH_star_ss, xH_ss, xH_star_ss):
-    """Eq. (54)-(55): sluggish adjustment of actual shares in log-deviations."""
     shareH_res = (shareH / shareH_ss).apply(np.log) - (theta_sub * (shareH(-1) / shareH_ss).apply(np.log) + (1.0 - theta_sub) * (xH_hat / xH_ss).apply(np.log))
     shareH_star_res = (shareH_star / shareH_star_ss).apply(np.log) - (theta_sub * (shareH_star(-1) / shareH_star_ss).apply(np.log) + (1.0 - theta_sub) * (xH_star_hat / xH_star_ss).apply(np.log))
     CH = shareH * C
     CH_star = shareH_star * C_star
-    return shareH_res, shareH_star_res, CH, CH_star
+    return xH_target_res, xH_star_target_res, shareH_res, shareH_star_res, CH, CH_star
 
 
 @sj.simple
@@ -186,72 +184,9 @@ def union_wage_nkpc(piw, N, W, P, C, psi_labor, phi_labor, sigma, mu_w, kappa_w,
     return wnkpc
 
 
-@sj.simple
-def external_accounts(PH, P, Y, C):
-    """Eq. (23) trade-balance component: NX = PH/P * Y - C."""
-    NX = PH / P * Y - C
-    return NX
-
-
 # -----------------------------------------------------------------------------
 # Calibration and model builder
 # -----------------------------------------------------------------------------
-
-def base_calibration():
-    """Quarterly calibration from Table 2 + section 5.3 shock settings."""
-    beta_star = 0.990
-    r_ss = 1.0 / beta_star - 1.0
-
-    theta_w = 0.938
-    theta_H = 0
-    theta_H_star = 0
-    alpha = 0.4
-
-    calib = {
-        # Preferences / demand
-        "sigma": 1.0,
-        "eis": 1.0,
-        "phi_labor": 2.0,
-        "beta": 0.965,
-        "beta_star": beta_star,
-        "alpha": alpha,
-        "eta": 1/(2-alpha), # varies ...
-        "gamma": 1/(2-alpha),
-        "cbar": 0,  # (not directly needed)
-        # Pricing / markups
-        "mu": 1.043,
-        # Phillips curve coefficients
-        "theta_w": theta_w,
-        "theta_H": theta_H,
-        "theta_H_star": theta_H_star,
-        "kappa_w": (1.0 - 0.962 * theta_w) * (1.0 - theta_w) / theta_w,
-        "kappa_H": (1.0 - theta_H) * (1.0 - theta_H / (1.0 + r_ss)) / theta_H,
-        "kappa_H_star": (1.0 - theta_H_star) * (1.0 - theta_H_star / (1.0 + r_ss)) / theta_H_star,
-        # Monetary policy
-        "eps_m": 0.0,
-        "r_ss": r_ss,
-        # Productivity
-        "Z": 1.0,
-        # Foreign block normalization
-        "C_star": 1.0,
-        # Idiosyncratic earnings process
-        "rho_e": 0.912,
-        "sd_e": 0.883,
-        "n_e": 7,
-        # Asset grid
-        "min_a": 0.0,
-        "max_a": 1000.0,
-        "n_a": 250,
-        # Steady-state anchors
-        "W_ss": 1.0 / 1.041,
-        "P_ss": 1.0,
-        "N_ss": 1.0,
-        # Shock process (section 5.3)
-        "rho_i_star": 0.85,
-        "q0_target": 0.01,
-    }
-    return calib
-
 
 def quantitative_calibration():
     """Quarterly calibration from Table 2 + section 5.3 shock settings."""
@@ -314,7 +249,7 @@ def quantitative_calibration():
     return calib
 
 
-def build_quant_model(policy_rule="const_r"):
+def build_quant_model(policy_rule="taylor"):
     """Build the quantitative open-economy model.
 
     policy_rule: "taylor" or "const_r"
@@ -337,12 +272,9 @@ def build_quant_model(policy_rule="const_r"):
         uip_real,
         piH_nkpc,
         piHstar_nkpc,
-        xH_target_law,
-        xHstar_target_law,
         delayed_substitution,
         goods_market,
         union_wage_nkpc,
-        external_accounts,
     ]
     model = sj.create_model(blocks, name=f"HA_OE_Quant_{policy_rule}")
     return model, hh_oe
@@ -464,7 +396,6 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
         "PH_star",
         "CH",
         "CH_star",
-        "NX",
         "shareH",
         "shareH_star",
         "xH_hat",
@@ -490,14 +421,21 @@ def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
     # Final, normalized IRF.
     irf = model.solve_impulse_linear(ss, unknowns, targets, {"i_star": 1e-4 * scale * base}, outputs=outputs)
 
-    # Ex-post NFA path from linearized current account identity.
-    dnfa = _linear_nfa_from_nx(irf["NX"], calib["r_ss"])
+    # Ex-post external accounts from levels.
+    Y = ss["Y"] + irf["Y"]
+    C = ss["C"] + irf["C"]
+    PH = ss["PH"] + irf["PH"]
+    P = ss["P"] + irf["P"]
+    nx = PH / P * Y - C
+    nx_ss = ss["PH"] / ss["P"] * ss["Y"] - ss["C"]
+    dnx = nx - nx_ss
+    dnfa = _linear_nfa_from_nx(dnx, calib["r_ss"])
 
     pct = {
         "Y_pct": 100.0 * irf["Y"] / ss["Y"],
         "C_pct": 100.0 * irf["C"] / ss["C"],
         "Q_pct": 100.0 * irf["Q"] / ss["Q"],
-        "NX_pctY": 100.0 * irf["NX"] / ss["Y"],
+        "NX_pctY": 100.0 * dnx / ss["Y"],
         "NFA_pctY": 100.0 * dnfa / ss["Y"],
         "r_pp": 100.0 * irf["r"],
         "i_pp": 100.0 * irf["i"],
@@ -573,7 +511,7 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_qua
 
 
 if __name__ == "__main__":
-    out = solve_exchange_rate_irf(T=40)
+    out = solve_exchange_rate_irf(T=120)
     d = out["derived"]
     fig_path = plot_exchange_rate_irf_figure(out, T_plot=32, savepath="figures/ha_oe_quant_irf.png")
     print("Shock scale:", out["shock_scale"])

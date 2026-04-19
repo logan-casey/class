@@ -1,0 +1,50 @@
+
+combine figure.
+
+check for more tables, figs.
+check interpretation.
+make slides.
+
+
+dot -Tpng figures\ha_oe_base_dag.dot -o figures\ha_oe_base_dag.png
+start figures\ha_oe_base_dag.png
+
+
+
+
+Use a “minimal closed system” workflow:
+
+1. Define the exact experiment first.  
+For you: Figure 2 vs Figure 8, shock process, policy rule, price-stickiness regime.
+
+2. Classify all paper equations into roles.  
+- Behavioral equilibrium conditions  
+- Accounting/definitions  
+- Normalizations  
+- Calibration/moment targets  
+- Optional extensions (for example delayed substitution, non-homotheticity)
+
+3. Pick one regime per mechanism, not both.  
+Examples:  
+- `PH* = PH/E` (flexible export pricing) or export NKPC, not both.  
+- Static foreign demand Eq. 12 or delayed-substitution Eq. 53–55 closure for that margin, not both.
+
+4. Build unknowns/targets so dimensions match.  
+In SSJ, dynamic unknown count must equal dynamic target count. Extra equations usually mean overdetermination or duplicated mechanisms.
+
+5. Keep identities as outputs unless needed for closure.  
+Things like inflation definitions, dividends, NFA accounting are often diagnostics, not solve targets.
+
+6. Ensure approximation consistency.  
+If MP is linear/net, Fisher should also be linear/net (or both gross). Mixed conventions create drift and false dynamics.
+
+7. Separate calibration from equilibrium conditions.  
+Some paper equations are used to pin parameters/SS anchors, not as dynamic residual equations.
+
+8. Add modules incrementally and re-test IRFs after each.  
+Base core first, then delayed substitution, then incidence, then non-homothetic demand. Compare shape/magnitude after each addition.
+
+9. Use a DAG sanity pass each time.  
+Check each endogenous variable has one path of determination and no circular duplication beyond intended forward-looking structure.
+
+That process is usually how you decide which equations from the full paper list belong in the implemented model versus notes/diagnostics/calibration.
