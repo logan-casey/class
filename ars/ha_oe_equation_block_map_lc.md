@@ -84,7 +84,7 @@ eps = domestic MP shock
 (14) pricing constant markup mu, W_t -> PH_t -- relaxed?
     not needed; only Phillips
 (15) dividends (profits) d_t
-    only needed for IRFs
+    can include but only needed for IRFs
 (16) foreign MP rule (constant Pstar_t, PstarF_t, Cstar) istar_t, rstar_t --(varies with beta shock) -- is PstarH not constant then?
     simple: foreign rate block
 (unnumbered) PF = E
@@ -117,7 +117,8 @@ extra:
 (51) home goods foreign Phillips curve
     simple: piHstar_nkpc (written as target)
 (52)-(53)-(54)-(55) delayed substitution (sticky consumption)
-    simple: xH_target_law, xHstar_target_law, delayed_substitution***
+    simple: xH_target_law, xHstar_target_law, delayed_substitution
+    see appendix D3
 
 ## 4) notes
 

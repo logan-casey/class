@@ -111,6 +111,13 @@ def monetary_rule_taylor(i, pi, r_ss, eps_m, rho_m, phi_pi):
 
 
 @sj.simple
+def monetary_rule_const_r(i, r_ss, pi, eps_m):
+    """Base-model policy rule with a constant real-rate anchor."""
+    mp_res = i - (r_ss + pi(+1) + eps_m)
+    return mp_res
+
+
+@sj.simple
 def fisher_equation(i, r, pi):
     """(unnumbered, linearized) i = r - pi_{t+1}."""
     fisher_res = i - r - pi(+1)
@@ -139,24 +146,24 @@ def piHstar_nkpc(piH_star, PH, E, PH_star, mu_H_star, kappa_H_star, r):
 
 
 @sj.simple
-def xH_target_law(xH_hat, PH, P, eta, beta, theta_sub):
-    """Eq. (52): target domestic share dynamics."""
-    xH_target_res = (xH_hat / xH_hat(-1)).apply(np.log) + (1.0 - beta * theta_sub) * eta * ((PH / P) / (PH(-1) / P(-1))).apply(np.log) - beta * theta_sub * (xH_hat(+1) / xH_hat).apply(np.log)
+def xH_target_law(xH_hat, PH, P, eta, beta, theta_sub, xH_ss, PH_ss, P_ss):
+    """Eq. (52): target domestic share in log-deviations from steady state."""
+    xH_target_res = (xH_hat / xH_ss).apply(np.log) + (1.0 - beta * theta_sub) * eta * ((PH / P) / (PH_ss / P_ss)).apply(np.log) - beta * theta_sub * (xH_hat(+1) / xH_ss).apply(np.log)
     return xH_target_res
 
 
 @sj.simple
-def xHstar_target_law(xH_star_hat, PH_star, gamma, beta_star, theta_sub):
-    """Eq. (53): target foreign demand dynamics."""
-    xH_star_target_res = (xH_star_hat / xH_star_hat(-1)).apply(np.log) + (1.0 - beta_star * theta_sub) * gamma * (PH_star / PH_star(-1)).apply(np.log) - beta_star * theta_sub * (xH_star_hat(+1) / xH_star_hat).apply(np.log)
+def xHstar_target_law(xH_star_hat, PH_star, gamma, beta_star, theta_sub, xH_star_ss, PH_star_ss):
+    """Eq. (53): target foreign home-good share in log-deviations from steady state."""
+    xH_star_target_res = (xH_star_hat / xH_star_ss).apply(np.log) + (1.0 - beta_star * theta_sub) * gamma * (PH_star / PH_star_ss).apply(np.log) - beta_star * theta_sub * (xH_star_hat(+1) / xH_star_ss).apply(np.log)
     return xH_star_target_res
 
 
 @sj.simple
-def delayed_substitution(shareH, shareH_star, xH_hat, xH_star_hat, theta_sub, C, C_star):
-    """Eq. (54)-(55)-style sluggish adjustment of actual shares toward targets."""
-    shareH_res = shareH.apply(np.log) - (theta_sub * shareH(-1).apply(np.log) + (1.0 - theta_sub) * xH_hat.apply(np.log))
-    shareH_star_res = shareH_star.apply(np.log) - (theta_sub * shareH_star(-1).apply(np.log) + (1.0 - theta_sub) * xH_star_hat.apply(np.log))
+def delayed_substitution(shareH, shareH_star, xH_hat, xH_star_hat, theta_sub, C, C_star, shareH_ss, shareH_star_ss, xH_ss, xH_star_ss):
+    """Eq. (54)-(55): sluggish adjustment of actual shares in log-deviations."""
+    shareH_res = (shareH / shareH_ss).apply(np.log) - (theta_sub * (shareH(-1) / shareH_ss).apply(np.log) + (1.0 - theta_sub) * (xH_hat / xH_ss).apply(np.log))
+    shareH_star_res = (shareH_star / shareH_star_ss).apply(np.log) - (theta_sub * (shareH_star(-1) / shareH_star_ss).apply(np.log) + (1.0 - theta_sub) * (xH_star_hat / xH_star_ss).apply(np.log))
     CH = shareH * C
     CH_star = shareH_star * C_star
     return shareH_res, shareH_star_res, CH, CH_star
@@ -307,9 +314,16 @@ def quantitative_calibration():
     return calib
 
 
-def build_quant_model():
-    """Build the quantitative open-economy model."""
+def build_quant_model(policy_rule="const_r"):
+    """Build the quantitative open-economy model.
+
+    policy_rule: "taylor" or "const_r"
+    """
+    if policy_rule not in {"taylor", "const_r"}:
+        raise ValueError(f"Unknown policy_rule='{policy_rule}'. Use 'taylor' or 'const_r'.")
+
     hh_oe = build_household_block()
+    mp_block = monetary_rule_taylor if policy_rule == "taylor" else monetary_rule_const_r
     blocks = [
         hh_oe,
         production,
@@ -318,7 +332,7 @@ def build_quant_model():
         price_index,
         inflation_defs,
         foreign_rate_block,
-        monetary_rule_taylor,
+        mp_block,
         fisher_equation,
         uip_real,
         piH_nkpc,
@@ -330,7 +344,7 @@ def build_quant_model():
         union_wage_nkpc,
         external_accounts,
     ]
-    model = sj.create_model(blocks, name="HA_OE_Quant")
+    model = sj.create_model(blocks, name=f"HA_OE_Quant_{policy_rule}")
     return model, hh_oe
 
 
@@ -362,7 +376,11 @@ def build_steady_state(model, hh_oe, calib):
 
     # Match average import share of 40% and goods-market clearing at Y_ss = 1.
     shareH_ss = 0.60
-    shareH_star_ss = 1.0 - shareH_ss * C_ss
+    CH_ss = shareH_ss * C_ss
+    CH_star_ss = 1.0 - CH_ss
+    shareH_star_ss = CH_star_ss / calib["C_star"]
+    xH_ss = shareH_ss
+    xH_star_ss = shareH_star_ss
 
     ss_guess = {
         **calib,
@@ -381,6 +399,12 @@ def build_steady_state(model, hh_oe, calib):
         "xH_star_hat": shareH_star_ss,
         "shareH": shareH_ss,
         "shareH_star": shareH_star_ss,
+        "xH_ss": xH_ss,
+        "xH_star_ss": xH_star_ss,
+        "shareH_ss": shareH_ss,
+        "shareH_star_ss": shareH_star_ss,
+        "PH_ss": 1.0,
+        "PH_star_ss": 1.0,
     }
     ss = model.steady_state(ss_guess)
     return ss
@@ -401,19 +425,23 @@ def _linear_nfa_from_nx(dnx, r_ss):
     return dnfa
 
 
-def solve_exchange_rate_irf(T=40):
-    """Run the section-5.3-style foreign-rate shock IRF, normalized to dQ0 = 1%."""
-    model, hh_oe = build_quant_model()
+def solve_exchange_rate_irf(T=40, policy_rule="taylor"):
+    """Run section-5.3-style foreign-rate shock IRF, normalized to dQ0 = 1%.
+
+    policy_rule: "taylor" or "const_r"
+    """
+    model, hh_oe = build_quant_model(policy_rule=policy_rule)
     calib = quantitative_calibration()
     ss = build_steady_state(model, hh_oe, calib)
 
     unknowns = ["Y", "W", "PH", "PH_star", "Q", "E", "i", "r", "xH_hat", "xH_star_hat", "shareH", "shareH_star"]
+    mp_target = "mp_taylor_res" if policy_rule == "taylor" else "mp_res"
     targets = [
         "goods_mkt",
         "wnkpc",
         "piH_res",
         "piH_star_res",
-        "mp_taylor_res",
+        mp_target,
         "fisher_res",
         "uip_res",
         "xH_target_res",
@@ -475,7 +503,15 @@ def solve_exchange_rate_irf(T=40):
         "i_pp": 100.0 * irf["i"],
     }
 
-    return {"model": model, "calibration": calib, "ss": ss, "irf": irf, "derived": pct, "shock_scale": scale}
+    return {
+        "model": model,
+        "policy_rule": policy_rule,
+        "calibration": calib,
+        "ss": ss,
+        "irf": irf,
+        "derived": pct,
+        "shock_scale": scale,
+    }
 
 
 def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_quant_irf.png"):
