@@ -1,0 +1,254 @@
+
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb,scrextend,mathtools}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[mathscr]{euscript}
+\let\euscr\mathscr \let\mathscr\relax
+\usepackage[scr]{rsfso}
+\usepackage{multicol}
+\usepackage[colorlinks=true,pdfstartview=FitV,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\pagestyle{fancy}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\let\ds\displaystyle
+\newcommand{\cont}{\subseteq}
+\newcommand{\un}{\cup}
+\newcommand{\inter}{\cap}
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\E}{\mathbb{E}}
+
+\begin{document}
+
+\lhead{PhD Macro: Replication Exercise}
+\chead{Logan Casey}
+\rhead{\today}
+
+\tableofcontents
+\newpage
+
+\section{Paper Overview}
+\subsection{What Does This Paper Do?}
+\begin{itemize}
+  \item Auclert-Rognlie-Straub style heterogeneous-agent model in an open-economy setting.
+  \item Contractionary depreciations can arise when the real-income channel (import prices up, output down) dominates the Keynesian multiplier channel (foreign demand up, output up).
+  \item These heterogeneous-agent channels can jointly dominate the representative-agent complete-markets expenditure-switching channel.
+  \item The paper delivers a calibrated quantitative model and policy counterfactuals.
+\end{itemize}
+
+\section{Base Model}
+\subsection{Core Ingredients}
+\begin{itemize}
+  \item Domestic households face idiosyncratic income shocks and a borrowing constraint.
+  \item Households can hold a domestic bond, foreign bond, and domestic equity.
+  \item Wages are sticky.
+  \item Impulse responses are computed to MIT shocks under perfect foresight.
+\end{itemize}
+
+\subsection{Simplifications}
+\begin{itemize}
+  \item No illiquid asset or adjustment friction, so UIP holds and portfolio choice is indeterminate.
+  \item No need to model consumption bundles in the base setup.
+  \item Rest of world is representative-agent complete-markets with flexible prices and wages.
+  \item No capital, taxes, debt, or government spending in the base setup.
+  \item Producer-currency pricing in the baseline (relaxed in the appendix of the slide deck).
+\end{itemize}
+
+\subsection{Solution Method (SSJ)}
+\begin{itemize}
+  \item Solve for a steady state where all residuals are zero.
+  \item Compute sequence-space Jacobians, including policy and distribution responses in the household block.
+  \item Solve for unknown aggregate paths that satisfy equilibrium targets.
+\end{itemize}
+
+\noindent Unknowns:
+\[
+\{Y_t,\;W_t,\;Q_t,\;E_t,\;i_t,\;r_t\}
+\]
+
+\noindent Targets:
+\[
+\text{goods market clearing,\ NKPC,\ UIP,\ exchange rate identity,\ Fisher equation,\ MP rule}
+\]
+
+\subsection{Base Model DAG}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_base_dag.png}
+  \caption{Base model DAG}
+\end{figure}
+
+\clearpage
+\section{Quantitative Extension}
+\begin{itemize}
+  \item Delayed substitution: consumers adjust consumption baskets with Calvo-style probability.
+  \item Heterogeneous labor-shock incidence, with larger impacts on poorer households.
+  \item Non-homothetic (Stone-Geary) consumption where poorer households consume more imports.
+  \item Sticky prices in the quantitative extension.
+\end{itemize}
+
+\subsection{Figure 8: Devaluation Shock IRFs}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/figure8_original.png}
+  \caption{Paper Figure 8 (original)}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/ha_oe_quant_irf_policy_compare.png}
+  \caption{Replication Figure 8}
+\end{figure}
+
+\clearpage
+\subsection{Figure 9: Monetary Policy Tradeoffs}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/figure9_original.png}
+  \caption{Paper Figure 9 (original)}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/ha_oe_quant_policy_rqy.png}
+  \caption{Replication Figure 9}
+\end{figure}
+
+\clearpage
+\section{Equations and Block-Map Notes}
+\subsection{Equilibrium Objects}
+Given sequences of rest-of-world discount shocks $\{B_t\}$, monetary shocks $\{\varepsilon_t\}$, and initial wealth distribution $D^i_0(s,B_H,B_F,e)$, equilibrium is a path of:
+\begin{itemize}
+  \item Policies $\{c^H_{i,t}(a',e), c^F_{i,t}(a',e), c_{i,t}(a',e), a_{i,t+1}(a',e)\}$.
+  \item Distributions $D_{i,t}(a',e)$.
+  \item Prices $\{E_t,Q_t,P_t,P^H_t,P^F_t,W_t,r_t,i_t\}$.
+  \item Aggregate quantities $\{C_t,C^H_t,C^F_t,Y_t,A_t,p_t,d_t,nfa_t\}$.
+\end{itemize}
+such that households optimize, distributions evolve consistently, firms optimize, and domestic goods markets clear.
+
+\subsection{Steady State}
+\begin{itemize}
+  \item Zero net foreign assets.
+  \item Zero inflation.
+  \item Normalize prices, output, and consumption to one.
+\end{itemize}
+
+\subsection{Parameters}
+\begin{itemize}
+  \item $\beta$: discount factor.
+  \item $\sigma$: inverse EIS.
+  \item $\phi_{labor}$: inverse Frisch elasticity.
+  \item $\eta$: home/foreign goods elasticity.
+  \item $\alpha$: openness/home bias.
+  \item $\psi$: labor-supply scaling parameter.
+  \item $\kappa_w$: wage Phillips slope, depends on $\beta$, $\theta_w$ (Calvo probability), and $\mu_w$ (wage markdown).
+  \item Not calibrated directly: $\chi=\eta(1-\alpha)+\gamma$; with $\gamma=\eta$, $\chi=\eta(2-\alpha)$.
+  \item $\phi_{\pi}$: Taylor-rule inflation coefficient.
+  \item $\rho_m$: monetary-shock persistence.
+  \item $\underline{c}$: subsistence consumption level.
+  \item $\zeta$: labor-incidence parameter in the quantitative extension.
+  \item $\mu$: markup.
+  \item $\theta_H$, $\kappa_H$: home-goods Calvo parameter and Phillips slope.
+  \item Foreign-sector $\theta$ and $\kappa$ analogs for foreign goods and home exports.
+  \item $\theta_{sub}$: consumption-reallocation (delayed-substitution) parameter.
+\end{itemize}
+
+\subsection{Base Equations (1)--(23): Mapping Notes}
+\begin{itemize}
+  \item (1), (2): household value and utility setup (handled inside the household block).
+  \item (3): CES aggregator replaced by Stone-Geary form in quantitative version.
+  \item (4): price index block (\texttt{price\_index}).
+  \item (5): nominal return equalization not used directly in this simplified map.
+  \item (6): real exchange-rate identity (\texttt{exchange\_rate\_identity} target residual).
+  \item Fisher equation uses an adjusted form to match constant-$r$ policy setup.
+  \item (7): real UIP (\texttt{uip\_real} target residual).
+  \item (8): real asset-position bookkeeping is implicit in household aggregation.
+  \item (9): one-asset household Bellman system (implemented in SSJ household routines).
+  \item (10)--(11): policy mapping from total consumption to home/foreign components not solved as separate aggregate unknowns in the simplified map.
+  \item (12): foreign demand block simplified when solving at aggregate H/F level.
+  \item (13): production $Y_t=N_t$ (\texttt{production}).
+  \item (14): static markup pricing omitted when Phillips blocks are used instead.
+  \item (15): dividends/profits useful for IRF accounting.
+  \item (16): foreign monetary block with discount-shock variation in rest-of-world rates.
+  \item Import price pass-through uses $P^F_t=E_t$ in the PCP baseline.
+  \item (17): loop for export pricing under PCP not solved as a separate aggregate target in this map.
+  \item (18): wage Phillips curve (\texttt{union\_wage\_nkpc} target residual).
+  \item (19)--(20): monetary policy rule (\texttt{monetary\_rule\_taylor} target residual).
+  \item (21): domestic goods market clearing (\texttt{goods\_market} target residual).
+  \item (22): net foreign asset definition for IRF accounting.
+  \item (23): current-account law of motion for IRF accounting.
+  \item Additional helper block: inflation definitions.
+\end{itemize}
+
+\subsection{Quantitative Equations (47)--(53): Mapping Notes}
+\begin{itemize}
+  \item (47): Stone-Geary non-homothetic CES aggregator replaces base equation (3).
+  \item (48): heterogeneous labor-shock incidence enters as household inputs.
+  \item (49): home-goods Phillips curve (\texttt{piH\_nkpc} target residual).
+  \item (50): foreign-goods Phillips curve (inactive in paper calibration when $\theta_F=0$).
+  \item (51): home-goods-foreign Phillips curve (\texttt{piHstar\_nkpc} target residual).
+  \item (52)--(55): delayed substitution system (\texttt{delayed\_substitution} with four targets), appendix D3.
+\end{itemize}
+
+\subsection{Additional Notes}
+\begin{itemize}
+  \item Portfolio choice is indeterminate in the one-asset setup.
+  \item Rest of world is representative-agent with an exogenous patience shock.
+  \item PCP baseline with no foreign price rigidity.
+  \item No government spending, taxation, or debt in the core setup.
+  \item Main solution emphasizes aggregate outcomes, with quantitative add-ons for distributional channels.
+\end{itemize}
+
+\clearpage
+\section{Code Listing}
+The model implementation can be read directly from the source file below.
+
+\lstinputlisting[
+  language=Python,
+  caption={\texttt{arss\_hank\_quant.py}},
+  label={lst:arss_hank_quant}
+]{../arss_hank_quant.py}
+
+\appendix
+\section{Appendix Figures}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_quant_dag.png}
+  \caption{Quantitative model DAG}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_base_irf.png}
+  \caption{Base model IRFs}
+\end{figure}
+
+\end{document}

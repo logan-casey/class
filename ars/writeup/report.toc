@@ -1,0 +1,19 @@
+\contentsline {section}{\numberline {1}Paper Overview}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}What Does This Paper Do?}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Base Model}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Core Ingredients}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Simplifications}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Solution Method (SSJ)}{2}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Base Model DAG}{3}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Quantitative Extension}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Figure 8: Devaluation Shock IRFs}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Figure 9: Monetary Policy Tradeoffs}{6}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Equations and Block-Map Notes}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Equilibrium Objects}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Steady State}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Parameters}{7}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Base Equations (1)--(23): Mapping Notes}{8}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Quantitative Equations (47)--(53): Mapping Notes}{9}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Additional Notes}{9}{subsection.4.6}%
+\contentsline {section}{\numberline {5}Code Listing}{10}{section.5}%
+\contentsline {section}{\numberline {A}Appendix Figures}{22}{appendix.A}%
