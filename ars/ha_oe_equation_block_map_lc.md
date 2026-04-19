@@ -32,6 +32,7 @@ muw = wage markdown
 
 **not calibrated directly
 chi = eta*(1-alpha) + gamma
+    with gamma = eta, chi = eta*(2-alpha)
 
 phi_pi = Taylor rule coefficient
 rhom = MP shock persistence
@@ -64,7 +65,7 @@ eps = domestic MP shock
     not needed (real instead)
 (6) real exchange rate E_t, Pstar_t, P_t -> Q_t
     simple: exchange_rate_identity (target residual)
-(unnumbered) Fisher eqs
+(unnumbered) Fisher eqs -- altered to match constant-r MP rule
     simple: fisher_equation (written as target)
 (7) real UIP + equalization with stock return
     simple: uip_real (target residual)

@@ -112,8 +112,8 @@ def monetary_rule_taylor(i, pi, r_ss, eps_m, rho_m, phi_pi):
 
 @sj.simple
 def fisher_equation(i, r, pi):
-    """Definition: 1+i = (1+r)(1+pi(+1))."""
-    fisher_res = 1.0 + i - (1.0 + r) * (1.0 + pi(+1))
+    """(unnumbered, linearized) i = r - pi_{t+1}."""
+    fisher_res = i - r - pi(+1)
     return fisher_res
 
 

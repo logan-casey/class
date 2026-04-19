@@ -124,8 +124,8 @@ def monetary_rule_const_r(i, r_ss, pi, eps_m):
 
 @sj.simple
 def fisher_equation(i, r, pi):
-    """1 + i = (1 + r)(1 + pi_{t+1})."""
-    fisher_res = 1.0 + i - (1.0 + r) * (1.0 + pi(+1))
+    """(unnumbered, linearized) i = r - pi_{t+1}."""
+    fisher_res = i - r - pi(+1)
     return fisher_res
 
 
@@ -184,7 +184,8 @@ def base_calibration():
     beta_star = 0.990
     r_ss = 1.0 / beta_star - 1.0
     alpha = 0.4
-    eta = 0.1 / (2-alpha)
+    chi = 1
+    eta = chi / (2-alpha)
 
     theta_w = 0.938
     beta = 0.965
