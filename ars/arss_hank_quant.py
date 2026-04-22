@@ -521,16 +521,28 @@ def plot_exchange_rate_irf_figure(result, T_plot=32, savepath="figures/ha_oe_qua
         (d["Q_pct"][:T_plot], "Real exchange rate", "Percent"),
         (d["r_pp"][:T_plot], "Real interest rate", "Percentage points"),
     ]
+    y_lims = [
+        (-0.15, 0.2),
+        (-0.25, 0.1),
+        (-0.6, 0.2),
+        (-2.5, 0.05),
+        (-0.8, 0.2),
+        (-0.05, 0.5),
+        (-0.1, 1.2),
+        (-0.02, 0.04),
+    ]
 
     fig, axes = plt.subplots(2, 4, figsize=(14, 7), constrained_layout=True)
     axes = axes.ravel()
 
-    for ax, (y, title, ylabel) in zip(axes, series):
+    for ax, (y, title, ylabel), (ymin, ymax) in zip(axes, series, y_lims):
         ax.plot(t, y, color="#2F6B4F", lw=2.2)
         ax.axhline(0.0, color="#666666", lw=0.8, alpha=0.6)
         ax.set_title(title, fontsize=11)
         ax.set_xlabel("Quarters")
         ax.set_ylabel(ylabel)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(ymin, ymax)
         ax.grid(alpha=0.25, lw=0.6)
 
     savepath = Path(savepath)
@@ -565,17 +577,29 @@ def plot_policy_rule_comparison_figure(result_taylor, result_const_r, T_plot=32,
         (d_t["Q_pct"][:T_plot], d_c["Q_pct"][:T_plot], "Real exchange rate", "Percent"),
         (d_t["r_pp"][:T_plot], d_c["r_pp"][:T_plot], "Real interest rate", "Percentage points"),
     ]
+    y_lims = [
+        (-0.15, 0.2),
+        (-0.25, 0.1),
+        (-0.6, 0.2),
+        (-2.5, 0.05),
+        (-0.8, 0.2),
+        (-0.05, 0.5),
+        (-0.1, 1.2),
+        (-0.02, 0.04),
+    ]
 
     fig, axes = plt.subplots(2, 4, figsize=(14, 7), constrained_layout=True)
     axes = axes.ravel()
 
-    for i, (ax, (y_t, y_c, title, ylabel)) in enumerate(zip(axes, series)):
+    for i, (ax, (y_t, y_c, title, ylabel), (ymin, ymax)) in enumerate(zip(axes, series, y_lims)):
         ax.plot(t, y_t, color="#2F6B4F", lw=2.2, label="Taylor")
         ax.plot(t, y_c, color="#C46A2E", lw=2.0, ls="--", label="Const r")
         ax.axhline(0.0, color="#666666", lw=0.8, alpha=0.6)
         ax.set_title(title, fontsize=11)
         ax.set_xlabel("Quarters")
         ax.set_ylabel(ylabel)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(ymin, ymax)
         ax.grid(alpha=0.25, lw=0.6)
         if i == 0:
             ax.legend(frameon=False, fontsize=9)

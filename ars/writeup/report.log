@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  19 APR 2026 15:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  21 APR 2026 14:45
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -734,7 +734,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/ha_oe_base_dag.png, id=114, 2864.7025pt x 893.3375pt>
 File: ../figures/ha_oe_base_dag.png Graphic file (type png)
 <use ../figures/ha_oe_base_dag.png>
-Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 105.
+Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 106.
 (pdftex.def)             Requested size: 469.72684pt x 146.48103pt.
 
 
@@ -748,12 +748,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/figure8_original.png, id=125, 583.17876pt x 298.61563pt>
 File: ../figures/figure8_original.png Graphic file (type png)
 <use ../figures/figure8_original.png>
-Package pdftex.def Info: ../figures/figure8_original.png  used on input line 121.
+Package pdftex.def Info: ../figures/figure8_original.png  used on input line 122.
 (pdftex.def)             Requested size: 469.76492pt x 240.54228pt.
 <../figures/ha_oe_quant_irf_policy_compare.png, id=126, 1019.9925pt x 514.1025pt>
 File: ../figures/ha_oe_quant_irf_policy_compare.png Graphic file (type png)
 <use ../figures/ha_oe_quant_irf_policy_compare.png>
-Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on input line 127.
+Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on input line 128.
 (pdftex.def)             Requested size: 469.76254pt x 236.77242pt.
 
 
@@ -780,12 +780,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/figure9_original.png, id=139, 584.68437pt x 224.84pt>
 File: ../figures/figure9_original.png Graphic file (type png)
 <use ../figures/figure9_original.png>
-Package pdftex.def Info: ../figures/figure9_original.png  used on input line 135.
+Package pdftex.def Info: ../figures/figure9_original.png  used on input line 136.
 (pdftex.def)             Requested size: 469.77332pt x 180.65102pt.
 <../figures/ha_oe_quant_policy_rqy.png, id=140, 875.4525pt x 282.8385pt>
 File: ../figures/ha_oe_quant_policy_rqy.png Graphic file (type png)
 <use ../figures/ha_oe_quant_policy_rqy.png>
-Package pdftex.def Info: ../figures/ha_oe_quant_policy_rqy.png  used on input line 141.
+Package pdftex.def Info: ../figures/ha_oe_quant_policy_rqy.png  used on input line 142.
 (pdftex.def)             Requested size: 469.7584pt x 151.7681pt.
 
 
@@ -826,7 +826,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [9] (C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 238.
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 239.
  (../arss_hank_quant.py
 Overfull \hbox (35.34404pt too wide) in paragraph at lines 18--19
 [][][][] 
@@ -956,12 +956,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/ha_oe_quant_dag.png, id=803, 2776.3725pt x 991.705pt>
 File: ../figures/ha_oe_quant_dag.png Graphic file (type png)
 <use ../figures/ha_oe_quant_dag.png>
-Package pdftex.def Info: ../figures/ha_oe_quant_dag.png  used on input line 244.
+Package pdftex.def Info: ../figures/ha_oe_quant_dag.png  used on input line 245.
 (pdftex.def)             Requested size: 469.7318pt x 167.78561pt.
 <../figures/ha_oe_base_irf.png, id=804, 1019.9925pt x 514.1025pt>
 File: ../figures/ha_oe_base_irf.png Graphic file (type png)
 <use ../figures/ha_oe_base_irf.png>
-Package pdftex.def Info: ../figures/ha_oe_base_irf.png  used on input line 250.
+Package pdftex.def Info: ../figures/ha_oe_base_irf.png  used on input line 251.
 (pdftex.def)             Requested size: 469.76254pt x 236.77242pt.
 
 
@@ -999,7 +999,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  108i,12n,107p,593b,2330s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\logan\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on report.pdf (23 pages, 1606744 bytes).
+Output written on report.pdf (23 pages, 1606825 bytes).
 PDF statistics:
  1024 PDF objects out of 1200 (max. 8388607)
  662 named destinations out of 1000 (max. 500000)

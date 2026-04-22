@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1776638573.96672 "c:/Users/logan/Documents/GitHub/class/ars/writeup/report.tex" "report.pdf" "report" 1776638580.61507 0
+["pdflatex"] 1776807929.37364 "c:/Users/logan/Documents/GitHub/class/ars/writeup/report.tex" "report.pdf" "report" 1776807932.73471 0
   "../arss_hank_quant.py" 1776637580 19664 66f239930ef81da513aa6c63a5d2161c ""
   "../figures/figure8_original.png" 1776628957 111869 eba9eacc354932bf433ebcfd33b2e13c ""
   "../figures/figure9_original.png" 1776628988 90188 d75ee12ad1f22d3e6be7711bc71f8b19 ""
@@ -179,11 +179,11 @@
   "C:/Users/logan/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/logan/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "C:/Users/logan/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1656236919 4937 4ce600ce9bd4ec84d0250eb6892fcf4f ""
-  "c:/Users/logan/Documents/GitHub/class/ars/writeup/report.tex" 1776638566 10380 69696ca478dc23e0bae912291cdcada6 ""
-  "report.aux" 1776638580 3722 cfbaabcee1d470143c0589055e547a78 "pdflatex"
-  "report.out" 1776638580 3164 ddc612ff68207cc1fbbfd7b187b93484 "pdflatex"
-  "report.tex" 1776638566 10380 69696ca478dc23e0bae912291cdcada6 ""
-  "report.toc" 1776638580 1601 6e3b907aa1906918464a1668bd4003e1 "pdflatex"
+  "c:/Users/logan/Documents/GitHub/class/ars/writeup/report.tex" 1776807928 10417 77a55e2a2f16338267af694974e6a701 ""
+  "report.aux" 1776807932 3722 cfbaabcee1d470143c0589055e547a78 "pdflatex"
+  "report.out" 1776807932 3164 ddc612ff68207cc1fbbfd7b187b93484 "pdflatex"
+  "report.tex" 1776807928 10417 77a55e2a2f16338267af694974e6a701 ""
+  "report.toc" 1776807932 1601 6e3b907aa1906918464a1668bd4003e1 "pdflatex"
   (generated)
   "report.aux"
   "report.log"

@@ -94,6 +94,22 @@ twoway ///
     title("Participation Rates by Asset Class (Kernel Smoothed)")
 graph export "participation_by_asset_percentile.png", replace width(2400)
 
+twoway ///
+    (line sh_hold_safe_assets p_asset, lcolor(navy) lwidth(medthick)) ///
+    (line sh_hold_vehicles p_asset, lcolor(maroon) lwidth(medthick)) ///
+    (line sh_hold_real_estate p_asset, lcolor(green) lwidth(medthick)) ///
+    (line sh_hold_public_equity p_asset, lcolor(orange) lwidth(medthick)) ///
+    (line sh_hold_private_business p_asset, lcolor(brown) lwidth(medthick)) ///
+    (line sh_hold_bonds p_asset, lcolor(gs6) lwidth(medthick)), ///
+    xlabel(0(10)100, labsize(small)) ///
+    ylabel(0(.2)1, format(%3.1f) angle(horizontal) labsize(small)) ///
+    xtitle("Percentile of distribution of total assets") ///
+    ytitle("Share with holdings") ///
+    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds") position(6) ring(1) rows(1)) ///
+    title("Participation Rates by Asset Class (Raw)")
+graph export "participation_by_asset_percentile_raw.png", replace width(2400)
+
+
 restore
 
 ** FIGURE 3: Asset class shares in portfolios (x-axis = p_asset)
@@ -152,5 +168,21 @@ twoway ///
     legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds") position(6) ring(1) rows(1)) ///
     title("Asset Class Shares in Household Portfolios (Kernel Smoothed)")
 graph export "portfolio_shares_by_asset_percentile.png", replace width(2400)
+
+twoway ///
+    (line sh_safe_assets p_asset, lcolor(navy) lwidth(medthick)) ///
+    (line sh_vehicles p_asset, lcolor(maroon) lwidth(medthick)) ///
+    (line sh_real_estate p_asset, lcolor(green) lwidth(medthick)) ///
+    (line sh_public_equity p_asset, lcolor(orange) lwidth(medthick)) ///
+    (line sh_private_business p_asset, lcolor(brown) lwidth(medthick)) ///
+    (line sh_bonds p_asset, lcolor(gs6) lwidth(medthick)), ///
+    xlabel(0(10)100, labsize(small)) ///
+    ylabel(0(20)100, angle(horizontal) labsize(small)) ///
+    xtitle("Percentile of distribution of total assets") ///
+    ytitle("Share of total assets (%)") ///
+    legend(order(1 "Safe assets" 2 "Vehicles" 3 "Real estate" 4 "Public equity" 5 "Private business" 6 "Bonds") position(6) ring(1) rows(1)) ///
+    title("Asset Class Shares in Household Portfolios (Raw)")
+graph export "portfolio_shares_by_asset_percentile_raw.png", replace width(2400)
+
 
 restore
