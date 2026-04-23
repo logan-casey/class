@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  22 APR 2026 17:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  22 APR 2026 17:30
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -754,7 +754,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [3]
-Overfull \hbox (49.3315pt too wide) in paragraph at lines 124--125
+Overfull \hbox (49.3315pt too wide) in paragraph at lines 128--129
 []\OT1/cmr/m/n/12 Household het-ero-gene-ity is han-dled with SSJ's built-in one-asset block (\OT1/cmtt/m/n/12 sj.hetblocks.hh[]sim.hh\OT1/cmr/m/n/12 ),
  []
 
@@ -771,10 +771,10 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/ha_oe_base_dag.png, id=113, 2864.7025pt x 893.3375pt>
 File: ../figures/ha_oe_base_dag.png Graphic file (type png)
 <use ../figures/ha_oe_base_dag.png>
-Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 138.
+Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 142.
 (pdftex.def)             Requested size: 469.72684pt x 146.48103pt.
 
-Overfull \hbox (423.9899pt too wide) detected at line 149
+Overfull \hbox (423.9899pt too wide) detected at line 153
 []
  []
 
@@ -789,12 +789,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <../figures/figure8_original.png, id=126, 583.17876pt x 298.61563pt>
 File: ../figures/figure8_original.png Graphic file (type png)
 <use ../figures/figure8_original.png>
-Package pdftex.def Info: ../figures/figure8_original.png  used on input line 163.
+Package pdftex.def Info: ../figures/figure8_original.png  used on input line 167.
 (pdftex.def)             Requested size: 469.76492pt x 240.54228pt.
 <../figures/ha_oe_quant_irf_policy_compare.png, id=127, 1019.9925pt x 514.1025pt>
 File: ../figures/ha_oe_quant_irf_policy_compare.png Graphic file (type png)
 <use ../figures/ha_oe_quant_irf_policy_compare.png>
-Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on input line 169.
+Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on input line 173.
 (pdftex.def)             Requested size: 469.76254pt x 236.77242pt.
 
 
@@ -804,4 +804,249 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancy
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[6 <../figures/figure8_original.png>]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[7 <../figures/ha_oe_quant_irf_policy_compare.png>]
+<../figures/figure9_original.png, id=141, 584.68437pt x 224.84pt>
+File: ../figures/figure9_original.png Graphic file (type png)
+<use ../figures/figure9_original.png>
+Package pdftex.def Info: ../figures/figure9_original.png  used on input line 182.
+(pdftex.def)             Requested size: 469.77332pt x 180.65102pt.
+<../figures/ha_oe_quant_policy_rqy.png, id=142, 875.4525pt x 282.8385pt>
+File: ../figures/ha_oe_quant_policy_rqy.png Graphic file (type png)
+<use ../figures/ha_oe_quant_policy_rqy.png>
+Package pdftex.def Info: ../figures/ha_oe_quant_policy_rqy.png  used on input line 188.
+(pdftex.def)             Requested size: 469.7584pt x 151.7681pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[8
+
+ <../figures/figure9_original.png> <../figures/ha_oe_quant_policy_rqy.png>]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[9]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[10
+
+]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[11]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[12] (C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+File: lstlang1.sty 2025/11/14 1.11b listings language file
+)
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 292.
+ (../arss_hank_quant.py
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 18--19
+[][][][] 
+ []
+
+
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 20--22
+[][][][] 
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[13
+
+]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[14]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[15]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[16]
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 192--193
+[][][][] 
+ []
+
+
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 194--196
+[][][][] 
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[17]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[18]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[19]
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 355--356
+[][][][] 
+ []
+
+
+Overfull \hbox (35.34404pt too wide) in paragraph at lines 357--360
+[][][][] 
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[20]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[21]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[22]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[23]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[24])
+<../figures/ha_oe_quant_dag.png, id=808, 2776.3725pt x 991.705pt>
+File: ../figures/ha_oe_quant_dag.png Graphic file (type png)
+<use ../figures/ha_oe_quant_dag.png>
+Package pdftex.def Info: ../figures/ha_oe_quant_dag.png  used on input line 296.
+(pdftex.def)             Requested size: 469.7318pt x 167.78561pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[25]
+<../figures/ha_oe_base_irf.png, id=860, 1019.9925pt x 514.1025pt>
+File: ../figures/ha_oe_base_irf.png Graphic file (type png)
+<use ../figures/ha_oe_base_irf.png>
+Package pdftex.def Info: ../figures/ha_oe_base_irf.png  used on input line 302.
+(pdftex.def)             Requested size: 469.76254pt x 236.77242pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[26 <../figures/ha_oe_quant_dag.png> <../figures/ha_oe_base_irf.png>] (report.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+ ***********
+Package rerunfilecheck Info: File `report.out' has not changed.
+(rerunfilecheck)             Checksum: 652862DC0E57BAB6A363A5F41081DA9D;2416.
+ ) 
+Here is how much of TeX's memory you used:
+ 26256 strings out of 467871
+ 474771 string characters out of 5418376
+ 1521742 words of memory out of 5000000
+ 54033 multiletter control sequences out of 15000+600000
+ 634558 words of font info for 66 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 108i,12n,107p,1115b,2357s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\logan\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on report.pdf (26 pages, 1613912 bytes).
+PDF statistics:
+ 1057 PDF objects out of 1200 (max. 8388607)
+ 691 named destinations out of 1000 (max. 500000)
+ 176 words of extra memory for PDF output out of 10000 (max. 10000000)
+

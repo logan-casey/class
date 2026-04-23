@@ -1,0 +1,21 @@
+\contentsline {section}{\numberline {1}Paper overview}{2}{section.1}%
+\contentsline {paragraph}{Motivation}{2}{section*.2}%
+\contentsline {paragraph}{Economic mechanisms}{2}{section*.3}%
+\contentsline {section}{\numberline {2}Model overview}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Base model}{2}{subsection.2.1}%
+\contentsline {paragraph}{Simplifications/tractability}{3}{section*.4}%
+\contentsline {paragraph}{Equilibrium}{3}{section*.5}%
+\contentsline {subsection}{\numberline {2.2}Quantitative model}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Solution outline}{4}{subsection.2.3}%
+\contentsline {paragraph}{More details}{5}{section*.6}%
+\contentsline {section}{\numberline {3}Replication}{6}{section.3}%
+\contentsline {section}{\numberline {4}Lessons from replication}{8}{section.4}%
+\contentsline {section}{\numberline {A}Equations and mapping notes}{10}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}Equilibrium Objects}{10}{subsection.A.1}%
+\contentsline {subsection}{\numberline {A.2}Steady State}{10}{subsection.A.2}%
+\contentsline {subsection}{\numberline {A.3}Parameters}{10}{subsection.A.3}%
+\contentsline {subsection}{\numberline {A.4}Base Equations (1)--(23): Mapping Notes}{11}{subsection.A.4}%
+\contentsline {subsection}{\numberline {A.5}Quantitative Equations (47)--(53): Mapping Notes}{12}{subsection.A.5}%
+\contentsline {subsection}{\numberline {A.6}Additional Notes}{12}{subsection.A.6}%
+\contentsline {section}{\numberline {B}Code}{13}{appendix.B}%
+\contentsline {section}{\numberline {C}Additional figures}{26}{appendix.C}%

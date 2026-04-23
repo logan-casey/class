@@ -52,6 +52,10 @@
 \lhead{PhD Macro: Replication Exercise}
 \chead{Logan Casey}
 \rhead{\today}
+\begin{center}
+\textbf{
+{\large Replication of\\\enquote{Exchange Rates and Monetary Policy with Heterogeneous Agents: Sizing up the Real Income Channel,}\\Auclert, Rognlie, Souchier, Straub (2024 WP)}}
+\end{center}
 
 \tableofcontents
 \newpage
@@ -196,6 +200,7 @@ I use a horizon length of 300. Horizons below 100 or so can make the results har
 The most important coding lesson was that, in this case, the final model in the code is simpler than the one in the paper (which is much easier than guessing at omitted equations). Minimizing the number of unknowns and targets made replication easier, and this was facilitated by the SSJ package's built in DAG display commands.
 
 \clearpage
+\appendix
 \section{Equations and mapping notes}
 This section contains a slightly cleaned-up version of the notes I took on the paper -- almost all the information needed to create the code is here (and in the actual equations).
 \subsection{Equilibrium Objects}
@@ -285,11 +290,7 @@ such that households optimize, distributions evolve consistently, firms optimize
 \section{Code}
 The quantitative model, calibration, solution, and IRF code are in the script below:
 \lstinputlisting[language=Python]{../arss_hank_quant.py}
-
-
-
-\appendix
-\section{Appendix}
+\section{Additional figures}
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_quant_dag.png}
