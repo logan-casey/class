@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  21 APR 2026 18:39
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.19)  22 APR 2026 16:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1008,11 +1008,9 @@ LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <8> not available
 (Font)              Font shape `OT1/phv/m/sl' tried instead on input line 173.
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <6> not available
 (Font)              Font shape `OT1/phv/m/sl' tried instead on input line 173.
-LaTeX Font Info:    Font shape `OT1/lato-TLF/m/it' will be
-(Font)              scaled to size 10.95pt on input line 173.
  [2
 
-{C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lato/a_rt66h3.enc}{C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lato/a_vc7epu.enc}] [3
+{C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lato/a_rt66h3.enc}] [3
 
 ]
 LaTeX Font Info:    Font shape `OT1/lato-TLF/m/n' will be
@@ -1039,7 +1037,7 @@ LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <7.6> not available
  [6
 
 {C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
-<../figures/ha_oe_base_dag.png, id=54, 2864.7025pt x 893.3375pt>
+<../figures/ha_oe_base_dag.png, id=53, 2864.7025pt x 893.3375pt>
 File: ../figures/ha_oe_base_dag.png Graphic file (type png)
 <use ../figures/ha_oe_base_dag.png>
 Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 219.
@@ -1049,7 +1047,7 @@ Package pdftex.def Info: ../figures/ha_oe_base_dag.png  used on input line 219.
  <../figures/ha_oe_base_dag.png>] [8
 
 ]
-<../figures/figure8_original.png, id=68, 583.17876pt x 298.61563pt>
+<../figures/figure8_original.png, id=67, 583.17876pt x 298.61563pt>
 File: ../figures/figure8_original.png Graphic file (type png)
 <use ../figures/figure8_original.png>
 Package pdftex.def Info: ../figures/figure8_original.png  used on input line 244.
@@ -1057,7 +1055,7 @@ Package pdftex.def Info: ../figures/figure8_original.png  used on input line 244
  [9
 
  <../figures/figure8_original.png>]
-<../figures/ha_oe_quant_irf_policy_compare.png, id=75, 1019.9925pt x 514.1025pt>
+<../figures/ha_oe_quant_irf_policy_compare.png, id=74, 1019.9925pt x 514.1025pt>
 File: ../figures/ha_oe_quant_irf_policy_compare.png Graphic file (type png)
 <use ../figures/ha_oe_quant_irf_policy_compare.png>
 Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on input line 249.
@@ -1065,7 +1063,7 @@ Package pdftex.def Info: ../figures/ha_oe_quant_irf_policy_compare.png  used on 
  [10
 
  <../figures/ha_oe_quant_irf_policy_compare.png>]
-<../figures/figure9_original.png, id=82, 584.68437pt x 224.84pt>
+<../figures/figure9_original.png, id=81, 584.68437pt x 224.84pt>
 File: ../figures/figure9_original.png Graphic file (type png)
 <use ../figures/figure9_original.png>
 Package pdftex.def Info: ../figures/figure9_original.png  used on input line 254.
@@ -1073,7 +1071,7 @@ Package pdftex.def Info: ../figures/figure9_original.png  used on input line 254
  [11
 
  <../figures/figure9_original.png>]
-<../figures/ha_oe_quant_policy_rqy.png, id=89, 875.4525pt x 282.8385pt>
+<../figures/ha_oe_quant_policy_rqy.png, id=88, 875.4525pt x 282.8385pt>
 File: ../figures/ha_oe_quant_policy_rqy.png Graphic file (type png)
 <use ../figures/ha_oe_quant_policy_rqy.png>
 Package pdftex.def Info: ../figures/ha_oe_quant_policy_rqy.png  used on input line 259.
@@ -1086,7 +1084,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\translate ' on input line 261.
 
 \c@framenumbervorappendix=\count404
-<../figures/ha_oe_quant_dag.png, id=96, 2776.3725pt x 991.705pt>
+<../figures/ha_oe_quant_dag.png, id=95, 2776.3725pt x 991.705pt>
 File: ../figures/ha_oe_quant_dag.png Graphic file (type png)
 <use ../figures/ha_oe_quant_dag.png>
 Package pdftex.def Info: ../figures/ha_oe_quant_dag.png  used on input line 267.
@@ -1094,7 +1092,7 @@ Package pdftex.def Info: ../figures/ha_oe_quant_dag.png  used on input line 267.
 [13
 
  <../figures/ha_oe_quant_dag.png>]
-<../figures/ha_oe_base_irf.png, id=103, 1019.9925pt x 514.1025pt>
+<../figures/ha_oe_base_irf.png, id=102, 1019.9925pt x 514.1025pt>
 File: ../figures/ha_oe_base_irf.png Graphic file (type png)
 <use ../figures/ha_oe_base_irf.png>
 Package pdftex.def Info: ../figures/ha_oe_base_irf.png  used on input line 272.
@@ -1120,17 +1118,17 @@ Package rerunfilecheck Info: File `slides.out' has not changed.
 (rerunfilecheck)             Checksum: 5BCEA9CF7D2D9AECE7CAC4018E9F6C5B;81.
  ) 
 Here is how much of TeX's memory you used:
- 30734 strings out of 467871
- 652993 string characters out of 5418376
+ 30730 strings out of 467871
+ 652914 string characters out of 5418376
  1131481 words of memory out of 5000000
- 58884 multiletter control sequences out of 15000+600000
- 679758 words of font info for 109 fonts, out of 8000000 for 9000
+ 58883 multiletter control sequences out of 15000+600000
+ 675367 words of font info for 107 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 128i,14n,123p,446b,545s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/typoland/lato/Lato-Italic.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/typoland/lato/Lato-Regular.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on slides.pdf (14 pages, 1403839 bytes).
+ 128i,14n,123p,431b,545s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/typoland/lato/Lato-Regular.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvro8a.pfb>
+Output written on slides.pdf (14 pages, 1389259 bytes).
 PDF statistics:
- 146 PDF objects out of 1000 (max. 8388607)
+ 140 PDF objects out of 1000 (max. 8388607)
  30 named destinations out of 1000 (max. 500000)
  90 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -530,7 +530,6 @@ INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvr
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvro7t.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvro7t.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvro7t.tfm
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\typoland\lato\Lato-Italic-OT1-TLF.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\vf\typoland\lato\Lato-Regular-TS1-TLF.vf
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\typoland\lato\Lato-Regular-TS1-TLF--base.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lato\a_rt66h3.enc
@@ -538,9 +537,6 @@ INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\vf\public\mathpazo\zplm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\public\mathpazo\fplmr.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\palatino\pplr8r.tfm
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\vf\typoland\lato\Lato-Italic-OT1-TLF.vf
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\typoland\lato\Lato-Italic-OT1-TLF--base.tfm
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lato\a_vc7epu.enc
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\typoland\lato\Lato-Regular-OT1-TLF.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\tfm\typoland\lato\Lato-Regular-TS1-TLF.tfm
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\vf\typoland\lato\Lato-Regular-TS1-TLF.vf
@@ -628,8 +624,6 @@ OUTPUT slides.snm
 INPUT slides.aux
 INPUT .\slides.out
 INPUT .\slides.out
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\type1\typoland\lato\Lato-Italic.pfb
-INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\type1\typoland\lato\Lato-Italic.pfb
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\type1\typoland\lato\Lato-Regular.pfb
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\type1\typoland\lato\Lato-Regular.pfb
 INPUT C:\Users\logan\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss10.pfb

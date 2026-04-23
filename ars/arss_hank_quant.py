@@ -612,8 +612,8 @@ def plot_policy_rule_comparison_figure(result_taylor, result_const_r, T_plot=32,
 
 
 if __name__ == "__main__":
-    out_taylor = solve_exchange_rate_irf(T=200, policy_rule="taylor")
-    out_const = solve_exchange_rate_irf(T=200, policy_rule="const_r")
+    out_taylor = solve_exchange_rate_irf(T=300, policy_rule="taylor")
+    out_const = solve_exchange_rate_irf(T=300, policy_rule="const_r")
 
     d = out_taylor["derived"]
     fig_single = plot_exchange_rate_irf_figure(out_taylor, T_plot=32, savepath="figures/ha_oe_quant_irf.png")

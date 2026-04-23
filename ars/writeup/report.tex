@@ -10,6 +10,7 @@
 \let\euscr\mathscr \let\mathscr\relax
 \usepackage[scr]{rsfso}
 \usepackage{multicol}
+\usepackage{csquotes}
 \usepackage[colorlinks=true,pdfstartview=FitV,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \pagestyle{fancy}
 
@@ -55,68 +56,108 @@
 \tableofcontents
 \newpage
 
-\section{Paper Overview}
-\subsection{What Does This Paper Do?}
+
+\section{Paper overview}
+\paragraph{Motivation}
+This paper brings HANK to a small open economy. In the context of this replication exercise, it matters because it shows how to add a foreign economy to the type of model ARS (and anyone building on their SSJ framework) use in a minimal way. Beyond the replication exercise, simply combining the two types of models lets the authors show why an HA model can capture exchange-rate transmission channels that traditional open-economy NK models miss, and why an open-economy model can capture monetary-policy transmission channels that closed-economy HANK models miss. In particular, devaluations may be contractionary in the ARSS model. This is because of two channels that are not present with a representative agent (or complete markets): the real income channel (households reduce spending as import prices rise) and the Keynesian multiplier effect, which amplifies the demand response. The monetary policy result builds on the foreign exchange result: because depreciation can cause output to fall, so can monetary easing.
+
+\paragraph{Economic mechanisms}
+In a heterogeneous-agent New Keynesian (HANK) small open economy, a depreciation raises import prices and reduces households' real income, especially for high-MPC households. This channel can dominate the traditional expenditure-switching channel (where exports rise), causing output to fall rather than rise. The key primitive is the total trade elasticity $\chi$. When $\chi = 1$, heterogeneity is irrelevant: the rise in output from expenditure switching exactly offsets the fall in real income. When $\chi<1$ (which the authors argue is empirically plausible in the short run), the real income channel dominates, and depreciations become contractionary. On the other hand, when $\chi >1$, the multiplier amplifies the expansionary effect.
+ 
+A depreciation triggered by monetary easing also raises import prices and lowers real income, which dampens the expansionary effect of lower interest rates. In some parameterizations, monetary easing generates an initial expansion, but \enquote{steals from the future} via the current account, lowering demand over the medium term as agents repay borrowing from abroad.
+
+The presence of the real income channel presents a dilemma for monetary policy: when the exchange rate falls (e.g., a foreign central bank raises rates), the domestic central bank faces a trade-off between responding to the exchange rate and hurting demand, or responding to output and exacerbating the depreciation. The optimal policy may be to cut or hike depending on the calibration.
+
+\section{Model overview}
+\subsection{Base model}
+The domestic economy follows a familiar HANK setup: domestic households face idiosyncratic income shocks and a borrowing constraint. They choose between holding a domestic bond, a foreign bond, and shares of domestic firms. Prices are flexible in the base model, but firms compete monopolistically. Wages are sticky with a Calvo adjustment probability, and unions and labor packers microfound a wage Phillips curve. There is no aggregate risk. Labor is the only factor of production. Impulse responses are computed as MIT shocks under perfect foresight.
+
+\paragraph{Simplifications/tractability}
+There is no illiquid asset or adjustment friction, so UIP holds and portfolio choice is indeterminate. This makes the model a one-account model. There is no government spending or taxation, so domestic bonds are in zero net supply. The trade balance and net foreign asset position still vary, however, as the foreign economy (which is presented as capturing a continuum of rest-of-world countries) has a representative agent and complete markets. It also has flexible prices and wages in the base setup.
+
+The shocks the authors examine are to foreign nominal interest rates (equivalently, patience) and domestic interest rates. The main outcomes of interest are output and consumption. Modeling is simplified by limiting our focus to aggregate consumption; there is no need to solve for home and foreign goods consumption separately, and exports can be calculated using prices only. In the base setup, central banks hold real interest rates fixed. After deriving analytical results, the quantitative model adds a domestic Taylor rule.
+
+\paragraph{Equilibrium}
+Given:
 \begin{itemize}
-  \item Auclert-Rognlie-Straub style heterogeneous-agent model in an open-economy setting.
-  \item Contractionary depreciations can arise when the real-income channel (import prices up, output down) dominates the Keynesian multiplier channel (foreign demand up, output up).
-  \item These heterogeneous-agent channels can jointly dominate the representative-agent complete-markets expenditure-switching channel.
-  \item The paper delivers a calibrated quantitative model and policy counterfactuals.
+    \item sequences for rest-of-world discount shocks
+    \item domestic monetary shocks
+    \item an initial distribution over productivity and assets
+\end{itemize}
+an equilibrium is a path of:
+\begin{itemize}
+    \item policies (consumption and savings)
+    \item distributions (jointly over productivity and savings)
+    \item prices (exchange rate, real exchange rate, prices for each good, domestic wages, nominal and real interest rate)
+    \item aggregate quantities (consumption, output, savings, price index, dividends, net foreign asset position)
+\end{itemize}
+such that:
+\begin{itemize}
+    \item households optimize
+    \item firms optimize
+    \item distributions evolve consistently with individual policies and the initial condition
+    \item the domestic goods market clears
+\end{itemize}
+The authors solve for a steady state with zero inflation and zero net foreign assets, and normalize prices, exchange rates, output, and consumption to 1.
+
+\clearpage
+\subsection{Quantitative model}
+The quantitative model adds several features to the base model described above:
+\begin{itemize}
+  \item Delayed substitution: consumers adjust consumption baskets with Calvo-style probability. The authors argue this captures realistic low short-run and high long-run trade elasticities.
+  \item Heterogeneous labor-shock incidence, with larger impacts on poorer households. The authors argue this reflects the unequal impact of exchange rate shocks on low-income workers, citing a recent paper on the 2001 Argentine devaluation (Blanco, Drenik, \& Zaratiegui (2024)). This amplifies the real income channel, which is driven by high-MPC households.
+  \item Non-homothetic (Stone-Geary) consumption where poorer households consume more imports. This replaces a standard CES consumption bundle. The authors argue this reflects evidence from Mexico (Cravino \& Levchenko (2017)). It similarly amplifies the role of high-MPC households.
+  \item Sticky prices: Calvo adjustment costs for domestic producers and imperfect exchange rate passthrough lead to domestic, domestic export, and foreign export price Phillips curves. The equity shares in the base model now also capture foreign exporter profits.
 \end{itemize}
 
-\section{Base Model}
-\subsection{Core Ingredients}
-\begin{itemize}
-  \item Domestic households face idiosyncratic income shocks and a borrowing constraint.
-  \item Households can hold a domestic bond, foreign bond, and domestic equity.
-  \item Wages are sticky.
-  \item Impulse responses are computed to MIT shocks under perfect foresight.
-\end{itemize}
 
-\subsection{Simplifications}
-\begin{itemize}
-  \item No illiquid asset or adjustment friction, so UIP holds and portfolio choice is indeterminate.
-  \item No need to model consumption bundles in the base setup.
-  \item Rest of world is representative-agent complete-markets with flexible prices and wages.
-  \item No capital, taxes, debt, or government spending in the base setup. No ZLB.
-  \item Producer-currency pricing in the baseline (relaxed in the appendix of the slide deck).
-  \item Calvo, not Rotemberg?
-\end{itemize}
 
-\subsection{Solution Method (SSJ)}
+\subsection{Solution outline}
+The solution follows the SSJ method outlined in the authors' GitHub and the tutorials we followed for the earlier computational assignment in this class.
 \begin{itemize}
   \item Solve for a steady state where all residuals are zero.
   \item Compute sequence-space Jacobians, including policy and distribution responses in the household block.
   \item Solve for unknown aggregate paths that satisfy equilibrium targets.
 \end{itemize}
+This is a deterministic perfect-foresight sequence-space linearization around a nonlinear steady state. For each policy experiment, we first construct a steady state object, then call \texttt{solve\_impulse\_linear} with a chosen set of unknown paths and target residuals. SSJ stacks all equilibrium conditions over time and solves one linear system for the full transition path.
 
-\noindent Unknowns:
+Household heterogeneity is handled with SSJ's built-in one-asset block (\texttt{sj.hetblocks.hh\_sim.hh}), while a model-specific heterogeneous income process is inserted through \texttt{add\_hetinputs}. In the code, \texttt{make\_grids\_oe} creates the discretized Rouwenhorst income process and asset grid, and \texttt{income\_incidence} maps aggregate wage/employment changes into state-dependent household income when we turn on the unequal-incidence extension.
+
+The key choice in translating the analytical model to code is choosing the targets and unknowns. From the equilibrium definition, we have a set of unknowns to choose from, but we can restrict this set for simplicity by focusing on those we want to examine. We can do this by first considering the IRFs we have in mind and working backwards, or by drawing a DAG for the full model and removing extraneous blocks. To replicate the paper's results, we know we want output, wages, and interest rates. Consumption and prices are calculated inside the model given these values. It turns out we can calculate exports, net foreign assets, and dividends from model output and do not need to solve for them directly (no other variables depend
+on them). This leaves us with the unknowns:
 \[
 \{Y_t,\;W_t,\;Q_t,\;E_t,\;i_t,\;r_t\}
 \]
-
-\noindent Targets:
+That means we need six targets for the code to set equal to zero. Market clearing and UIP are natural places to start, as is the Phillips curve. The other equations are intuitively somewhere between definitions and important equilibrium outcomes, but I follow similar ARS papers and target the linearized Fisher equation (which is not a numbered equation in the paper) and the monetary policy rule. The final target is the exchange-rate identity (which can be interpreted as a no-arbitrage condition).
 \[
 \text{goods market clearing,\ NKPC,\ UIP,\ exchange rate identity,\ Fisher equation,\ MP rule}
 \]
 
-\subsection{Base Model DAG}
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_base_dag.png}
   \caption{Base model DAG}
 \end{figure}
 
-\clearpage
-\section{Quantitative Extension}
-\begin{itemize}
-  \item Delayed substitution: consumers adjust consumption baskets with Calvo-style probability.
-  \item Heterogeneous labor-shock incidence, with larger impacts on poorer households.
-  \item Non-homothetic (Stone-Geary) consumption where poorer households consume more imports.
-  \item Sticky prices in the quantitative extension.
-\end{itemize}
+The setup for the quantitative model involves more unknowns due to delayed substitution and sticky-price additions. We also solve for home-good prices. The unknowns are:
+\[
+\{Y_t,\;W_t,\;Q_t,\;E_t,\;i_t,\;r_t,\;\hat{x}_{Ht},\;\hat{x}_{Ht}^*,\;P_{Ht},\;P_{Ht}^*,\;\text{shareH}_t,\;\text{shareH}_t^*,\;(\text{ie }\frac{C_{Ht}}{C_t}\;,C_{Ht}^*)\}
+\]
+Therefore we add to the targets (again mostly for the delayed adjustment equations).
+\[
+\text{goods market clearing,\ NKPC,\ UIP,\ exchange rate identity,\ Fisher equation,\ MP rule,\ home goods domestic inflation,\ home exports inflation,\ 4 delayed adjustment equations}
+\]
 
-\subsection{Figure 8: Devaluation Shock IRFs}
+\paragraph{More details}
+We follow the shock normalization described in the paper: we run a first ``raw'' IRF with a tiny foreign-rate AR(1) shock, measure impact $dQ_0$, and rescale the shock so impact depreciation is exactly 1\%. 
+
+We also compute some series ex post instead of treating them as solved variables. In particular, net exports and net foreign assets are reconstructed from solved level paths and the linearized NFA law of motion. This keeps the solved DAG smaller and avoids adding equations that are just accounting identities.
+
+For policy comparisons (Taylor/constant-$r$/alternative closures), we hold the foreign shock process fixed by reusing a common shock scale across scenarios. This avoids conflating policy differences with different effective shock sizes.
+
+\section{Replication}
+The main replication is successful -- the IRFs to a devaluation shock in the quantitative model are very similar to those in the paper Figure 8. I show the comparison below.
+
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/figure8_original.png}
@@ -130,7 +171,8 @@
 \end{figure}
 
 \clearpage
-\subsection{Figure 9: Monetary Policy Tradeoffs}
+The paper gives less guidance on the quantitative solution for optimal policy, summarized in Figure 9. I obtain a path of interest rates that perfectly stabilizes output, but it is not the same as the one shown in the paper, particularly on impact.
+
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{../figures/figure9_original.png}
@@ -143,8 +185,19 @@
   \caption{Replication Figure 9}
 \end{figure}
 
+\section{Lessons from replication}
+
+The base replication is fairly smooth. Choosing targets is not trivial (getting the Fisher equation in the right form was a hold up), but the SSJ package allows me to avoid constructing the household problem by hand, and it makes the actual solution straightforward. Realizing that we can avoid solving for many variables directly (especially home and foreign prices and consumption levels) simplifies the code. The quantitative replication is a bit more complicated -- the delayed substitution block works better in deviations from steady state than it does in the form listed in the paper, and the heterogeneous-incidence labor shock specification requires modifying the household block with the \texttt{hetinputs} method, though not solving for any Jacobians by hand.
+
+The quantitative model's delayed-substitution equations are coded in log deviations from steady state, i.e. terms like $\log(x_t/x^{ss})$, which AI tells me is more numerically stable than the paper's ``$d\log x_t$'' notation around steady state (and equivalent, to first-order). This changed helped resolve an issue which may have resulted from combining multiple residual equations inside a single block, which makes the DAG cleaner but potentially complicates the path to convergence.
+
+I use a horizon length of 300. Horizons below 100 or so can make the results hard to interpret even when the equations are well-behaved, and at least for this model the time to solve the model is trivial at these horizons.
+
+The most important coding lesson was that, in this case, the final model in the code is simpler than the one in the paper (which is much easier than guessing at omitted equations). Minimizing the number of unknowns and targets made replication easier, and this was facilitated by the SSJ package's built in DAG display commands.
+
 \clearpage
-\section{Equations and Block-Map Notes}
+\section{Equations and mapping notes}
+This section contains a slightly cleaned-up version of the notes I took on the paper -- almost all the information needed to create the code is here (and in the actual equations).
 \subsection{Equilibrium Objects}
 Given sequences of rest-of-world discount shocks $\{B_t\}$, monetary shocks $\{\varepsilon_t\}$, and initial wealth distribution $D^i_0(s,B_H,B_F,e)$, equilibrium is a path of:
 \begin{itemize}
@@ -229,17 +282,14 @@ such that households optimize, distributions evolve consistently, firms optimize
 \end{itemize}
 
 \clearpage
-\section{Code Listing}
-The model implementation can be read directly from the source file below.
+\section{Code}
+The quantitative model, calibration, solution, and IRF code are in the script below:
+\lstinputlisting[language=Python]{../arss_hank_quant.py}
 
-\lstinputlisting[
-  language=Python,
-  caption={\texttt{arss\_hank\_quant.py}},
-  label={lst:arss_hank_quant}
-]{../arss_hank_quant.py}
+
 
 \appendix
-\section{Appendix Figures}
+\section{Appendix}
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{../figures/ha_oe_quant_dag.png}
