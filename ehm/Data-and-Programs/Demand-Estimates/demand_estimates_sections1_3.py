@@ -129,9 +129,25 @@ def quarter_index_from_daily(day_value: pd.Series) -> pd.Series:
 
 
 def _wls_predict(df: pd.DataFrame, y: str, interactions: Iterable[str], weight_col: str, out_col: str) -> None:
+    cols = [y, weight_col, "offdom", "q", "certno", *list(interactions)]
+    work = df[cols].copy()
+    for c in [y, weight_col, "offdom", "q", "certno", *list(interactions)]:
+        work[c] = pd.to_numeric(work[c], errors="coerce")
+    keep = np.isfinite(work[y]) & np.isfinite(work[weight_col]) & (work[weight_col] > 0)
+    for c in ["offdom", "q", "certno", *list(interactions)]:
+        keep &= np.isfinite(work[c])
+    work = work.loc[keep].copy()
+    work["q"] = work["q"].astype(int)
+    work["certno"] = work["certno"].astype(int)
+
     rhs = " + ".join(list(interactions) + ["C(q)", "C(certno)", "offdom"])
-    model = smf.wls(formula=f"{y} ~ {rhs}", data=df, weights=np.sqrt(df[weight_col])).fit(cov_type="HC1")
-    df[out_col] = model.predict(df)
+    model = smf.wls(
+        formula=f"{y} ~ {rhs}",
+        data=work,
+        weights=np.sqrt(work[weight_col]),
+    ).fit(cov_type="HC1")
+    df[out_col] = np.nan
+    df.loc[work.index, out_col] = model.fittedvalues
 
 
 def _iv_fit(
@@ -141,11 +157,22 @@ def _iv_fit(
     instruments: list[str],
     weight_col: str,
 ) -> IV2SLS:
+    cols = [dep, "offdom", "q", "certno", weight_col, *endog, *instruments]
+    work = df[cols].copy()
+    for c in cols:
+        work[c] = pd.to_numeric(work[c], errors="coerce")
+    keep = np.isfinite(work[weight_col]) & (work[weight_col] > 0)
+    for c in [dep, "offdom", "q", "certno", *endog, *instruments]:
+        keep &= np.isfinite(work[c])
+    work = work.loc[keep].copy()
+    work["q"] = work["q"].astype(int)
+    work["certno"] = work["certno"].astype(int)
+
     exog = "offdom + C(certno) + C(q)"
     endog_block = " + ".join(endog)
     instr_block = " + ".join(instruments)
     formula = f"{dep} ~ 0 + {exog} + [{endog_block} ~ {instr_block}]"
-    return IV2SLS.from_formula(formula, data=df, weights=np.sqrt(df[weight_col])).fit(cov_type="robust")
+    return IV2SLS.from_formula(formula, data=work, weights=np.sqrt(work[weight_col])).fit(cov_type="robust")
 
 
 def _run_pyblp_linear(
