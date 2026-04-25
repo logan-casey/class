@@ -187,11 +187,44 @@ def _run_pyblp_linear(
     for i, col in enumerate(inst_cols):
         work[f"demand_instruments{i}"] = work[col]
 
+    for col in ["shares", "prices", "hazard", "offdom", *[f"demand_instruments{i}" for i in range(len(inst_cols))]]:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
+
+    bad_share = (~np.isfinite(work["shares"])) | (work["shares"] <= 0) | (work["shares"] >= 1)
+    bad_prices = ~np.isfinite(work["prices"])
+    bad_hazard = ~np.isfinite(work["hazard"])
+    bad_offdom = ~np.isfinite(work["offdom"])
+    inst_names = [f"demand_instruments{i}" for i in range(len(inst_cols))]
+    bad_inst = np.zeros(len(work), dtype=bool)
+    for c in inst_names:
+        bad_inst |= ~np.isfinite(work[c])
+
+    keep = ~(bad_share | bad_prices | bad_hazard | bad_offdom | bad_inst)
+    dropped = int((~keep).sum())
+    work = work.loc[keep].copy()
+
+    market_sum = work.groupby("market_ids")["shares"].sum()
+    market_count = work.groupby("market_ids")["firm_ids"].nunique()
+    print(
+        f"\npyblp diagnostics ({share_col}): "
+        f"rows={len(work)} dropped={dropped} "
+        f"bad_share={int(bad_share.sum())} bad_prices={int(bad_prices.sum())} "
+        f"bad_hazard={int(bad_hazard.sum())} bad_offdom={int(bad_offdom.sum())} "
+        f"bad_instrument={int(bad_inst.sum())}"
+    )
+    if len(market_sum) > 0:
+        print(
+            f"  market share sums: max={market_sum.max():.6f}, "
+            f"count(sum>=1)={(market_sum >= 1).sum()}, "
+            f"min products/market={int(market_count.min())}"
+        )
+
     formulation = pyblp.Formulation("0 + prices + hazard + offdom", absorb="C(firm_ids) + C(market_ids)")
     try:
         problem = pyblp.Problem(formulation, work)
         return problem.solve()
-    except Exception:
+    except Exception as e:
+        print(f"  pyblp error ({share_col}): {repr(e)}")
         return None
 
 
@@ -244,9 +277,18 @@ def build_section1_data(
             "Expected columns include ins_rate/unins_rate or rate1/rate2, plus keys charter_nbr and month."
         )
 
-    df["cds"] = df["spread5y"].round(4)
+    df["cds"] = pd.to_numeric(df["spread5y"], errors="coerce").round(4)
+    df["cds_key"] = (df["cds"] * 10000).round().astype("Int64")
     hazard = read_csv_data(cds_to_hazard_data)
-    df = df.merge(hazard, on="cds", how="inner", validate="m:1")
+    hazard["cds"] = pd.to_numeric(hazard["cds"], errors="coerce").round(4)
+    hazard["cds_key"] = (hazard["cds"] * 10000).round().astype("Int64")
+    hazard = hazard.drop_duplicates(subset=["cds_key"])
+    before = len(df)
+    df = df.merge(hazard[["cds_key", "hazard"]], on="cds_key", how="left", validate="m:1")
+    matched = int(df["hazard"].notna().sum())
+    print(f"hazard merge: matched {matched}/{before} rows")
+    df = df[df["hazard"].notna()].copy()
+    print(f"hazard sample after drop missing: {len(df)} rows")
 
     df["d_share_unins"] = np.log(df["share_unins"]) - np.log(df["o_unins_share"])
     df["d_share_ins"] = np.log(df["share_ins"]) - np.log(df["o_ins_share"])
@@ -263,6 +305,11 @@ def build_section1_data(
     df["ins_rt_spd"] = df["ins_rate"] - df["cmt1y"]
     df["unins_rt_spd"] = df["unins_rate"] - df["cmt1y"]
     df["month"] = df["month_key"]
+    bq = df[["certno", "q"]].drop_duplicates()
+    print(
+        f"post-section1 sample: rows={len(df)} "
+        f"banks={df['certno'].nunique()} quarters={df['q'].nunique()} bank_quarters={len(bq)}"
+    )
     return df
 
 
