@@ -393,6 +393,87 @@ def _print_table_summaries(results: Section3Result) -> None:
     print("pyblp insured model solved." if results.pyblp_ins is not None else "pyblp insured model did not solve.")
 
 
+def _stars(p: float) -> str:
+    if not np.isfinite(p):
+        return ""
+    if p < 0.01:
+        return "***"
+    if p < 0.05:
+        return "**"
+    if p < 0.10:
+        return "*"
+    return ""
+
+
+def _coef_se_cell(fit: IV2SLS, name: str) -> tuple[str, str]:
+    coef = fit.params.get(name, np.nan)
+    se = fit.std_errors.get(name, np.nan)
+    p = fit.pvalues.get(name, np.nan)
+    if not np.isfinite(coef):
+        return "", ""
+    return f"{coef:.2f}{_stars(float(p))}", f"({se:.2f})" if np.isfinite(se) else ""
+
+
+def write_table3_outputs(results: Section3Result, out_csv: Path, out_tex: Path) -> None:
+    fits = results.table_unins + results.table_ins  # cols (1)-(7)
+    col_labels = [f"({i})" for i in range(1, 8)]
+
+    coef_rows = {"rt": [], "hazard": [], "offdom": []}
+    se_rows = {"rt": [], "hazard": [], "offdom": []}
+    nobs_row: list[str] = []
+
+    for fit in fits:
+        for v in ["rt", "hazard", "offdom"]:
+            c, s = _coef_se_cell(fit, v)
+            coef_rows[v].append(c)
+            se_rows[v].append(s)
+        nobs_row.append(str(int(fit.nobs)))
+
+    # Match paper layout: hazard blank in insured col (4) where hazard is excluded.
+    if len(coef_rows["hazard"]) >= 4:
+        coef_rows["hazard"][3] = ""
+        se_rows["hazard"][3] = ""
+
+    # CSV output (long form, easier programmatic comparison).
+    long_records = []
+    for i, fit in enumerate(fits, start=1):
+        for v in ["rt", "hazard", "offdom"]:
+            long_records.append(
+                {
+                    "column": i,
+                    "variable": v,
+                    "coef": fit.params.get(v, np.nan),
+                    "robust_se": fit.std_errors.get(v, np.nan),
+                    "p_value": fit.pvalues.get(v, np.nan),
+                    "stars": _stars(float(fit.pvalues.get(v, np.nan))),
+                    "nobs": int(fit.nobs),
+                }
+            )
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(long_records).to_csv(out_csv, index=False)
+
+    # LaTeX output (wide form similar to demand_estimates.tex).
+    lines: list[str] = []
+    lines.append("\\begin{tabular}{lccccccc} \\hline")
+    lines.append(" & " + " & ".join(col_labels) + " \\\\")
+    lines.append("VARIABLES & Ins1 & Ins1 & Ins1 & Ins1 & Ins1 & Ins1 & Ins1 \\\\ \\hline")
+    lines.append("rt & " + " & ".join(coef_rows["rt"]) + " \\\\")
+    lines.append(" & " + " & ".join(se_rows["rt"]) + " \\\\")
+    lines.append("hazard & " + " & ".join(coef_rows["hazard"]) + " \\\\")
+    lines.append(" & " + " & ".join(se_rows["hazard"]) + " \\\\")
+    lines.append("offdom & " + " & ".join(coef_rows["offdom"]) + " \\\\")
+    lines.append(" & " + " & ".join(se_rows["offdom"]) + " \\\\")
+    lines.append("Observations & " + " & ".join(nobs_row) + " \\\\ \\hline")
+    lines.append("\\multicolumn{8}{c}{Robust standard errors in parentheses} \\\\")
+    lines.append("\\multicolumn{8}{c}{*** p$<$0.01, ** p$<$0.05, * p$<$0.10} \\\\")
+    lines.append("\\end{tabular}")
+
+    out_tex.parent.mkdir(parents=True, exist_ok=True)
+    out_tex.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Saved Table 3 comparison CSV to: {out_csv}")
+    print(f"Saved Table 3 comparison TeX to: {out_tex}")
+
+
 def parse_args() -> argparse.Namespace:
     data_default = Path("Data-and-Programs/Data-Sets")
     parser = argparse.ArgumentParser(description="Sections 1 and 3 translation for demand_estimates_final.do (CSV inputs)")
@@ -405,6 +486,16 @@ def parse_args() -> argparse.Namespace:
         "--output-csv",
         type=Path,
         default=Path("Data-and-Programs/Demand-Estimates/demand_estimates_sections1_3_output.csv"),
+    )
+    parser.add_argument(
+        "--output-table3-csv",
+        type=Path,
+        default=Path("Data-and-Programs/Demand-Estimates/table3_comparison.csv"),
+    )
+    parser.add_argument(
+        "--output-table3-tex",
+        type=Path,
+        default=Path("Data-and-Programs/Demand-Estimates/table3_comparison.tex"),
     )
     return parser.parse_args()
 
@@ -420,6 +511,7 @@ def main() -> None:
     )
     results = run_section3(df)
     _print_table_summaries(results)
+    write_table3_outputs(results, args.output_table3_csv, args.output_table3_tex)
     args.output_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.output_csv, index=False)
     print(f"\nSaved translated Section 1 + 3 dataset to: {args.output_csv}")
