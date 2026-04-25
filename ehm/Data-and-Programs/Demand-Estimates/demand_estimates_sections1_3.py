@@ -110,6 +110,8 @@ def month_to_datetime(stata_month: pd.Series) -> pd.Series:
 
 def parse_stata_daily(series: pd.Series) -> pd.Series:
     """Parse Stata daily dates from int days or strings like 31mar2002."""
+    if isinstance(series, pd.DataFrame):
+        series = series.iloc[:, 0]
     if pd.api.types.is_datetime64_any_dtype(series):
         return pd.to_datetime(series, errors="coerce")
     if pd.api.types.is_numeric_dtype(series):
@@ -117,8 +119,8 @@ def parse_stata_daily(series: pd.Series) -> pd.Series:
 
     s = series.astype(str).str.strip()
     d = pd.to_datetime(s, format="%d%b%Y", errors="coerce")
-    fallback = pd.to_datetime(s, errors="coerce")
-    return d.fillna(fallback)
+    iso = pd.to_datetime(s, format="%Y-%m-%d", errors="coerce")
+    return d.fillna(iso)
 
 
 def quarter_index_from_daily(day_value: pd.Series) -> pd.Series:
@@ -183,11 +185,11 @@ def build_section1_data(
     df = df.merge(monthly_cds, on=["shortname", "month_key"], how="left", validate="m:1")
 
     swaps = read_csv_data(monthly_swaps_data)
-    swaps["date"] = parse_stata_daily(swaps["date"]).dt.normalize()
-    df["date2"] = df["date"]
+    swaps["swap_date"] = parse_stata_daily(swaps["date"]).dt.normalize()
+    swaps = swaps.drop(columns=["date"])
     df["date_merge"] = month_to_datetime(df["month_key"]).dt.normalize()
-    df = df.merge(swaps, left_on="date_merge", right_on="date", how="left", validate="m:1")
-    df = df.drop(columns=["date", "date_merge"]).rename(columns={"date2": "date"})
+    df = df.merge(swaps, left_on="date_merge", right_on="swap_date", how="left", validate="m:1")
+    df = df.drop(columns=["swap_date", "date_merge"])
 
     if cd_rate_data is not None and cd_rate_data.exists():
         cd = read_csv_data(cd_rate_data)
@@ -197,6 +199,23 @@ def build_section1_data(
             cd["charter_nbr"] = pd.to_numeric(cd["certno"], errors="coerce")
         df["charter_nbr"] = pd.to_numeric(df["certno"], errors="coerce")
         df = df.merge(cd, on=["charter_nbr", "month_key"], how="left", validate="1:1")
+
+    # Accept legacy wide names from CD-rate file.
+    if "ins_rate" not in df.columns and "rate1" in df.columns:
+        df["ins_rate"] = df["rate1"]
+    if "unins_rate" not in df.columns and "rate2" in df.columns:
+        df["unins_rate"] = df["rate2"]
+
+    required_now = ["ins_rate", "unins_rate", "cmt1y"]
+    missing_now = [c for c in required_now if c not in df.columns]
+    if missing_now:
+        rate_like = [c for c in df.columns if "rate" in c.lower()]
+        raise ValueError(
+            "Missing required columns after Section 1 merges: "
+            f"{missing_now}. Current rate-like columns: {rate_like[:25]}. "
+            "If needed, inspect your CD-rate file and pass it with --cd-rate-data. "
+            "Expected columns include ins_rate/unins_rate or rate1/rate2, plus keys charter_nbr and month."
+        )
 
     df["cds"] = df["spread5y"].round(4)
     hazard = read_csv_data(cds_to_hazard_data)
@@ -306,7 +325,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--deposit-data", type=Path, default=data_default / "deposit_data_final.csv")
     parser.add_argument("--monthly-cds-data", type=Path, default=data_default / "monthly cds.csv")
     parser.add_argument("--monthly-swaps-data", type=Path, default=data_default / "monthly_swaps_and_treasuries_rates.csv")
-    parser.add_argument("--cd-rate-data", type=Path, default=None)
+    parser.add_argument("--cd-rate-data", type=Path, default=Path("Data-and-Programs/Data-Sets/depost_rate_data_1yr_cd_wide.csv"))
     parser.add_argument("--cds-to-hazard-data", type=Path, default=data_default / "cds-to-hazard.csv")
     parser.add_argument(
         "--output-csv",
